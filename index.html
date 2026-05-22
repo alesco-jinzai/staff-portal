@@ -1140,13 +1140,30 @@ Template Name: Staff Portal App
       if(id === 'bank') currentStatus = currentUser.statusBank;
       if(id === 'mynumber') currentStatus = currentUser.statusMyNumber;
       if (currentStatus && currentStatus.includes('提出済')) {
+        // 1. Tách chuỗi bằng \n
         const lines = currentStatus.split('\n');
-        let logItems = lines.map(line => `<span>✓ ${line}</span>`).join('');
+        
+        // 2. Lọc bỏ các dòng trống hoặc dòng chỉ có mỗi chữ "提出済" (Do data cũ từ hệ thống khác sang)
+        let logItems = '';
+        lines.forEach(line => {
+          let cleanLine = line.trim();
+          // Chỉ in ra những dòng có chứa ngày tháng hoặc thông tin cụ thể.
+          // Bỏ qua dòng chỉ ghi cộc lốc "提出済" hoặc "旧システムで提出済"
+          if (cleanLine && cleanLine !== '提出済' && cleanLine !== '旧システムで提出済') {
+             logItems += `<span style="display:block; margin-left:8px; margin-bottom:8px; font-size:14px; font-weight:500;">✓ ${cleanLine}</span>`;
+          }
+        });
+  
+        // Nếu sau khi lọc mà không có dòng lịch sử nào cụ thể, in ra 1 dòng mặc định.
+        if (logItems === '') {
+           logItems = `<span style="display:block; margin-left:8px; margin-bottom:8px; font-size:14px; font-weight:500;">✓ 提出済 (Đã nộp)</span>`;
+        }
+  
         historyHtml = `
-          <div class="history-log">
-            <p>📝 提出履歴</p>
+          <div style="margin-top: 16px; margin-bottom: 24px; padding: 20px; background: var(--md-primary-container); border-radius: var(--shape-large); color: var(--md-on-primary-container);">
+            <p style="margin: 0 0 12px; font-size: 15px; font-weight: 700;">📝 提出履歴</p>
             ${logItems}
-            <div class="history-note">※変更や更新がある場合は、下から再度アップロードしてください。</div>
+            <div style="font-size: 12px; margin-top: 16px; color: var(--md-on-primary-container); opacity: 0.8;">※変更や更新がある場合は、下から再度アップロードしてください。</div>
           </div>
         `;
       }
