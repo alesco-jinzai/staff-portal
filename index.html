@@ -703,23 +703,46 @@
   // =========================================================================
   const API_URL = "https://script.google.com/macros/s/AKfycbxC71cAofv5QXr-pjKkmK8ehgNzo4M5wRMMjtG1enU-5w62j0slyK56XJtDvMimAlvE/exec";
 
-  // HÀM GỌI API VƯỢT TƯỜNG LỬA CORS CỦA GOOGLE
+  // HÀM GỌI API THÔNG MINH (TỰ CHIA GET / POST)
   async function callAPI(action, payload = {}) {
     payload.action = action;
+    
+    // CÁC HÀM NẶNG BẮT BUỘC DÙNG POST
+    const postActions = ["createKariRecord", "saveSingleKariFile", "finalCheckKari", "submitHon", "updateStaffData", "uploadFiles", "generateHonPdfBackground", "generateMyNumberPdfBackground", "submitShiftRequestsWithNotes", "saveManualAttendanceRecord", "approveAttendanceRecord", "approveAllPendingForLocation"];
+    
+    const isPost = postActions.includes(action);
+
     try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        // MẸO: Không dùng kiểu json hay plain-text nữa. Phải ép nó thành form-urlencoded
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: JSON.stringify(payload)
-      });
+      let response;
+      if (isPost) {
+        // Gọi bằng POST (Dành cho việc đẩy data nặng như ảnh, array)
+        // MẸO CỐT LÕI ĐỂ VƯỢT CORS CHO LỆNH POST LÀ DÙNG text/plain
+        response = await fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: { "Content-Type": "text/plain;charset=utf-8" }
+        });
+      } else {
+        // Gọi bằng GET (Chuyên trị lỗi CORS cho các lệnh nhẹ như Login, Điểm danh...)
+        const urlParams = new URLSearchParams();
+        for (const key in payload) {
+          if (payload.hasOwnProperty(key)) {
+            // Ép data thành String (nếu nó là Object thì JSON hóa lại)
+            let val = typeof payload[key] === 'object' ? JSON.stringify(payload[key]) : payload[key];
+            urlParams.append(key, val);
+          }
+        }
+        const getUrl = `${API_URL}?${urlParams.toString()}`;
+        response = await fetch(getUrl, {
+          method: "GET"
+        });
+      }
       
       if (!response.ok) throw new Error("Network response was not ok");
       return await response.json();
+      
     } catch (error) {
-      console.error("API Error:", error);
+      console.error(`API Error [${action}]:`, error);
       throw error;
     }
   }
