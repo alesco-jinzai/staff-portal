@@ -1581,6 +1581,23 @@
     return html;
   }
 
+  function setLoading(v, statusText = "処理中...", progressText = "") {
+    const loadingEl = document.getElementById('loading');
+    if (!loadingEl) return;
+    
+    loadingEl.style.display = v ? 'flex' : 'none';
+    
+    const statusEl = document.getElementById('loadingStatus');
+    if (statusEl) statusEl.innerText = statusText;
+    
+    const progressEl = document.getElementById('loadingProgress');
+    if (progressEl) progressEl.innerText = progressText;
+    
+    if (v && statusEl) {
+      statusEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+  
   function getDocContent(id) {
     if(id==='hon-consent') return `
       <div style="text-align: center; margin-bottom: 15px;">
