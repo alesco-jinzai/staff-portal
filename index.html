@@ -703,16 +703,19 @@
   // =========================================================================
   const API_URL = "https://script.google.com/macros/s/AKfycbxC71cAofv5QXr-pjKkmK8ehgNzo4M5wRMMjtG1enU-5w62j0slyK56XJtDvMimAlvE/exec";
 
-  // HÀM GỌI API CHUẨN (Thay thế cho google.script.run)
+  // HÀM GỌI API VƯỢT TƯỜNG LỬA CORS CỦA GOOGLE
   async function callAPI(action, payload = {}) {
     payload.action = action;
     try {
-      // Gọi fetch trực tiếp không có CORS wrapper vì GAS xử lý doPost với CORS
       const response = await fetch(API_URL, {
         method: "POST",
-        body: JSON.stringify(payload),
-        headers: { "Content-Type": "text/plain;charset=utf-8" }
+        // MẸO: Không dùng kiểu json hay plain-text nữa. Phải ép nó thành form-urlencoded
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: JSON.stringify(payload)
       });
+      
       if (!response.ok) throw new Error("Network response was not ok");
       return await response.json();
     } catch (error) {
