@@ -384,6 +384,9 @@
   </style>
 </head>
 <body>
+  <div id="toastAlert" style="display:none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; padding: 16px 20px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); z-index: 10000; text-align: center; font-weight: 700; font-size: 15px; transition: all 0.3s ease;">
+    <span id="toastMessage"></span>
+  </div>
   <div id="loading">
       <div class="spinner"></div>
       <p id="loadingStatus" style="font-weight:700; color:var(--primary); margin-bottom:5px;">処理中...</p>
@@ -2236,22 +2239,30 @@
     }
 
     function showCustomAlert(msg, isError = false) {
-      const activeView = document.querySelector('.view.active');
-      if (!activeView) return alert(msg);
-      let alertBox = activeView.querySelector('.dynamic-alert-box');
-      if (!alertBox) {
-        alertBox = document.createElement('div');
-        alertBox.className = 'dynamic-alert-box';
-        activeView.insertBefore(alertBox, activeView.children[1]);
-      }
+      const toast = document.getElementById('toastAlert');
+      const toastMsg = document.getElementById('toastMessage');
+      
+      // Đổi màu Xanh (Thành công) hoặc Đỏ (Lỗi)
       const bgColor = isError ? 'var(--md-error-container)' : 'var(--md-success-container)';
-      const textColor = isError ? 'var(--md-error)' : 'var(--md-on-success-container)';
+      const textColor = isError ? 'var(--md-error)' : 'var(--md-success)'; // Dùng màu xanh đậm cho dễ đọc
       const icon = isError ? '⚠️ ' : '✅ ';
-      alertBox.style.cssText = `background: ${bgColor}; color: ${textColor}; padding: 15px; border-radius: 12px; margin: 16px 0; text-align: center; font-weight: bold; font-size: 15px; animation: fadeIn 0.3s ease; display: block;`;
-      alertBox.innerHTML = icon + msg.replace(/\n/g, '<br>');
+      
+      toast.style.background = bgColor;
+      toast.style.color = textColor;
+      toast.style.border = `1px solid ${textColor}`;
+      
+      toastMsg.innerHTML = icon + msg.replace(/\n/g, '<br>');
+      
+      // Hiển thị hiệu ứng bay từ trên xuống
+      toast.style.display = 'block';
+      toast.style.top = '-100px'; 
+      setTimeout(() => { toast.style.top = '20px'; }, 10);
+  
+      // Tự động biến mất sau 3 giây
       setTimeout(() => { 
-        alertBox.style.display = 'none'; 
-      }, 5000);
+        toast.style.top = '-100px'; 
+        setTimeout(() => { toast.style.display = 'none'; }, 300); // Đợi bay lên xong mới ẩn
+      }, 3000);
     }
 
     function handleCheckInOut(type) {
