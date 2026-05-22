@@ -45,13 +45,13 @@
       line-height: 1.5; 
     }
     .app-shell { 
-      max-width: 500px; 
+      width: 100%; 
+      max-width: 600px; /* Nới rộng ra một chút cho thoáng, nếu mở trên iPad vẫn đẹp */
       margin: 0 auto; 
       background: transparent; 
       min-height: 100vh; 
       display: flex; 
       flex-direction: column; 
-      box-shadow: none;
     }
     header { 
       display: none; 
@@ -184,7 +184,7 @@
     .history-note { font-size: 12px; margin-top: 16px; color: var(--md-on-primary-container); opacity: 0.8; }
     .scroll-container { position: relative; margin-bottom: 16px; }
     .scroll-box { 
-      max-height: 300px; overflow-y: auto; 
+      max-height: 40vh; overflow-y: auto; 
       border: 1px solid var(--md-outline-variant); 
       padding: 20px; font-size: 14px; 
       background: var(--md-surface); 
