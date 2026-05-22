@@ -59,7 +59,8 @@
       padding: 20px 20px; 
       border-bottom: 2px solid var(--md-primary-container); 
       text-align: center; 
-      /* Đã xóa position: sticky, top, z-index, box-shadow để nó trôi tự nhiên */
+      position: sticky; top: 0; z-index: 1000; /* Dính chặt trên nóc */
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05); /* Đổ bóng nhẹ cho đẹp */
     }
     header h1 { font-size: 20px; color: var(--md-primary); margin: 0; font-weight: 900; letter-spacing: 0.5px;}
     .content { padding: 24px; flex: 1; }
@@ -771,13 +772,19 @@
         <div id="historyListContainer" style="margin-bottom:20px;"></div>
         <button class="btn btn-gray" onclick="routeUser()">戻る</button>
       </div>
-      <div id="viewManual" class="view">
-        <h3 id="manualModalTitle" style="text-align:center; margin-bottom: 20px;">勤務記録の修正</h3>
-        <div style="background: var(--md-surface-container); padding: 20px; border-radius: var(--shape-large); border: 1px solid var(--md-outline-variant); margin-bottom: 24px;">
+      <!-- ============================================== -->
+      <!-- POP-UP: SỬA/THÊM CHẤM CÔNG THỦ CÔNG -->
+      <!-- ============================================== -->
+      <div id="manualModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(3px);">
+        <div style="background: var(--md-surface-container); padding: 24px 20px; border-radius: var(--shape-large); width: 90%; max-width: 400px; max-height: 90vh; overflow-y: auto; box-shadow: var(--elevation-2);">
+          <h3 id="manualModalTitle" style="text-align:center; margin: 0 0 16px 0; color: var(--md-primary); font-size: 18px;">勤務記録の修正</h3>
+          
           <label style="margin-bottom: 4px;">日付</label>
           <input type="date" id="manualDate" style="margin-bottom: 12px; height: 48px;">
+          
           <label style="margin-bottom: 4px;">勤務地</label>
           <select id="manualLocation" style="margin-bottom: 12px; height: 48px;"></select>
+          
           <div style="display:flex; gap:10px; margin-bottom: 12px;">
             <div style="flex:1;">
               <label style="margin-bottom: 4px;">出勤時間</label>
@@ -788,27 +795,37 @@
               <input type="time" id="manualOut" style="height: 48px;">
             </div>
           </div>
+  
           <label style="margin-bottom: 4px;">交通費</label>
           <input type="tel" id="manualFee" inputmode="numeric" style="margin-bottom: 20px; height: 48px;">
+          
           <input type="hidden" id="manualRowIndex">
+  
           <div style="display:flex; gap:10px;">
-            <button class="btn btn-gray" style="flex:1; margin:0;" onclick="showView('viewHistory')">キャンセル</button>
-            <button class="btn btn-primary" style="flex:1; margin:0;" onclick="saveManualData()">保存</button>
+            <button class="btn btn-gray" style="flex:1; margin:0; height: 48px;" onclick="document.getElementById('manualModal').style.display='none'">キャンセル</button>
+            <button class="btn btn-primary" style="flex:1; margin:0; height: 48px;" onclick="saveManualData()">保存</button>
           </div>
         </div>
       </div>
-      <div id="viewShonin" class="view">
-        <h3 style="text-align:center; color: var(--md-primary);">勤怠承認</h3>
-        <div style="background: var(--md-surface-container); padding: 20px; border-radius: var(--shape-large); border: 1px solid var(--md-outline-variant); text-align: center; margin-bottom: 24px;">
+  
+      <!-- ============================================== -->
+      <!-- POP-UP: PHÊ DUYỆT (SHONIN) CHO QUẢN LÝ -->
+      <!-- ============================================== -->
+      <div id="shoninModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(3px);">
+        <div style="background: var(--md-surface-container); padding: 24px 20px; border-radius: var(--shape-large); width: 90%; max-width: 400px; text-align: center; box-shadow: var(--elevation-2);">
+          <h3 style="margin: 0 0 10px 0; color: var(--md-primary); font-size: 18px;">勤怠承認</h3>
           <p id="shoninModalDesc" style="font-size: 14px; margin-bottom: 20px; color: var(--md-on-surface-variant);"></p>
-          <input type="text" id="shoninApproverName" placeholder="承認者名" style="margin-bottom: 15px; text-align: center; height: 48px;">
-          <input type="password" id="shoninPassword" placeholder="パスワード" style="margin-bottom: 25px; text-align: center; width: 100%; height: 48px; padding: 0 16px; border: 1px solid var(--md-outline); border-radius: var(--shape-medium); font-size: 16px;">
+          
+          <input type="text" id="shoninApproverName" placeholder="承認者名" style="margin-bottom: 12px; text-align: center; height: 48px;">
+          <input type="password" id="shoninPassword" placeholder="パスワード" style="margin-bottom: 20px; text-align: center; width: 100%; height: 48px; border: 1px solid var(--md-outline); border-radius: var(--shape-medium); font-size: 16px;">
+          
           <input type="hidden" id="shoninMode">
           <input type="hidden" id="shoninTargetDate">
           <input type="hidden" id="shoninTargetLoc">
+  
           <div style="display:flex; gap:10px;">
-            <button class="btn btn-gray" style="flex:1; margin:0;" onclick="showView('viewHistory')">キャンセル</button>
-            <button class="btn btn-secondary" style="flex:1; margin:0;" onclick="submitShonin()">承認する</button>
+            <button class="btn btn-gray" style="flex:1; margin:0; height:48px;" onclick="document.getElementById('shoninModal').style.display='none'">キャンセル</button>
+            <button class="btn btn-secondary" style="flex:1; margin:0; height:48px;" onclick="submitShonin()">承認する</button>
           </div>
         </div>
       </div>
@@ -2419,7 +2436,7 @@
       document.getElementById('manualRowIndex').value = rowIndex;
       const locSelect = document.getElementById('manualLocation');
       locSelect.innerHTML = '<option value="" disabled selected>読み込み中...</option>';
-      showView('viewManual'); window.scrollTo(0,0);
+      document.getElementById('manualModal').style.display = 'flex';
       google.script.run.withSuccessHandler(locations => {
         let options = '<option value="" disabled selected>選択してください</option>';
         if (locations && locations.length > 0) {
@@ -2451,8 +2468,7 @@
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
         if (res.success) {
-          showView('viewHistory'); // Chuyển về trang Lịch sử
-          window.scrollTo(0,0);
+          document.getElementById('manualModal').style.display = 'none';
           showCustomAlert(res.message); // Xanh lá
           loadFilteredHistory(); // Tải lại danh sách
         } else {
@@ -2469,7 +2485,7 @@
       document.getElementById('shoninPassword').value = '';
       const desc = (mode === 'bulk') ? `【一括承認】<br>拠点: ${locName}<br>対象月: ${document.getElementById('historyMonthFilter').value}` : `【個別承認】<br>日付: ${dateStr}`;
       document.getElementById('shoninModalDesc').innerHTML = desc;
-      showView('viewShonin'); window.scrollTo(0,0);
+      document.getElementById('shoninModal').style.display = 'flex';
     }
 
     function submitShonin() {
@@ -2493,8 +2509,7 @@
       serverTask.then(res => {
         setLoading(false);
         if (res.success) {
-          showView('viewHistory');
-          window.scrollTo(0,0);
+          document.getElementById('shoninModal').style.display = 'none';
           showCustomAlert(res.message); // Xanh lá
           loadFilteredHistory(); // Tải lại danh sách
         } else {
