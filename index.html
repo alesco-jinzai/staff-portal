@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>株式会社アレスコ</title>
-
+  
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
 
@@ -64,7 +63,6 @@
       padding: 20px 20px; 
       border-bottom: 2px solid var(--md-primary-container); 
       text-align: center; 
-      /* Đã xóa position: sticky, top, z-index, box-shadow để nó trôi tự nhiên */
     }
     header h1 { font-size: 20px; color: var(--md-primary); margin: 0; font-weight: 900; letter-spacing: 0.5px;}
     .content { padding: 24px; flex: 1; }
@@ -77,201 +75,65 @@
       display: flex; align-items: center; justify-content: center;
       width: 100%; height: 50px; 
       border: none; 
-      border-radius: var(--shape-full); /* Viên thuốc đặc trưng của M3 */
+      border-radius: var(--shape-full);
       font-size: 15px; font-weight: 500; letter-spacing: 0.5px;
       cursor: pointer; margin-bottom: 16px; 
       transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
     }
     .btn:active { transform: scale(0.98); }
-    .btn-primary { 
-      background: var(--md-primary); 
-      color: var(--md-on-primary); 
-    }
+    .btn-primary { background: var(--md-primary); color: var(--md-on-primary); }
     .btn-primary:hover { background: #094eb8; box-shadow: var(--elevation-1); }
-    .btn-outline { 
-      background: transparent; 
-      color: var(--md-primary); 
-      border: 1px solid var(--md-outline); 
-    }
+    .btn-outline { background: transparent; color: var(--md-primary); border: 1px solid var(--md-outline); }
     .btn-outline:hover { background: var(--md-primary-container); border-color: transparent; }
-    .btn-gray { 
-      background: var(--md-surface-variant); 
-      color: var(--md-on-surface-variant); 
-    }
+    .btn-gray { background: var(--md-surface-variant); color: var(--md-on-surface-variant); }
     .btn-gray:hover { background: #cdd0ce; }
-
-    .btn-secondary { 
-      background: var(--md-secondary); 
-      color: #ffffff; 
-    }
+    .btn-secondary { background: var(--md-secondary); color: #ffffff; }
     .btn-secondary:hover { background: #7a3600; box-shadow: var(--elevation-1); }
-
-    .btn:disabled { 
-      background: rgba(31, 31, 31, 0.12) !important; 
-      color: rgba(31, 31, 31, 0.38) !important; 
-      border: none !important;
-      cursor: not-allowed; 
-      box-shadow: none; 
-    }
+    .btn:disabled { background: rgba(31, 31, 31, 0.12) !important; color: rgba(31, 31, 31, 0.38) !important; border: none !important; cursor: not-allowed; box-shadow: none; }
     .btn-group { display: flex; flex-direction: column; gap: 0px; margin-top: 30px; }
-    .btn-tonal { 
-      background: var(--md-primary-container);
-      color: var(--md-on-primary-container);
-    }
+    .btn-tonal { background: var(--md-primary-container); color: var(--md-on-primary-container); }
     .btn-tonal:hover { background: #c0d3fa; }
     .mypage-header h2 { color: var(--md-on-primary) !important; }
     .form-group { margin-bottom: 24px; position: relative; }
-    label { 
-      display: block; 
-      font-weight: 500; 
-      margin-bottom: 8px; 
-      font-size: 13px; 
-      color: var(--md-on-surface-variant); 
-    }
+    label { display: block; font-weight: 500; margin-bottom: 8px; font-size: 13px; color: var(--md-on-surface-variant); }
     input[type="text"], input[type="tel"], input[type="email"], input[type="date"], input[type="month"], input[type="time"], select { 
-      width: 100%; 
-      height: 54px; 
-      padding: 0 16px; 
-      background: var(--md-surface-container); /* Ép nền trắng cho đẹp */
-      border: 1px solid var(--md-outline); 
-      border-radius: var(--shape-medium);
-      font-size: 16px; 
-      color: var(--md-on-surface);
-      outline: none;
-      transition: all 0.2s ease;
-      box-sizing: border-box;
-      -webkit-appearance: none;
-      appearance: none;
+      width: 100%; height: 54px; padding: 0 16px; background: var(--md-surface-container); border: 1px solid var(--md-outline); border-radius: var(--shape-medium); font-size: 16px; color: var(--md-on-surface); outline: none; transition: all 0.2s ease; box-sizing: border-box; -webkit-appearance: none; appearance: none;
     }
-    input:focus, select:focus {
-      border: 2px solid var(--md-primary);
-      padding: 0 15px;
-      background: var(--md-surface-container);
-    }
-    select { 
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23444746' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-    }
-    .task-card {
-      background: var(--md-surface-container); 
-      border: 1px solid var(--md-outline-variant); 
-      border-radius: var(--shape-large); /* Góc bo tròn bự 24px đặc trưng M3 */
-      padding: 20px; 
-      margin-bottom: 16px; 
-      display: flex; align-items: center; justify-content: space-between; 
-      cursor: pointer; 
-      transition: background-color 0.2s, box-shadow 0.2s;
-    }
+    input:focus, select:focus { border: 2px solid var(--md-primary); padding: 0 15px; background: var(--md-surface-container); }
+    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23444746' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+    .task-card { background: var(--md-surface-container); border: 1px solid var(--md-outline-variant); border-radius: var(--shape-large); padding: 20px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: background-color 0.2s, box-shadow 0.2s; }
     .task-card:hover:not(.is-done) { background: var(--md-surface); box-shadow: var(--elevation-1); border-color: transparent;}
     .task-card.is-done { cursor: default; opacity: 0.6; background: transparent; border-style: dashed; }
     .task-card h4 { margin: 0; font-size: 15px; font-weight: 500; color: var(--md-on-surface); }
-    .status-badge { 
-      padding: 6px 14px; 
-      border-radius: var(--shape-small); 
-      font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
-      white-space: nowrap; 
-    }
+    .status-badge { padding: 6px 14px; border-radius: var(--shape-small); font-size: 12px; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; }
     .status-done { background: var(--md-success-container); color: var(--md-on-success-container); }
     .status-wait { background: var(--md-error-container); color: var(--md-on-error-container); }
     .status-skip { background: var(--md-surface-variant); color: var(--md-on-surface-variant); } 
     .status-refuse { background: var(--md-warning-container); color: var(--md-warning); }
-    .history-log { 
-      margin-top: 16px; margin-bottom: 24px; padding: 20px; 
-      background: var(--md-primary-container); /* Nền Tonal */
-      border-radius: var(--shape-large); 
-      border: none;
-      color: var(--md-on-primary-container);
-    }
+    .history-log { margin-top: 16px; margin-bottom: 24px; padding: 20px; background: var(--md-primary-container); border-radius: var(--shape-large); border: none; color: var(--md-on-primary-container); }
     .history-log p { margin: 0 0 12px; font-size: 15px; font-weight: 700; }
     .history-log span { display: block; margin-left: 8px; margin-bottom: 8px; font-size: 14px; font-weight: 500;}
     .history-note { font-size: 12px; margin-top: 16px; color: var(--md-on-primary-container); opacity: 0.8; }
     .scroll-container { position: relative; margin-bottom: 16px; }
-    .scroll-box { 
-      max-height: 300px; overflow-y: auto; 
-      border: 1px solid var(--md-outline-variant); 
-      padding: 20px; font-size: 14px; 
-      background: var(--md-surface); 
-      border-radius: var(--shape-large); 
-      line-height: 1.8; color: var(--md-on-surface-variant);
-    }
+    .scroll-box { max-height: 300px; overflow-y: auto; border: 1px solid var(--md-outline-variant); padding: 20px; font-size: 14px; background: var(--md-surface); border-radius: var(--shape-large); line-height: 1.8; color: var(--md-on-surface-variant); }
     .scroll-hint { font-size: 12px; color: var(--md-error); text-align: right; margin-top: 8px; font-weight: 500; }
-    .scroll-box {
-      background: #ffffff !important;
-      color: #1f1f1f !important;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-    .scroll-box strong {
-      color: var(--md-primary);
-    }
-    .scroll-box div[style*="background:#fff1f0"] {
-      background-color: #feebe9 !important;
-      border: 1px solid #ffcfcc !important;
-      color: #b3261e !important;
-      padding: 15px !important;
-      border-radius: 12px !important;
-    }
-    .scroll-box div[style*="background:var(--error)"] {
-      background-color: #b3261e !important;
-      color: #ffffff !important;
-      font-weight: 700 !important;
-    }
-    .table-responsive table {
-      color: #1f1f1f !important;
-    }
-    .table-responsive th {
-      background: #f1f3f4 !important;
-      color: #444746 !important;
-    }
-    .checkbox-item { 
-      display: flex; align-items: center; padding: 20px; 
-      background: var(--md-surface); 
-      border-radius: var(--shape-large); 
-      margin-bottom: 24px; border: 1px solid var(--md-outline-variant); cursor: pointer;
-      transition: 0.2s ease;
-    }
+    .scroll-box { background: #ffffff !important; color: #1f1f1f !important; font-size: 14px; line-height: 1.6; }
+    .scroll-box strong { color: var(--md-primary); }
+    .scroll-box div[style*="background:#fff1f0"] { background-color: #feebe9 !important; border: 1px solid #ffcfcc !important; color: #b3261e !important; padding: 15px !important; border-radius: 12px !important; }
+    .scroll-box div[style*="background:var(--error)"] { background-color: #b3261e !important; color: #ffffff !important; font-weight: 700 !important; }
+    .table-responsive table { color: #1f1f1f !important; }
+    .table-responsive th { background: #f1f3f4 !important; color: #444746 !important; }
+    .checkbox-item { display: flex; align-items: center; padding: 20px; background: var(--md-surface); border-radius: var(--shape-large); margin-bottom: 24px; border: 1px solid var(--md-outline-variant); cursor: pointer; transition: 0.2s ease; }
     .checkbox-item input { width: 24px; height: 24px; margin: 0 16px 0 0; pointer-events: none; accent-color: var(--md-primary); }
     .checkbox-item label { margin: 0; font-size: 15px; font-weight: 500; cursor: pointer; flex: 1; color: var(--md-on-surface); }
     .checkbox-item.active-box { background: var(--md-primary-container); border-color: transparent; }
     .checkbox-item.active-box label { color: var(--md-on-primary-container); font-weight: 700;}
     .test-q-box { background: var(--md-surface-container); border: 1px solid var(--md-outline-variant); padding: 20px; border-radius: var(--shape-large); margin-bottom: 16px; }
     .test-options { display: flex; gap: 12px; margin-top: 16px; }
-    .option-item { 
-      flex: 1; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      height: 60px;
-      background: var(--md-surface); 
-      border-radius: var(--shape-medium); 
-      cursor: pointer; 
-      font-weight: 700; 
-      font-size: 24px;
-      color: var(--md-on-surface-variant); 
-      border: 1px solid var(--md-outline-variant);
-      transition: 0.2s;
-      position: relative;
-    }
-    .option-item input { 
-      display: none !important; 
-    }
-    .option-item.selected { 
-      background: var(--md-primary); 
-      color: var(--md-on-primary); 
-      border-color: transparent;
-      box-shadow: var(--elevation-1);
-      transform: scale(1.05);
-    }
-    .upload-box { 
-      position: relative;
-      border: 2px dashed var(--md-outline-variant); 
-      border-radius: var(--shape-large); 
-      padding: 24px; margin-bottom: 16px; 
-      background: var(--md-surface);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: background 0.2s;
-    }
+    .option-item { flex: 1; display: flex; align-items: center; justify-content: center; height: 60px; background: var(--md-surface); border-radius: var(--shape-medium); cursor: pointer; font-weight: 700; font-size: 24px; color: var(--md-on-surface-variant); border: 1px solid var(--md-outline-variant); transition: 0.2s; position: relative; }
+    .option-item input { display: none !important; }
+    .option-item.selected { background: var(--md-primary); color: var(--md-on-primary); border-color: transparent; box-shadow: var(--elevation-1); transform: scale(1.05); }
+    .upload-box { position: relative; border: 2px dashed var(--md-outline-variant); border-radius: var(--shape-large); padding: 24px; margin-bottom: 16px; background: var(--md-surface); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: background 0.2s; }
     .upload-box:hover { background: var(--md-primary-container); border-color: var(--md-primary); }
     .upload-box label { font-weight: 700; color: var(--md-primary); margin-bottom: 12px; width: 100%; text-align: center; }
     .file-input-wrapper { width: 100%; display: flex; justify-content: center; }
@@ -279,133 +141,61 @@
     .preview-container { width: 100%; margin-top: 16px; padding: 12px; background: var(--md-surface-container); border-radius: var(--shape-medium); box-shadow: var(--elevation-1); display: none; position: relative;}
     .preview-img { width: 100%; max-height: 250px; object-fit: cover; border-radius: var(--shape-small); }
     .pdf-label { font-size: 13px; font-weight: 500; color: var(--md-primary); word-break: break-all; margin: 0; text-align: center; padding: 10px;}
-    .btn-remove-img {
-      position: absolute; top: -10px; right: -10px;
-      width: 32px; height: 32px; border: none; border-radius: 50%;
-      background: var(--md-error); color: white; font-weight: bold; font-size: 16px;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      box-shadow: var(--elevation-1); z-index: 10;
-    }
-    input.input-error, select.input-error, .upload-box.input-error, .test-q-box.error {
-      border: 2px solid var(--md-error) !important;
-      background-color: var(--md-error-container) !important;
-      animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-    }
+    .btn-remove-img { position: absolute; top: -10px; right: -10px; width: 32px; height: 32px; border: none; border-radius: 50%; background: var(--md-error); color: white; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--elevation-1); z-index: 10; }
+    input.input-error, select.input-error, .upload-box.input-error, .test-q-box.error { border: 2px solid var(--md-error) !important; background-color: var(--md-error-container) !important; animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
     input.input-error:focus, select.input-error:focus { padding: 0 15px; }
-    .error-message {
-      color: var(--md-error); font-size: 12px; font-weight: 500;
-      margin-left: 8px; display: none; 
-    }
-    @keyframes shake {
-      10%, 90% { transform: translate3d(-1px, 0, 0); }
-      20%, 80% { transform: translate3d(2px, 0, 0); }
-      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-      40%, 60% { transform: translate3d(4px, 0, 0); }
-    }
-    .mypage-header {
-      background: var(--md-primary); 
-      color: var(--md-on-primary); 
-      padding: 20px 24px; /* Đã thu gọn chiều cao */
-      border-radius: var(--shape-large); 
-      margin-bottom: 24px; 
-      text-align: center; /* Thêm căn giữa cho tên đẹp hơn */
-    }
-    .confirm-box {
-      background: var(--md-surface-container); 
-      border: 1px solid var(--md-outline-variant);
-      border-radius: var(--shape-large); 
-      padding: 24px; margin-bottom: 24px;
-    }
+    .error-message { color: var(--md-error); font-size: 12px; font-weight: 500; margin-left: 8px; display: none; }
+    @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+    .mypage-header { background: var(--md-primary); color: var(--md-on-primary); padding: 20px 24px; border-radius: var(--shape-large); margin-bottom: 24px; text-align: center; }
+    .confirm-box { background: var(--md-surface-container); border: 1px solid var(--md-outline-variant); border-radius: var(--shape-large); padding: 24px; margin-bottom: 24px; }
     .confirm-row { display: flex; flex-direction: column; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--md-surface-variant); }
     .confirm-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
     .confirm-label { font-size: 12px; color: var(--md-on-surface-variant); font-weight: 500; margin-bottom: 4px; }
     .confirm-val { font-size: 16px; font-weight: 500; color: var(--md-on-surface); word-break: break-all; }
-    .alert-box {
-      background: var(--md-warning-container);
-      color: var(--md-warning);
-      padding: 16px; border-radius: var(--shape-large); margin-bottom: 20px;
-    }
+    .alert-box { background: var(--md-warning-container); color: var(--md-warning); padding: 16px; border-radius: var(--shape-large); margin-bottom: 20px; }
     .alert-box-error { background: var(--md-error-container); color: var(--md-error); border: none; }
-    #loading { 
-      display: none; 
-      position: absolute;
-      top: 0; left: 0; 
-      width: 100%; height: 100%; 
-      background: rgba(255,255,255,0.85);
-      z-index: 9999; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: flex-start;
-      padding-top: 15vh;
-    }
-    .spinner { border: 4px solid var(--md-surface-variant); border-top: 4px solid var(--md-primary); border-radius: 50%; width: 48px; height: 48px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+    #loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.85); z-index: 9999; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 15vh; }
+    .spinner { border: 4px solid var(--md-surface-variant); border-top: 4px solid var(--md-primary); border-radius: 50%; width: 48px; height: 48px; animation: spin 0.8s linear infinite; margin-bottom: 20px; }
     .table-responsive { width: 100%; overflow-x: auto; margin: 16px 0; border: 1px solid var(--md-outline-variant); border-radius: var(--shape-small); }
     table { width: 100%; min-width: 500px; border-collapse: collapse; font-size: 12px; background: var(--md-surface-container); }
     th, td { border-bottom: 1px solid var(--md-outline-variant); padding: 10px; text-align: left; }
     th { background: var(--md-surface); color: var(--md-on-surface-variant); font-weight: 500; }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .spinner { 
-      border: 4px solid rgba(0,0,0,0.1); /* Viền mờ */
-      border-top: 4px solid var(--md-primary); /* Đỉnh xanh */
-      border-radius: 50%; 
-      width: 48px; height: 48px; 
-      animation: spin 0.8s linear infinite; /* Chạy animation spin */
-      margin-bottom: 20px; 
-    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* ===== CSS SHIFT (CA LÀM) SIÊU MỎNG ===== */
+    /* CSS SHIFT (CA LÀM) */
     .shift-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: var(--md-surface-container); padding: 8px; border-radius: var(--shape-full); border: 1px solid var(--md-outline-variant); }
     .shift-nav button { background: none; border: none; font-size: 14px; font-weight: 700; color: var(--md-primary); cursor: pointer; padding: 8px 16px; }
     #shiftMonthDisplay, #kakuteiMonthDisplay { font-size: 18px; font-weight: 700; color: var(--md-on-surface); }
     .shift-quick-btn { flex: 1; height: 40px; border-radius: var(--shape-small); font-size: 13px; font-weight: 700; cursor: pointer; }
-    
     .shift-list-day { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px dashed var(--md-outline-variant); }
     .shift-list-day:last-child { border-bottom: none; }
     .day-header { font-size: 15px; font-weight: 700; color: var(--md-primary); margin-bottom: 10px; }
     .location-header { font-size: 13px; font-weight: 700; color: var(--md-on-primary-container); background: var(--md-primary-container); padding: 4px 10px; border-radius: 4px; margin-bottom: 8px; display: inline-block;}
-    
     .shift-items-wrapper { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
     .shift-slot { padding: 10px; border-radius: 8px; font-size: 14px; cursor: pointer; text-align: center; border: 2px solid transparent; transition: 0.1s; font-weight: 500;}
     .shift-slot.available { background: var(--md-surface-variant); color: var(--md-on-surface-variant); }
     .shift-slot.staging, .shift-slot.requested { background: var(--md-secondary); color: #fff; font-weight: 700; }
     .shift-slot.confirmed { background: var(--md-success); color: #fff; font-weight: 700; opacity: 0.7; pointer-events: none;}
-    
     .confirmed-shift-item { background: var(--md-success-container); color: var(--md-on-success-container); padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 700; margin-bottom: 8px; border-left: 4px solid var(--md-success); }
     .shift-remarks { font-size: 12px; color: var(--md-on-surface-variant); margin-top: 6px; font-weight: 400; border-top: 1px dashed var(--md-outline); padding-top: 6px;}
-
-    /* Lịch nhỏ ở màn hình Review */
     .calendar-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: 700; margin-bottom: 4px; }
     .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); border-top: 1px solid #ddd; border-left: 1px solid #ddd; }
     .calendar-day { border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 4px; min-height: 50px; }
     .day-number { font-size: 11px; font-weight: bold; margin-bottom: 4px; }
-    .shift-entry { 
-      background: var(--md-secondary); 
-      color: #fff; 
-      font-size: 10px; 
-      padding: 4px; 
-      border-radius: 4px; 
-      margin-bottom: 2px; 
-      white-space: normal;      /* Cho phép rớt dòng tự nhiên */
-      word-break: break-word;   /* Tự động ngắt chữ nếu tên cửa hàng quá dài */
-      line-height: 1.2;
-      text-align: center;
-    }
-
+    .shift-entry { background: var(--md-secondary); color: #fff; font-size: 10px; padding: 4px; border-radius: 4px; margin-bottom: 2px; white-space: normal; word-break: break-word; line-height: 1.2; text-align: center; }
   </style>
 </head>
-
 <body>
 <div id="loading">
     <div class="spinner"></div>
-    <p id="loadingStatus" style="font-weight:700; color:var(--primary); margin-bottom:5px;">処理中...</p>
+    <p id="loadingStatus" style="font-weight:700; color:var(--md-primary); margin-bottom:5px;">処理中...</p>
     <p id="loadingProgress" style="font-size:12px; color:#666;"></p>
 </div>
+
 <div class="app-shell">
   <header><h1>株式会社アレスコ</h1></header>
   <div class="content">
+
     <div id="viewStart" class="view active">
       <div style="text-align:center; padding: 30px 0 10px;">
         <img src="https://alesco-v.co.jp/wp/wp-content/uploads/ALESCO-LOGO.png" style="width:150px; margin-bottom:20px;">
@@ -424,6 +214,8 @@
         <button class="btn btn-gray" onclick="showView('viewLogin')">マイページにログイン</button>
       </div>
     </div>
+
+    <!-- KARI REGISTER -->
     <div id="viewKari" class="view">
       <div id="kariStep1">
         <h3>1. 個人情報の取扱いについて</h3>
@@ -575,11 +367,12 @@
         </div>
       </div>
     </div>
+    
     <div id="viewKariSuccess" class="view">
       <div style="text-align:center; padding: 40px 0;">
-        <div style="font-size: 60px; color: var(--success); margin-bottom: 20px;">✓</div>
-        <h2 style="color: var(--success); font-size: 22px;">STEP 1 が完了しました</h2>
-        <div style="background: #f8f9fa; border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin: 20px 0; text-align: left;">
+        <div style="font-size: 60px; color: var(--md-success); margin-bottom: 20px;">✓</div>
+        <h2 style="color: var(--md-success); font-size: 22px;">STEP 1 が完了しました</h2>
+        <div style="background: var(--md-surface-container); border: 1px solid var(--md-outline-variant); border-radius: 12px; padding: 15px; margin: 20px 0; text-align: left;">
           <p style="font-size: 13px; color: #333; margin-bottom: 10px; font-weight: bold;">■ これから選考に進む方</p>
           <p style="font-size: 12px; color: #5f6368; margin: 0 0 15px 0;">担当者より面接等に関するご案内をお電話またはメールにてご連絡します。</p>
           <p style="font-size: 13px; color: #333; margin-bottom: 10px; font-weight: bold;">■ すでに採用が決まっている方</p>
@@ -588,10 +381,11 @@
         <button class="btn btn-primary" onclick="showView('viewStart')">トップページへ戻る</button>
       </div>
     </div>
+    
     <div id="viewHonSuccess" class="view">
       <div style="text-align:center; padding: 40px 0;">
-        <div style="font-size: 60px; color: var(--success); margin-bottom: 20px;">✓</div>
-        <h2 style="color: var(--success); font-size: 20px;">入社手続きが完了しました</h2>
+        <div style="font-size: 60px; color: var(--md-success); margin-bottom: 20px;">✓</div>
+        <h2 style="color: var(--md-success); font-size: 20px;">入社手続きが完了しました</h2>
         <p style="color:#5f6368; font-size:14px; line-height:1.6; margin-top:15px; margin-bottom:30px;">
           手続きありがとうございます。<br>
           続けて、マイページにログインし、<br>
@@ -602,6 +396,8 @@
         <button class="btn btn-gray" onclick="showView('viewStart')">トップページへ戻る</button>
       </div>
     </div>
+
+    <!-- HON LOGIN -->
     <div id="viewHonLogin" class="view">
       <h3>入社手続き</h3>
       <div id="honLoginErrorBox" style="display:none; background:#fff8e1; border:1px solid #ffe082; padding:15px; border-radius:12px; margin-bottom:20px;">
@@ -625,10 +421,12 @@
       <button class="btn btn-primary" onclick="handleHonLogin()">次へ進む</button>
       <button class="btn btn-gray" onclick="showView('viewStart')">戻る</button>
     </div>
+
+    <!-- HON REGISTER -->
     <div id="viewHonRegister" class="view">
-      <div style="background:var(--bg); border:1px solid var(--border); border-left:4px solid var(--primary); padding:15px; border-radius:8px; margin-bottom:25px;">
+      <div style="background:var(--md-surface-variant); border:1px solid var(--md-outline); border-left:4px solid var(--md-primary); padding:15px; border-radius:8px; margin-bottom:25px;">
         <p style="font-size:12px; color:#666; margin:0 0 5px 0;">以下のご本人様でお間違いないでしょうか？</p>
-        <h3 id="honConfirmName" style="margin:0; color:var(--primary-dark); font-size:18px;">--- 様</h3>
+        <h3 id="honConfirmName" style="margin:0; color:var(--md-primary-container); font-size:18px;">--- 様</h3>
         <div id="honSubmitErrorBox" class="alert-box alert-box-error" style="display:none; margin-top:10px;"></div>
       </div>
       <div id="honStep1">
@@ -638,8 +436,8 @@
           <select id="honEmpType">
             <option value="メイン">メイン（主となるお仕事）</option>
             <option value="ダブルワーク">ダブルワーク（副業としてのお仕事）</option>
-            <option value="フリーランス">フリーランス（業務委託・個人事業主）</option> <!-- ĐÃ SỬA -->
-            <option value="ワーキングホリデー">ワーキングホリデー（特定活動ビザ等での就労）</option> <!-- ĐÃ THÊM -->
+            <option value="フリーランス">フリーランス（業務委託・個人事業主）</option>
+            <option value="ワーキングホリデー">ワーキングホリデー（特定活動ビザ等での就労）</option>
           </select>
         </div>
         <div class="btn-group">
@@ -650,8 +448,7 @@
       <div id="honStep2" style="display:none;">
         <h3>2. 個人情報の取扱いについて「告知書兼同意書」</h3>
         <div class="scroll-container">
-          <div class="scroll-box" id="honConsentBox" onscroll="handleScrollStrict(this, 'honConsentCheck', 'honConsentHint')">
-          </div>
+          <div class="scroll-box" id="honConsentBox" onscroll="handleScrollStrict(this, 'honConsentCheck', 'honConsentHint')"></div>
           <p class="scroll-hint" id="honConsentHint">※一番下までスクロールしてください</p>
         </div>
         <div class="checkbox-item" onclick="toggleCheckboxFromBox('honConsentCheck')">
@@ -667,8 +464,7 @@
       <div id="honStep3" style="display:none;">
         <h3>3. 承諾書</h3>
         <div class="scroll-container">
-          <div class="scroll-box" id="honAgreementBox" onscroll="handleScrollStrict(this, 'honAgreementCheck', 'honAgreementHint')">
-          </div>
+          <div class="scroll-box" id="honAgreementBox" onscroll="handleScrollStrict(this, 'honAgreementCheck', 'honAgreementHint')"></div>
           <p class="scroll-hint" id="honAgreementHint">※一番下までスクロールしてください</p>
         </div>
         <div class="checkbox-item" onclick="toggleCheckboxFromBox('honAgreementCheck')">
@@ -684,8 +480,7 @@
       <div id="honStep4" style="display:none;">
         <h3>4. 秘密保持契約書</h3>
         <div class="scroll-container">
-          <div class="scroll-box" id="honNdaBox" onscroll="handleScrollStrict(this, 'honNdaCheck', 'honNdaHint')">
-          </div>
+          <div class="scroll-box" id="honNdaBox" onscroll="handleScrollStrict(this, 'honNdaCheck', 'honNdaHint')"></div>
           <p class="scroll-hint" id="honNdaHint">※一番下までスクロールしてください</p>
         </div>
         <div class="checkbox-item" onclick="toggleCheckboxFromBox('honNdaCheck')">
@@ -701,8 +496,7 @@
       <div id="honStep5" style="display:none;">
         <h3>5. 個人情報保護教育</h3>
         <div class="scroll-container">
-          <div class="scroll-box" id="honEduBox" onscroll="handleScrollStrict(this, 'honEduCheck', 'honEduHint')">
-          </div>
+          <div class="scroll-box" id="honEduBox" onscroll="handleScrollStrict(this, 'honEduCheck', 'honEduHint')"></div>
           <p class="scroll-hint" id="honEduHint">※一番下までスクロールしてください</p>
         </div>
         <div class="checkbox-item" onclick="toggleCheckboxFromBox('honEduCheck')">
@@ -711,7 +505,6 @@
         </div>
         <p class="error-message" id="honEduCheckError">「内容を確認しました」にチェックを入れてください。</p>
         <div id="testArea" style="display:none;">
-          <h4 style="font-size:14px; color:var(--primary); margin: 20px 0 10px;">【理解度テスト】正しい方にチェック</h4>
           <div id="honEduTestArea"></div>
         </div>
         <div class="btn-group" style="margin-top:20px;">
@@ -720,6 +513,8 @@
         </div>
       </div>
     </div>
+
+    <!-- MAIN LOGIN -->
     <div id="viewLogin" class="view">
       <h3>ログイン</h3>
       <p class="error-message" id="loginError" style="background:#fff1f0; padding:12px; border-radius:10px; border:1px solid #ffa39e; margin-bottom:20px; font-size:13px;"></p>
@@ -731,160 +526,53 @@
       <button class="btn btn-primary" onclick="handleLogin()">ログイン</button>
       <button class="btn btn-gray" onclick="showView('viewStart')">戻る</button>
     </div>
+
+    <!-- MY PAGE (DOCS) -->
     <div id="viewMyPage" class="view">
-    <div class="mypage-header">
-      <h2 id="mpUserName" style="margin:0; font-size: 22px;">--- 様</h2>
-      <span id="mpUserType" style="font-size: 14px; opacity: 0.9; font-weight: 500; display: block; margin-top: 4px;">---</span>
-    </div>
+      <div class="mypage-header">
+        <h2 id="mpUserName" style="margin:0; font-size: 22px;">--- 様</h2>
+      </div>
       <div id="shinkokushoAlert" style="display:none; background:#fff8e1; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #ffe082;">
         <p style="margin:0 0 12px 0; font-size:13px; color:#b07a00; font-weight:700;">
           <span style="font-size:16px; margin-right:8px;">⚠️</span> 扶養控除等申告書の提出が必要です。
         </p>
-        <button class="btn btn-primary" style="height:48px; font-size:14px; margin:0;" onclick="openFuyoForm()">
-          申告書を入力する
-        </button>
+        <button class="btn btn-primary" style="height:48px; font-size:14px; margin:0;" onclick="openFuyoForm()">申告書を入力する</button>
       </div>
       <div id="taskList"></div>
-
-      <!-- Nút Quay lại và Đăng xuất cho màn hình Hồ sơ -->
       <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
         <button class="btn btn-gray" onclick="routeUser()">戻る</button>
         <button class="btn btn-gray" onclick="currentUser = null; resetHonForm(); resetKariForm(); showView('viewStart');">ログアウト</button>
       </div>
     </div>
-    <div id="viewRegSuccess" class="view">
-      <div style="text-align:center; padding: 40px 0;">
-        <div style="font-size: 60px; color: var(--success); margin-bottom: 20px;">✓</div>
-        <h2 style="color: var(--success);">登録が完了しました</h2>
-        <p style="color:#5f6368; font-size:14px; line-height:1.6;">
-          スタッフ登録の初期設定が完了しました。<br>
-          続けて、マイページにログインして<br>
-          <b>身分証・口座情報の提出</b>を行ってください。
-        </p>
-        <button class="btn btn-primary" style="margin-top:30px;" onclick="showView('viewLogin')">ログイン画面へ</button>
-      </div>
-    </div>
-    <div id="viewTaskDetail" class="view"><h3 id="taskDetailTitle" style="color:var(--primary); border-bottom:2px solid var(--primary); padding-bottom:10px;">---</h3><div id="taskDetailContent"></div><div id="taskDetailActions" style="margin-top:20px;"></div><button class="btn btn-gray" onclick="showView('viewMyPage')" style="margin-top:20px;">戻る</button></div>
 
-    <!-- ============================================== -->
-    <!-- MÀN HÌNH LỊCH SỬ CHẤM CÔNG -->
-    <!-- ============================================== -->
-    <div id="viewHistory" class="view">
-      <h3 style="text-align: center;">勤怠履歴</h3>
-      
-      <div class="form-group" style="display:flex; gap:10px;">
-        <input type="month" id="historyMonthFilter" style="flex:2; margin-bottom:0;" onchange="loadFilteredHistory()">
-        <button class="btn btn-primary" style="flex:1; margin-bottom:0; height:54px;" onclick="openManualModal()">追加</button>
-      </div>
-
-      <div id="historySummary" style="display:none; background: var(--md-secondary-container); color: var(--md-on-secondary-container); padding: 15px; border-radius: var(--shape-medium); margin-bottom: 20px; display:flex; justify-content:space-around; text-align:center;">
-        <div>
-          <span style="font-size:12px; display:block;">合計時間</span>
-          <strong id="summaryTotalTime" style="font-size:20px;">0:00</strong>
-        </div>
-        <div>
-          <span style="font-size:12px; display:block;">合計交通費</span>
-          <strong id="summaryTotalFee" style="font-size:20px;">0</strong>
-        </div>
-      </div>
-
-      <div id="historyListContainer" style="margin-bottom:20px;"></div>
-
-      <button class="btn btn-gray" onclick="routeUser()">戻る</button>
+    <div id="viewTaskDetail" class="view">
+      <h3 id="taskDetailTitle" style="color:var(--md-primary); border-bottom:2px solid var(--md-primary); padding-bottom:10px;">---</h3>
+      <div id="taskDetailContent"></div>
+      <div id="taskDetailActions" style="margin-top:20px;"></div>
+      <button class="btn btn-gray" onclick="showView('viewMyPage')" style="margin-top:20px;">戻る</button>
     </div>
 
-    <!-- ============================================== -->
-    <!-- TRANG: SỬA/THÊM CHẤM CÔNG THỦ CÔNG (Thay cho Pop-up) -->
-    <!-- ============================================== -->
-    <div id="viewManual" class="view">
-      <h3 id="manualModalTitle" style="text-align:center; margin-bottom: 20px;">勤務記録の修正</h3>
-      
-      <div style="background: var(--md-surface-container); padding: 20px; border-radius: var(--shape-large); border: 1px solid var(--md-outline-variant); margin-bottom: 24px;">
-        <label style="margin-bottom: 4px;">日付</label>
-        <input type="date" id="manualDate" style="margin-bottom: 12px; height: 48px;">
-        
-        <label style="margin-bottom: 4px;">勤務地</label>
-        <select id="manualLocation" style="margin-bottom: 12px; height: 48px;"></select>
-        
-        <div style="display:flex; gap:10px; margin-bottom: 12px;">
-          <div style="flex:1;">
-            <label style="margin-bottom: 4px;">出勤時間</label>
-            <input type="time" id="manualIn" style="height: 48px;">
-          </div>
-          <div style="flex:1;">
-            <label style="margin-bottom: 4px;">退勤時間</label>
-            <input type="time" id="manualOut" style="height: 48px;">
-          </div>
-        </div>
-
-        <label style="margin-bottom: 4px;">交通費</label>
-        <input type="tel" id="manualFee" inputmode="numeric" style="margin-bottom: 20px; height: 48px;">
-        
-        <input type="hidden" id="manualRowIndex">
-
-        <div style="display:flex; gap:10px;">
-          <button class="btn btn-gray" style="flex:1; margin:0;" onclick="showView('viewHistory')">キャンセル</button>
-          <button class="btn btn-primary" style="flex:1; margin:0;" onclick="saveManualData()">保存</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================== -->
-    <!-- TRANG: PHÊ DUYỆT (SHONIN) CHO QUẢN LÝ -->
-    <!-- ============================================== -->
-    <div id="viewShonin" class="view">
-      <h3 style="text-align:center; color: var(--md-primary);">勤怠承認</h3>
-      
-      <div style="background: var(--md-surface-container); padding: 20px; border-radius: var(--shape-large); border: 1px solid var(--md-outline-variant); text-align: center; margin-bottom: 24px;">
-        <p id="shoninModalDesc" style="font-size: 14px; margin-bottom: 20px; color: var(--md-on-surface-variant);"></p>
-        
-        <input type="text" id="shoninApproverName" placeholder="承認者名" style="margin-bottom: 15px; text-align: center; height: 48px;">
-        <input type="password" id="shoninPassword" placeholder="パスワード" style="margin-bottom: 25px; text-align: center; width: 100%; height: 48px; padding: 0 16px; border: 1px solid var(--md-outline); border-radius: var(--shape-medium); font-size: 16px;">
-        
-        <input type="hidden" id="shoninMode">
-        <input type="hidden" id="shoninTargetDate">
-        <input type="hidden" id="shoninTargetLoc">
-
-        <div style="display:flex; gap:10px;">
-          <button class="btn btn-gray" style="flex:1; margin:0;" onclick="showView('viewHistory')">キャンセル</button>
-          <button class="btn btn-secondary" style="flex:1; margin:0;" onclick="submitShonin()">承認する</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================== -->
-    <!-- MÀN HÌNH CHẤM CÔNG (THAY THẾ KHI HỒ SƠ ĐÃ XONG)  -->
-    <!-- ============================================== -->
+    <!-- ATTENDANCE -->
     <div id="viewAttendance" class="view">
       <div class="mypage-header">
         <h2 id="attUserName" style="margin:0; font-size: 22px;">--- 様</h2>
       </div>
-
-      <!-- Đồng hồ điện tử -->
       <div style="text-align: center; margin: 30px 0;">
         <div id="attDateDisplay" style="font-size: 16px; color: var(--md-on-surface-variant); font-weight: 500;">----/--/-- (-)</div>
         <div id="attClockDisplay" style="font-size: 42px; font-weight: 900; color: var(--md-primary); letter-spacing: 2px; font-variant-numeric: tabular-nums;">--:--:--</div>
       </div>
-
-      <!-- Trạng thái (hiện khi đã check in) -->
       <div id="attStatusBox" style="display:none; background: var(--md-primary-container); color: var(--md-on-primary-container); padding: 20px; border-radius: var(--shape-large); text-align: center; font-size: 16px; font-weight: 700; margin-bottom: 24px;"></div>
-
       <div class="form-group">
         <label>勤務地を選択</label>
-        <select id="attLocationSelect">
-          <option value="" disabled selected>読み込み中...</option>
-        </select>
+        <select id="attLocationSelect"><option value="" disabled selected>読み込み中...</option></select>
       </div>
-
       <div class="form-group" id="attFeeGroup" style="display:none;">
         <label>往復交通費</label>
         <input type="tel" id="attCommuteFee" placeholder="半角数字のみ (例: 500)" inputmode="numeric">
       </div>
-
       <div style="display: flex; gap: 16px; margin-top: 30px;">
         <button id="btnCheckIn" class="btn btn-primary" style="flex:1; height: 70px; font-size: 20px; border-radius: 16px;" onclick="handleCheckInOut('出勤')">出勤</button>
         <button id="btnCheckOut" class="btn btn-outline" style="flex:1; height: 70px; font-size: 20px; border-radius: 16px; border-width: 2px;" onclick="handleCheckInOut('退勤')" disabled>退勤</button>
-        
       </div>
       <div style="display: flex; gap: 16px; margin-top: 20px;">
         <button class="btn btn-tonal" style="flex:1; margin:0; height:54px; font-weight:bold;" onclick="showShiftView()">シフト管理</button>
@@ -896,61 +584,103 @@
       </div>
     </div>
 
-    <!-- ============================================== -->
-    <!-- MÀN HÌNH QUẢN LÝ CA (SHIFT) -->
-    <!-- ============================================== -->
+    <!-- HISTORY -->
+    <div id="viewHistory" class="view">
+      <h3 style="text-align: center;">勤怠履歴</h3>
+      <div class="form-group" style="display:flex; gap:10px;">
+        <input type="month" id="historyMonthFilter" style="flex:2; margin-bottom:0;" onchange="loadFilteredHistory()">
+        <button class="btn btn-primary" style="flex:1; margin-bottom:0; height:54px;" onclick="openManualModal()">追加</button>
+      </div>
+      <div id="historySummary" style="display:none; background: var(--md-secondary-container); color: var(--md-on-secondary-container); padding: 15px; border-radius: var(--shape-medium); margin-bottom: 20px; justify-content:space-around; text-align:center;">
+        <div><span style="font-size:12px; display:block;">合計時間</span><strong id="summaryTotalTime" style="font-size:20px;">0:00</strong></div>
+        <div><span style="font-size:12px; display:block;">合計交通費</span><strong id="summaryTotalFee" style="font-size:20px;">0</strong></div>
+      </div>
+      <div id="historyListContainer" style="margin-bottom:20px;"></div>
+      <button class="btn btn-gray" onclick="routeUser()">戻る</button>
+    </div>
+
+    <!-- MANUAL MODAL (View) -->
+    <div id="viewManual" class="view">
+      <h3 id="manualModalTitle" style="text-align:center; margin-bottom: 20px; color: var(--md-primary);">勤務記録の修正</h3>
+      <div style="background: var(--md-surface-container); padding: 24px 20px; border-radius: var(--shape-large); border: 1px solid var(--md-outline-variant); margin-bottom: 24px;">
+        <label style="margin-bottom: 4px;">日付</label>
+        <input type="date" id="manualDate" style="margin-bottom: 12px; height: 48px;">
+        <label style="margin-bottom: 4px;">勤務地</label>
+        <select id="manualLocation" style="margin-bottom: 12px; height: 48px;"></select>
+        <div style="display:flex; gap:10px; margin-bottom: 12px;">
+          <div style="flex:1;"><label style="margin-bottom: 4px;">出勤時間</label><input type="time" id="manualIn" style="height: 48px;"></div>
+          <div style="flex:1;"><label style="margin-bottom: 4px;">退勤時間</label><input type="time" id="manualOut" style="height: 48px;"></div>
+        </div>
+        <label style="margin-bottom: 4px;">交通費</label>
+        <input type="tel" id="manualFee" inputmode="numeric" style="margin-bottom: 20px; height: 48px;">
+        <input type="hidden" id="manualRowIndex">
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-gray" style="flex:1; margin:0; height: 48px;" onclick="showView('viewHistory')">キャンセル</button>
+          <button class="btn btn-primary" style="flex:1; margin:0; height: 48px;" onclick="saveManualData()">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHONIN MODAL (View) -->
+    <div id="viewShonin" class="view">
+      <h3 style="text-align:center; color: var(--md-primary);">勤怠承認</h3>
+      <div style="background: var(--md-surface-container); padding: 20px; border-radius: var(--shape-large); border: 1px solid var(--md-outline-variant); text-align: center; margin-bottom: 24px;">
+        <p id="shoninModalDesc" style="font-size: 14px; margin-bottom: 20px; color: var(--md-on-surface-variant);"></p>
+        <input type="text" id="shoninApproverName" placeholder="承認者名" style="margin-bottom: 15px; text-align: center; height: 48px;">
+        <input type="password" id="shoninPassword" placeholder="パスワード" style="margin-bottom: 25px; text-align: center; width: 100%; height: 48px; padding: 0 16px; border: 1px solid var(--md-outline); border-radius: var(--shape-medium); font-size: 16px;">
+        <input type="hidden" id="shoninMode">
+        <input type="hidden" id="shoninTargetDate">
+        <input type="hidden" id="shoninTargetLoc">
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-gray" style="flex:1; margin:0; height:48px;" onclick="showView('viewHistory')">キャンセル</button>
+          <button class="btn btn-secondary" style="flex:1; margin:0; height:48px;" onclick="submitShonin()">承認する</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHIFT VIEW -->
     <div id="viewShift" class="view">
       <h3 style="text-align: center;">シフト管理</h3>
-      
       <div class="shift-nav">
         <button onclick="navigateShiftMonth(-1, 'selection')">◀ 前月</button>
         <div id="shiftMonthDisplay">----年 --月</div>
         <button onclick="navigateShiftMonth(1, 'selection')">次月 ▶</button>
       </div>
-
       <div id="shiftDeadlineDisplay" style="text-align:center; font-size:14px; font-weight:700; color:var(--md-error); margin-bottom:12px;"></div>
-      
       <div id="quickSelectControls" style="display:flex; gap:8px; margin-bottom:16px;">
         <button class="btn-outline shift-quick-btn" onclick="handleQuickSelect('weekdays')">平日選択</button>
         <button class="btn-outline shift-quick-btn" onclick="handleQuickSelect('weekends')">土日選択</button>
         <button class="btn-gray shift-quick-btn" onclick="handleQuickSelect('clear')">クリア</button>
       </div>
-
       <div id="shiftListContainer" class="scroll-box" style="padding:12px; margin-bottom:16px; height: 50vh;"></div>
-
       <div style="display:flex; justify-content:center; gap:16px; font-size:13px; margin-bottom: 20px;">
         <span style="display:flex; align-items:center; gap:4px;"><div style="width:16px; height:16px; background:var(--md-surface-variant); border-radius:4px;"></div> 募集</span>
         <span style="display:flex; align-items:center; gap:4px;"><div style="width:16px; height:16px; background:var(--md-secondary); border-radius:4px;"></div> 選択中</span>
         <span style="display:flex; align-items:center; gap:4px;"><div style="width:16px; height:16px; background:var(--md-success); border-radius:4px;"></div> 確定</span>
       </div>
-
       <button id="btnKiboReview" class="btn btn-secondary" style="display:none;" onclick="showKiboReviewView()">選択したシフトを確認 (<span id="stagedCount">0</span>)</button>
-      
       <div style="display:flex; gap:12px; margin-top:20px; padding-top:20px; border-top:1px solid var(--md-outline-variant);">
         <button class="btn btn-gray" style="flex:1; margin:0;" onclick="routeUser()">戻る</button>
         <button class="btn btn-primary" style="flex:1; margin:0;" onclick="showKakuteiView()">確定シフト</button>
       </div>
     </div>
 
-    <!-- MÀN HÌNH XÁC NHẬN CA (REVIEW) -->
+    <!-- SHIFT REVIEW -->
     <div id="viewKiboReview" class="view">
       <h3 style="text-align:center;">希望シフトの確認</h3>
       <p style="font-size:13px; text-align:center;">以下の内容で提出します。</p>
-      
       <div id="reviewCalendarContainer" style="margin-bottom:16px;"></div>
-      
       <div class="form-group">
        <label>連絡事項</label>
         <textarea id="contactNotes" rows="3" style="width:100%; padding:12px; border-radius:var(--shape-medium); border:1px solid var(--md-outline); font-family:inherit; resize:vertical;"></textarea>
       </div>
-
       <div style="display:flex; gap:12px;">
         <button class="btn btn-gray" style="flex:1; margin:0;" onclick="showView('viewShift')">修正する</button>
         <button class="btn btn-secondary" style="flex:1; margin:0;" onclick="kiboConfirmSubmit()">提出する</button>
       </div>
     </div>
 
-    <!-- MÀN HÌNH XEM CA ĐÃ CHỐT (KAKUTEI) -->
+    <!-- KAKUTEI SHIFT -->
     <div id="viewKakutei" class="view">
       <h3 style="text-align:center;">確定シフト</h3>
       <div class="shift-nav">
@@ -964,6 +694,9 @@
 
   </div>
 </div>
+
+<!-- DYNAMIC INLINE ALERTS WILL BE INJECTED BY JS -->
+
 <script>
   // =========================================================================
   // API ENDPOINT: LINK GOOGLE APPS SCRIPT CỦA BẠN
@@ -974,6 +707,7 @@
   async function callAPI(action, payload = {}) {
     payload.action = action;
     try {
+      // Gọi fetch trực tiếp không có CORS wrapper vì GAS xử lý doPost với CORS
       const response = await fetch(API_URL, {
         method: "POST",
         body: JSON.stringify(payload),
@@ -1061,7 +795,6 @@
   function renderMyPage() {
     showView('viewMyPage');
     document.getElementById('mpUserName').innerText = currentUser.name.replace(/\//g, ' ') + " 様";
-    document.getElementById('mpUserType').innerText = currentUser.employmentType;
     let fuyoStatus = currentUser.statusFuyo || "";
     let isMainEmployee = (currentUser.employmentType === 'メイン');
     let needsFuyo = (isMainEmployee && fuyoStatus.indexOf('提出済') === -1);
@@ -1597,7 +1330,7 @@
       statusEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }
-  
+
   function getDocContent(id) {
     if(id==='hon-consent') return `
       <div style="text-align: center; margin-bottom: 15px;">
