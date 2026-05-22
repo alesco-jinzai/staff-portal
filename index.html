@@ -43,13 +43,14 @@
       color: var(--md-on-surface); 
       margin: 0; 
       line-height: 1.5; 
-      overflow: hidden; /* Khóa cuộn toàn trang */
+      overflow: hidden; 
+      overflow-x: hidden; /* Thêm dòng này */
     }
     .app-shell { 
       max-width: 500px; 
       margin: 0 auto; 
       background: transparent; 
-      height: 100vh;      /* Ép cao đúng bằng màn hình */
+      height: 100dvh;     /* SỬA THÀNH dvh - Sẽ tương thích 100% với Safari/iOS */
       display: flex; 
       flex-direction: column; 
       box-shadow: none;
@@ -1261,12 +1262,13 @@
     }
 
     function handleScrollStrict(el, checkId, hintId) {
-      if (el.scrollHeight - el.scrollTop <= el.clientHeight + 5) enableCheckbox(checkId, hintId);
+      // Trừ hao 10px để đảm bảo user chỉ cần cuộn gần chạm đáy là nút mở khóa
+      if (el.scrollHeight - el.scrollTop <= el.clientHeight + 10) enableCheckbox(checkId, hintId);
     }
-
+  
     function checkInitialVisibility(boxId, checkId, hintId) {
       const el = document.getElementById(boxId);
-      if (el && el.scrollHeight <= el.clientHeight + 5) enableCheckbox(checkId, hintId);
+      if (el && el.scrollHeight <= el.clientHeight + 10) enableCheckbox(checkId, hintId);
     }
 
     function enableCheckbox(checkId, hintId) {
@@ -2314,24 +2316,32 @@
       }
     }
 
-    function showCustomAlert(msg, isError = false) {
-      const activeView = document.querySelector('.view.active');
-      if (!activeView) return alert(msg);
-      let alertBox = activeView.querySelector('.dynamic-alert-box');
-      if (!alertBox) {
-        alertBox = document.createElement('div');
-        alertBox.className = 'dynamic-alert-box';
-        activeView.insertBefore(alertBox, activeView.children[1]);
-      }
-      const bgColor = isError ? 'var(--md-error-container)' : 'var(--md-success-container)';
-      const textColor = isError ? 'var(--md-error)' : 'var(--md-on-success-container)';
-      const icon = isError ? '⚠️ ' : '✅ ';
-      alertBox.style.cssText = `background: ${bgColor}; color: ${textColor}; padding: 15px; border-radius: 12px; margin: 16px 0; text-align: center; font-weight: bold; font-size: 15px; animation: fadeIn 0.3s ease; display: block;`;
-      alertBox.innerHTML = icon + msg.replace(/\n/g, '<br>');
-      setTimeout(() => { 
-        alertBox.style.display = 'none'; 
-      }, 5000);
+  function showCustomAlert(msg, isError = false) {
+    const activeView = document.querySelector('.view.active');
+    if (!activeView) return alert(msg); 
+
+    let alertBox = activeView.querySelector('.dynamic-alert-box');
+    if (!alertBox) {
+      alertBox = document.createElement('div');
+      alertBox.className = 'dynamic-alert-box';
+      activeView.insertBefore(alertBox, activeView.children[0]); // ĐÃ SỬA: Luôn nhét lên DÒNG ĐẦU TIÊN
     }
+
+    const bgColor = isError ? 'var(--md-error-container)' : 'var(--md-success-container)';
+    const textColor = isError ? 'var(--md-error)' : 'var(--md-on-success-container)';
+    const icon = isError ? '⚠️ ' : '✅ ';
+    
+    alertBox.style.cssText = `background: ${bgColor}; color: ${textColor}; padding: 15px; border-radius: 12px; margin: 0 0 16px 0; text-align: center; font-weight: bold; font-size: 15px; animation: fadeIn 0.3s ease; display: block;`;
+    alertBox.innerHTML = icon + msg.replace(/\n/g, '<br>');
+
+    // Tự động cuộn phần nội dung lên đỉnh để thấy được thông báo
+    const contentBox = document.querySelector('.content');
+    if (contentBox) contentBox.scrollTo({ top: 0, behavior: 'smooth' });
+
+    setTimeout(() => { 
+      alertBox.style.display = 'none'; 
+    }, 5000);
+  }
 
     function handleCheckInOut(type) {
       const locationName = document.getElementById('attLocationSelect').value;
