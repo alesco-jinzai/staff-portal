@@ -43,25 +43,24 @@
       color: var(--md-on-surface); 
       margin: 0; 
       line-height: 1.5; 
-      overflow: hidden; 
-      overflow-x: hidden; /* Thêm dòng này */
+      overflow: hidden; /* Khóa cuộn toàn trang */
     }
     .app-shell { 
       max-width: 500px; 
       margin: 0 auto; 
       background: transparent; 
-      height: 100dvh;     /* SỬA THÀNH dvh - Sẽ tương thích 100% với Safari/iOS */
+      height: 100vh;      /* Ép cao đúng bằng màn hình */
       display: flex; 
       flex-direction: column; 
       box-shadow: none;
       position: relative;
     }
     .content { 
-      padding: 24px; 
+      padding: 20px; 
       flex: 1; 
-      overflow-y: auto; 
-      padding-bottom: 120px; /* Bắt buộc phải có để chữ không bị chui tọt xuống dưới Menu */
-    }
+      overflow-y: auto;   /* Chỉ cho phép cuộn nội dung ở giữa */
+      padding-bottom: 80px; /* Chừa chỗ cho thanh Menu đáy không bị che mất chữ */
+    } 
       font-family: 'Noto Sans JP', sans-serif; 
       background: #ffffff;
       color: var(--md-on-surface); 
@@ -406,23 +405,19 @@
       text-align: center;
     }
 
-    /* ===== BOTTOM NAVIGATION BAR (BẢN FIX MOBILE) ===== */
+    /* ===== BOTTOM NAVIGATION BAR ===== */
     .bottom-nav {
-      position: fixed; /* Khóa chết vào mặt kính điện thoại */
+      position: absolute;
       bottom: 0;
-      left: 50%;
-      transform: translateX(-50%); /* Luôn căn giữa theo khung 500px */
       width: 100%;
-      max-width: 500px;
-      height: calc(65px + env(safe-area-inset-bottom)); /* Tự động cao lên nếu là iPhone tai thỏ */
-      padding-bottom: env(safe-area-inset-bottom); /* Né dải đen vuốt về Home của iOS/Android */
+      height: 65px;
       background: #ffffff;
       border-top: 1px solid var(--md-outline-variant);
       display: flex;
       justify-content: space-around;
       align-items: center;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.08); /* Đổ bóng hắt lên trên */
-      z-index: 9999; /* Luôn nằm trên cùng mọi thứ */
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+      z-index: 1000;
     }
     .nav-item {
       flex: 1;
@@ -432,14 +427,14 @@
       justify-content: center;
       color: var(--md-on-surface-variant);
       text-decoration: none;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       cursor: pointer;
-      height: 65px;
+      height: 100%;
       transition: 0.2s;
     }
     .nav-item .icon {
-      font-size: 22px;
+      font-size: 20px;
       margin-bottom: 4px;
       padding: 4px 16px;
       border-radius: 16px;
@@ -832,6 +827,7 @@
           </div>
         </div>
         <div id="historyListContainer" style="margin-bottom:20px;"></div>
+        <button class="btn btn-gray" onclick="routeUser()">戻る</button>
       </div>
       <div id="viewManual" class="view">
         <h3 id="manualModalTitle" style="text-align:center; margin-bottom: 20px;">勤務記録の修正</h3>
@@ -897,6 +893,14 @@
           <button id="btnCheckIn" class="btn btn-primary" style="flex:1; height: 70px; font-size: 20px; border-radius: 16px;" onclick="handleCheckInOut('出勤')">出勤</button>
           <button id="btnCheckOut" class="btn btn-outline" style="flex:1; height: 70px; font-size: 20px; border-radius: 16px; border-width: 2px;" onclick="handleCheckInOut('退勤')" disabled>退勤</button>
         </div>
+        <div style="display: flex; gap: 16px; margin-top: 20px;">
+          <button class="btn btn-tonal" style="flex:1; margin:0; height:54px; font-weight:bold;" onclick="showShiftView()">シフト管理</button>
+          <button class="btn btn-tonal" style="flex:1; margin:0; height:54px; font-weight:bold;" onclick="showHistoryView()">勤怠履歴</button>
+        </div>
+        <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
+          <button class="btn btn-gray" onclick="showView('viewMyPage')">登録情報・書類</button>
+          <button class="btn btn-gray" onclick="currentUser = null; resetHonForm(); resetKariForm(); showView('viewStart');">ログアウト</button>
+        </div>
       </div>
       <div id="viewShift" class="view">
         <h3 style="text-align: center;">シフト管理</h3>
@@ -946,21 +950,22 @@
         <div id="kakuteiListContainer" class="scroll-box" style="padding:12px; height: 60vh;"></div>
         <button class="btn btn-gray" style="margin-top:20px;" onclick="showView('viewShift')">シフト管理に戻る</button>
       </div>
-    </div>
 
-    <div id="bottomNav" class="bottom-nav" style="display:none;">
-      <div class="nav-item active" id="navAttendance" onclick="routeUser()">
-        <span class="icon">⏱️</span><span>出退勤</span>
+      <div id="bottomNav" class="bottom-nav" style="display:none;">
+        <div class="nav-item active" id="navAttendance" onclick="routeUser()">
+          <span class="icon">⏱️</span><span>出退勤</span>
+        </div>
+        <div class="nav-item" id="navShift" onclick="showShiftView(); updateNav('navShift')">
+          <span class="icon">📅</span><span>シフト</span>
+        </div>
+        <div class="nav-item" id="navHistory" onclick="showHistoryView(); updateNav('navHistory')">
+          <span class="icon">📜</span><span>履歴</span>
+        </div>
+        <div class="nav-item" id="navDocs" onclick="showView('viewMyPage'); updateNav('navDocs')">
+          <span class="icon">📁</span><span>書類</span>
+        </div>
       </div>
-      <div class="nav-item" id="navShift" onclick="showShiftView(); updateNav('navShift')">
-        <span class="icon">📅</span><span>シフト</span>
-      </div>
-      <div class="nav-item" id="navHistory" onclick="showHistoryView(); updateNav('navHistory')">
-        <span class="icon">📜</span><span>履歴</span>
-      </div>
-      <div class="nav-item" id="navDocs" onclick="showView('viewMyPage'); updateNav('navDocs')">
-        <span class="icon">📁</span><span>書類</span>
-      </div>
+
     </div>
   </div>
   <script>
@@ -993,16 +998,10 @@
     }
     const google = { script: { run: new GASRunner().getProxy() } };
     let currentUser = null;
-    
     window.showView = function(id) {
-      if (id === 'viewStart' || id === 'viewLogin' || id === 'viewKari' || id === 'viewHonLogin' || id === 'viewHonRegister') {
-        // Ẩn Menu ở các trang Đăng nhập / Đăng ký
-        const nav = document.getElementById('bottomNav');
-        if(nav) nav.style.display = 'none';
-      } else {
-        // Hiện Menu ở các trang bên trong App
-        const nav = document.getElementById('bottomNav');
-        if(nav) nav.style.display = 'flex';
+      if (id === 'viewStart') {
+        resetKariForm();
+        if (typeof resetHonForm === 'function') resetHonForm();
       }
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       const target = document.getElementById(id);
@@ -1014,12 +1013,6 @@
       }
     };
 
-    // Đổi màu Menu đang được chọn
-    function updateNav(activeId) {
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-      if(activeId) document.getElementById(activeId).classList.add('active');
-    }
-    
     function searchAddress() {
       const zip = document.getElementById('regZip').value.replace(/[^0-9]/g, "");
       if(zip.length !== 7) return alert("郵便番号は7桁で入力してください。"); 
@@ -1267,13 +1260,12 @@
     }
 
     function handleScrollStrict(el, checkId, hintId) {
-      // Trừ hao 10px để đảm bảo user chỉ cần cuộn gần chạm đáy là nút mở khóa
-      if (el.scrollHeight - el.scrollTop <= el.clientHeight + 10) enableCheckbox(checkId, hintId);
+      if (el.scrollHeight - el.scrollTop <= el.clientHeight + 5) enableCheckbox(checkId, hintId);
     }
-  
+
     function checkInitialVisibility(boxId, checkId, hintId) {
       const el = document.getElementById(boxId);
-      if (el && el.scrollHeight <= el.clientHeight + 10) enableCheckbox(checkId, hintId);
+      if (el && el.scrollHeight <= el.clientHeight + 5) enableCheckbox(checkId, hintId);
     }
 
     function enableCheckbox(checkId, hintId) {
@@ -2248,11 +2240,10 @@
     
     function routeUser() {
       if (currentUser && currentUser.progress && currentUser.progress.includes("完了")) {
+        renderMyPage();
         renderAttendanceView(); 
-        updateNav('navAttendance'); // Sáng đèn nút Điểm danh
       } else {
         renderMyPage();
-        updateNav('navDocs'); // Sáng đèn nút Giấy tờ
       }
     }
     
@@ -2321,32 +2312,24 @@
       }
     }
 
-  function showCustomAlert(msg, isError = false) {
-    const activeView = document.querySelector('.view.active');
-    if (!activeView) return alert(msg); 
-
-    let alertBox = activeView.querySelector('.dynamic-alert-box');
-    if (!alertBox) {
-      alertBox = document.createElement('div');
-      alertBox.className = 'dynamic-alert-box';
-      activeView.insertBefore(alertBox, activeView.children[0]); // ĐÃ SỬA: Luôn nhét lên DÒNG ĐẦU TIÊN
+    function showCustomAlert(msg, isError = false) {
+      const activeView = document.querySelector('.view.active');
+      if (!activeView) return alert(msg);
+      let alertBox = activeView.querySelector('.dynamic-alert-box');
+      if (!alertBox) {
+        alertBox = document.createElement('div');
+        alertBox.className = 'dynamic-alert-box';
+        activeView.insertBefore(alertBox, activeView.children[1]);
+      }
+      const bgColor = isError ? 'var(--md-error-container)' : 'var(--md-success-container)';
+      const textColor = isError ? 'var(--md-error)' : 'var(--md-on-success-container)';
+      const icon = isError ? '⚠️ ' : '✅ ';
+      alertBox.style.cssText = `background: ${bgColor}; color: ${textColor}; padding: 15px; border-radius: 12px; margin: 16px 0; text-align: center; font-weight: bold; font-size: 15px; animation: fadeIn 0.3s ease; display: block;`;
+      alertBox.innerHTML = icon + msg.replace(/\n/g, '<br>');
+      setTimeout(() => { 
+        alertBox.style.display = 'none'; 
+      }, 5000);
     }
-
-    const bgColor = isError ? 'var(--md-error-container)' : 'var(--md-success-container)';
-    const textColor = isError ? 'var(--md-error)' : 'var(--md-on-success-container)';
-    const icon = isError ? '⚠️ ' : '✅ ';
-    
-    alertBox.style.cssText = `background: ${bgColor}; color: ${textColor}; padding: 15px; border-radius: 12px; margin: 0 0 16px 0; text-align: center; font-weight: bold; font-size: 15px; animation: fadeIn 0.3s ease; display: block;`;
-    alertBox.innerHTML = icon + msg.replace(/\n/g, '<br>');
-
-    // Tự động cuộn phần nội dung lên đỉnh để thấy được thông báo
-    const contentBox = document.querySelector('.content');
-    if (contentBox) contentBox.scrollTo({ top: 0, behavior: 'smooth' });
-
-    setTimeout(() => { 
-      alertBox.style.display = 'none'; 
-    }, 5000);
-  }
 
     function handleCheckInOut(type) {
       const locationName = document.getElementById('attLocationSelect').value;
