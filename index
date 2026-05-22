@@ -1,0 +1,2809 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>株式会社アレスコ - スタッフ専用ポータル</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --md-primary: #0061A4;
+      --md-on-primary: #ffffff;
+      --md-primary-container: #D1E4FF;
+      --md-on-primary-container: #001D36;
+      --md-secondary: #9C4500;
+      --md-secondary-container: #FFDBCA;
+      --md-on-secondary-container: #331200;
+      --md-surface: #ffffff;
+      --md-surface-container: #ffffff;
+      --md-surface-variant: #e1e3e1; 
+      --md-on-surface: #1A1C1E;
+      --md-on-surface-variant: #444746;
+      --md-outline: #C4C7C5;
+      --md-outline-variant: #e0e0e0;
+      --md-error: #BA1A1A;
+      --md-error-container: #FFDAD6;
+      --md-on-error-container: #410e0b;
+      --md-success: #006E1C;
+      --md-success-container: #B4F5AB;
+      --md-on-success-container: #002105;
+      --md-warning: #9C4500;
+      --md-warning-container: #FFDBCA;
+      --shape-small: 8px;
+      --shape-medium: 12px;
+      --shape-large: 24px;
+      --shape-full: 100px;
+      --elevation-1: 0px 4px 10px rgba(0, 97, 164, 0.1);
+      --elevation-2: 0 16px 40px rgba(0,0,0,0.1);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { 
+      font-family: 'Noto Sans JP', sans-serif; 
+      background: #ffffff;
+      color: var(--md-on-surface); 
+      margin: 0; 
+      line-height: 1.5; 
+      overflow: hidden; /* Khóa cuộn toàn trang */
+    }
+    .app-shell { 
+      max-width: 500px; 
+      margin: 0 auto; 
+      background: transparent; 
+      height: 100vh;      /* Ép cao đúng bằng màn hình */
+      display: flex; 
+      flex-direction: column; 
+      box-shadow: none;
+      position: relative;
+    }
+    .content { 
+      padding: 20px; 
+      flex: 1; 
+      overflow-y: auto;   /* Chỉ cho phép cuộn nội dung ở giữa */
+      padding-bottom: 80px; /* Chừa chỗ cho thanh Menu đáy không bị che mất chữ */
+    } 
+      font-family: 'Noto Sans JP', sans-serif; 
+      background: #ffffff;
+      color: var(--md-on-surface); 
+      margin: 0; 
+      line-height: 1.5; 
+    }
+    .app-shell { 
+      max-width: 500px; 
+      margin: 0 auto; 
+      background: transparent; 
+      min-height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      box-shadow: none;
+    }
+    header { 
+      display: none; 
+      background: var(--md-surface-container); 
+      padding: 20px 20px; 
+      border-bottom: 2px solid var(--md-primary-container); 
+      text-align: center; 
+      /* Đã xóa position: sticky, top, z-index, box-shadow để nó trôi tự nhiên */
+    }
+    header h1 { font-size: 20px; color: var(--md-primary); margin: 0; font-weight: 900; letter-spacing: 0.5px;}
+    .content { padding: 24px; flex: 1; }
+    .view { display: none; }
+    .view.active { display: block; animation: fadeIn 0.25s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    h2, h3 { color: var(--md-on-surface); margin-top: 0; font-weight: 700; }
+    h3 { font-size: 20px; margin-bottom: 24px; color: var(--md-primary); }
+    .btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; height: 50px; 
+      border: none; 
+      border-radius: var(--shape-full); /* Viên thuốc đặc trưng của M3 */
+      font-size: 15px; font-weight: 500; letter-spacing: 0.5px;
+      cursor: pointer; margin-bottom: 16px; 
+      transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { 
+      background: var(--md-primary); 
+      color: var(--md-on-primary); 
+    }
+    .btn-primary:hover { background: #094eb8; box-shadow: var(--elevation-1); }
+    .btn-outline { 
+      background: transparent; 
+      color: var(--md-primary); 
+      border: 1px solid var(--md-outline); 
+    }
+    .btn-outline:hover { background: var(--md-primary-container); border-color: transparent; }
+    .btn-gray { 
+      background: var(--md-surface-variant); 
+      color: var(--md-on-surface-variant); 
+    }
+    .btn-gray:hover { background: #cdd0ce; }
+
+    .btn-secondary { 
+      background: var(--md-secondary); 
+      color: #ffffff; 
+    }
+    .btn-secondary:hover { background: #7a3600; box-shadow: var(--elevation-1); }
+
+    .btn:disabled { 
+      background: rgba(31, 31, 31, 0.12) !important; 
+      color: rgba(31, 31, 31, 0.38) !important; 
+      border: none !important;
+      cursor: not-allowed; 
+      box-shadow: none; 
+    }
+    .btn-group { display: flex; flex-direction: column; gap: 0px; margin-top: 30px; }
+    .btn-tonal { 
+      background: var(--md-primary-container);
+      color: var(--md-on-primary-container);
+    }
+    .btn-tonal:hover { background: #c0d3fa; }
+    .mypage-header h2 { color: var(--md-on-primary) !important; }
+    .form-group { margin-bottom: 24px; position: relative; }
+    label { 
+      display: block; 
+      font-weight: 500; 
+      margin-bottom: 8px; 
+      font-size: 13px; 
+      color: var(--md-on-surface-variant); 
+    }
+    input[type="text"], input[type="tel"], input[type="email"], input[type="date"], input[type="month"], input[type="time"], select { 
+      width: 100%; 
+      height: 54px; 
+      padding: 0 16px; 
+      background: var(--md-surface-container); /* Ép nền trắng cho đẹp */
+      border: 1px solid var(--md-outline); 
+      border-radius: var(--shape-medium);
+      font-size: 16px; 
+      color: var(--md-on-surface);
+      outline: none;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input:focus, select:focus {
+      border: 2px solid var(--md-primary);
+      padding: 0 15px;
+      background: var(--md-surface-container);
+    }
+    select { 
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23444746' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+    }
+    .task-card {
+      background: var(--md-surface-container); 
+      border: 1px solid var(--md-outline-variant); 
+      border-radius: var(--shape-large); /* Góc bo tròn bự 24px đặc trưng M3 */
+      padding: 20px; 
+      margin-bottom: 16px; 
+      display: flex; align-items: center; justify-content: space-between; 
+      cursor: pointer; 
+      transition: background-color 0.2s, box-shadow 0.2s;
+    }
+    .task-card:hover:not(.is-done) { background: var(--md-surface); box-shadow: var(--elevation-1); border-color: transparent;}
+    .task-card.is-done { cursor: default; opacity: 0.6; background: transparent; border-style: dashed; }
+    .task-card h4 { margin: 0; font-size: 15px; font-weight: 500; color: var(--md-on-surface); }
+    .status-badge { 
+      padding: 6px 14px; 
+      border-radius: var(--shape-small); 
+      font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+      white-space: nowrap; 
+    }
+    .status-done { background: var(--md-success-container); color: var(--md-on-success-container); }
+    .status-wait { background: var(--md-error-container); color: var(--md-on-error-container); }
+    .status-skip { background: var(--md-surface-variant); color: var(--md-on-surface-variant); } 
+    .status-refuse { background: var(--md-warning-container); color: var(--md-warning); }
+    .history-log { 
+      margin-top: 16px; margin-bottom: 24px; padding: 20px; 
+      background: var(--md-primary-container); /* Nền Tonal */
+      border-radius: var(--shape-large); 
+      border: none;
+      color: var(--md-on-primary-container);
+    }
+    .history-log p { margin: 0 0 12px; font-size: 15px; font-weight: 700; }
+    .history-log span { display: block; margin-left: 8px; margin-bottom: 8px; font-size: 14px; font-weight: 500;}
+    .history-note { font-size: 12px; margin-top: 16px; color: var(--md-on-primary-container); opacity: 0.8; }
+    .scroll-container { position: relative; margin-bottom: 16px; }
+    .scroll-box { 
+      max-height: 300px; overflow-y: auto; 
+      border: 1px solid var(--md-outline-variant); 
+      padding: 20px; font-size: 14px; 
+      background: var(--md-surface); 
+      border-radius: var(--shape-large); 
+      line-height: 1.8; color: var(--md-on-surface-variant);
+    }
+    .scroll-hint { font-size: 12px; color: var(--md-error); text-align: right; margin-top: 8px; font-weight: 500; }
+    .scroll-box {
+      background: #ffffff !important;
+      color: #1f1f1f !important;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .scroll-box strong {
+      color: var(--md-primary);
+    }
+    .scroll-box div[style*="background:#fff1f0"] {
+      background-color: #feebe9 !important;
+      border: 1px solid #ffcfcc !important;
+      color: #b3261e !important;
+      padding: 15px !important;
+      border-radius: 12px !important;
+    }
+    .scroll-box div[style*="background:var(--error)"] {
+      background-color: #b3261e !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+    }
+    .table-responsive table {
+      color: #1f1f1f !important;
+    }
+    .table-responsive th {
+      background: #f1f3f4 !important;
+      color: #444746 !important;
+    }
+    .checkbox-item { 
+      display: flex; align-items: center; padding: 20px; 
+      background: var(--md-surface); 
+      border-radius: var(--shape-large); 
+      margin-bottom: 24px; border: 1px solid var(--md-outline-variant); cursor: pointer;
+      transition: 0.2s ease;
+    }
+    .checkbox-item input { width: 24px; height: 24px; margin: 0 16px 0 0; pointer-events: none; accent-color: var(--md-primary); }
+    .checkbox-item label { margin: 0; font-size: 15px; font-weight: 500; cursor: pointer; flex: 1; color: var(--md-on-surface); }
+    .checkbox-item.active-box { background: var(--md-primary-container); border-color: transparent; }
+    .checkbox-item.active-box label { color: var(--md-on-primary-container); font-weight: 700;}
+    .test-q-box { background: var(--md-surface-container); border: 1px solid var(--md-outline-variant); padding: 20px; border-radius: var(--shape-large); margin-bottom: 16px; }
+    .test-options { display: flex; gap: 12px; margin-top: 16px; }
+    .option-item { 
+      flex: 1; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      height: 60px;
+      background: var(--md-surface); 
+      border-radius: var(--shape-medium); 
+      cursor: pointer; 
+      font-weight: 700; 
+      font-size: 24px;
+      color: var(--md-on-surface-variant); 
+      border: 1px solid var(--md-outline-variant);
+      transition: 0.2s;
+      position: relative;
+    }
+    .option-item input { 
+      display: none !important; 
+    }
+    .option-item.selected { 
+      background: var(--md-primary); 
+      color: var(--md-on-primary); 
+      border-color: transparent;
+      box-shadow: var(--elevation-1);
+      transform: scale(1.05);
+    }
+    .upload-box { 
+      position: relative;
+      border: 2px dashed var(--md-outline-variant); 
+      border-radius: var(--shape-large); 
+      padding: 24px; margin-bottom: 16px; 
+      background: var(--md-surface);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .upload-box:hover { background: var(--md-primary-container); border-color: var(--md-primary); }
+    .upload-box label { font-weight: 700; color: var(--md-primary); margin-bottom: 12px; width: 100%; text-align: center; }
+    .file-input-wrapper { width: 100%; display: flex; justify-content: center; }
+    .file-input-wrapper input { width: auto; max-width: 100%; font-size: 13px; background: none; border: none; height: auto; padding: 0; color: var(--md-on-surface-variant);}
+    .preview-container { width: 100%; margin-top: 16px; padding: 12px; background: var(--md-surface-container); border-radius: var(--shape-medium); box-shadow: var(--elevation-1); display: none; position: relative;}
+    .preview-img { width: 100%; max-height: 250px; object-fit: cover; border-radius: var(--shape-small); }
+    .pdf-label { font-size: 13px; font-weight: 500; color: var(--md-primary); word-break: break-all; margin: 0; text-align: center; padding: 10px;}
+    .btn-remove-img {
+      position: absolute; top: -10px; right: -10px;
+      width: 32px; height: 32px; border: none; border-radius: 50%;
+      background: var(--md-error); color: white; font-weight: bold; font-size: 16px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      box-shadow: var(--elevation-1); z-index: 10;
+    }
+    input.input-error, select.input-error, .upload-box.input-error, .test-q-box.error {
+      border: 2px solid var(--md-error) !important;
+      background-color: var(--md-error-container) !important;
+      animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    input.input-error:focus, select.input-error:focus { padding: 0 15px; }
+    .error-message {
+      color: var(--md-error); font-size: 12px; font-weight: 500;
+      margin-left: 8px; display: none; 
+    }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+    .mypage-header {
+      background: var(--md-primary); 
+      color: var(--md-on-primary); 
+      padding: 20px 24px; /* Đã thu gọn chiều cao */
+      border-radius: var(--shape-large); 
+      margin-bottom: 24px; 
+      text-align: center; /* Thêm căn giữa cho tên đẹp hơn */
+    }
+    .confirm-box {
+      background: var(--md-surface-container); 
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--shape-large); 
+      padding: 24px; margin-bottom: 24px;
+    }
+    .confirm-row { display: flex; flex-direction: column; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--md-surface-variant); }
+    .confirm-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .confirm-label { font-size: 12px; color: var(--md-on-surface-variant); font-weight: 500; margin-bottom: 4px; }
+    .confirm-val { font-size: 16px; font-weight: 500; color: var(--md-on-surface); word-break: break-all; }
+    .alert-box {
+      background: var(--md-warning-container);
+      color: var(--md-warning);
+      padding: 16px; border-radius: var(--shape-large); margin-bottom: 20px;
+    }
+    .alert-box-error { background: var(--md-error-container); color: var(--md-error); border: none; }
+    #loading { 
+      display: none; 
+      position: absolute;
+      top: 0; left: 0; 
+      width: 100%; height: 100%; 
+      background: rgba(255,255,255,0.85);
+      z-index: 9999; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: flex-start;
+      padding-top: 15vh;
+    }
+    .spinner { border: 4px solid var(--md-surface-variant); border-top: 4px solid var(--md-primary); border-radius: 50%; width: 48px; height: 48px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+    .table-responsive { width: 100%; overflow-x: auto; margin: 16px 0; border: 1px solid var(--md-outline-variant); border-radius: var(--shape-small); }
+    table { width: 100%; min-width: 500px; border-collapse: collapse; font-size: 12px; background: var(--md-surface-container); }
+    th, td { border-bottom: 1px solid var(--md-outline-variant); padding: 10px; text-align: left; }
+    th { background: var(--md-surface); color: var(--md-on-surface-variant); font-weight: 500; }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .spinner { 
+      border: 4px solid rgba(0,0,0,0.1); /* Viền mờ */
+      border-top: 4px solid var(--md-primary); /* Đỉnh xanh */
+      border-radius: 50%; 
+      width: 48px; height: 48px; 
+      animation: spin 0.8s linear infinite; /* Chạy animation spin */
+      margin-bottom: 20px; 
+    }
+    .shift-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: var(--md-surface-container); padding: 8px; border-radius: var(--shape-full); border: 1px solid var(--md-outline-variant); }
+    .shift-nav button { background: none; border: none; font-size: 14px; font-weight: 700; color: var(--md-primary); cursor: pointer; padding: 8px 16px; }
+    #shiftMonthDisplay, #kakuteiMonthDisplay { font-size: 18px; font-weight: 700; color: var(--md-on-surface); }
+    .shift-quick-btn { flex: 1; height: 40px; border-radius: var(--shape-small); font-size: 13px; font-weight: 700; cursor: pointer; }
+    .shift-list-day { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px dashed var(--md-outline-variant); }
+    .shift-list-day:last-child { border-bottom: none; }
+    .day-header { font-size: 15px; font-weight: 700; color: var(--md-primary); margin-bottom: 10px; }
+    .location-header { font-size: 13px; font-weight: 700; color: var(--md-on-primary-container); background: var(--md-primary-container); padding: 4px 10px; border-radius: 4px; margin-bottom: 8px; display: inline-block;}
+    .shift-items-wrapper { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+    .shift-slot { padding: 10px; border-radius: 8px; font-size: 14px; cursor: pointer; text-align: center; border: 2px solid transparent; transition: 0.1s; font-weight: 500;}
+    .shift-slot.available { background: var(--md-surface-variant); color: var(--md-on-surface-variant); }
+    .shift-slot.staging, .shift-slot.requested { background: var(--md-secondary); color: #fff; font-weight: 700; }
+    .shift-slot.confirmed { background: var(--md-success); color: #fff; font-weight: 700; opacity: 0.7; pointer-events: none;}
+    .confirmed-shift-item { background: var(--md-success-container); color: var(--md-on-success-container); padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 700; margin-bottom: 8px; border-left: 4px solid var(--md-success); }
+    .shift-remarks { font-size: 12px; color: var(--md-on-surface-variant); margin-top: 6px; font-weight: 400; border-top: 1px dashed var(--md-outline); padding-top: 6px;}
+    .calendar-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); border-top: 1px solid #ddd; border-left: 1px solid #ddd; }
+    .calendar-day { border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 4px; min-height: 50px; }
+    .day-number { font-size: 11px; font-weight: bold; margin-bottom: 4px; }
+    .shift-entry { 
+      background: var(--md-secondary); 
+      color: #fff; 
+      font-size: 10px; 
+      padding: 4px; 
+      border-radius: 4px; 
+      margin-bottom: 2px; 
+      white-space: normal;
+      word-break: break-word;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    /* ===== BOTTOM NAVIGATION BAR ===== */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 65px;
+      background: #ffffff;
+      border-top: 1px solid var(--md-outline-variant);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+      z-index: 1000;
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--md-on-surface-variant);
+      text-decoration: none;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      height: 100%;
+      transition: 0.2s;
+    }
+    .nav-item .icon {
+      font-size: 20px;
+      margin-bottom: 4px;
+      padding: 4px 16px;
+      border-radius: 16px;
+    }
+    .nav-item.active { color: var(--md-primary); }
+    .nav-item.active .icon { background: var(--md-primary-container); }
+    
+  </style>
+</head>
+<body>
+  <div id="loading">
+      <div class="spinner"></div>
+      <p id="loadingStatus" style="font-weight:700; color:var(--primary); margin-bottom:5px;">処理中...</p>
+      <p id="loadingProgress" style="font-size:12px; color:#666;"></p>
+  </div>
+  <div class="app-shell">
+    <header><h1>株式会社アレスコ</h1></header>
+    <div class="content">
+      <div id="viewStart" class="view active">
+        <div style="text-align:center; padding: 30px 0 10px;">
+          <img src="https://alesco-v.co.jp/wp/wp-content/uploads/ALESCO-LOGO.png" style="width:150px; margin-bottom:20px;">
+          <h2>スタッフ専用ポータル</h2>
+        </div>
+        <div style="margin-bottom: 25px; padding-top: 15px; border-top: 1px dashed #ddd;">
+          <p style="font-size: 13px; color: #5f6368; margin-bottom: 8px; font-weight: bold; text-align: center;">【STEP 1】 初めての方はこちら</p>
+          <button class="btn btn-primary" onclick="resetKariForm(); showView('viewKari')">プロフィール登録</button>
+        </div>
+        <div style="margin-bottom: 25px;">
+          <p style="font-size: 13px; color: #5f6368; margin-bottom: 8px; font-weight: bold; text-align: center;">【STEP 2】 採用が決まった方はこちら</p>
+          <button class="btn btn-tonal" onclick="showView('viewHonLogin')">入社手続き</button>
+        </div>
+        <div>
+          <p style="font-size: 13px; color: #5f6368; margin-bottom: 8px; font-weight: bold; text-align: center;">すでに就業中・登録済みの方</p>
+          <button class="btn btn-gray" onclick="showView('viewLogin')">マイページにログイン</button>
+        </div>
+      </div>
+      <div id="viewKari" class="view">
+        <div id="kariStep1">
+          <h3>1. 個人情報の取扱いについて</h3>
+          <div class="scroll-container">
+            <div class="scroll-box" id="kariBox" onscroll="handleScrollStrict(this, 'kariConsentCheck', 'kariHint')">
+              <div style="text-align: center; margin-bottom: 15px;">
+                <strong style="font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 2px;">
+                  告知書兼同意書
+                </strong>
+              </div>
+                当社は、従業者に関する個人情報の取扱について、以下の様に定めます。<br><br>
+                <strong>１．個人情報の取得・利用目的</strong><br>当社は、ご提供いただく個人情報は下記の必要な範囲内で利用致します。<br>・人材派遣・請負に関する業務<br>・入社・退社手続、給与支払、勤怠管理、社会保険及び労働保険関係手続<br>・取引先への業務上必要な連絡等<br><br>
+                <strong>２．個人情報の委託</strong><br>当社は、利用目的の達成に必要な範囲内において、従業者の個人情報の取扱いを委託します。その場合は、個人情報保護体制が整備された委託先を選定して利用致します。<br><br>
+                <strong>３．個人情報の安全管理</strong><br>個人情報の漏洩等がなされないよう、適切に安全管理対策を実施します。<br><br>
+                <strong>４．個人情報の任意性</strong><br>当社に個人情報を提供いただくことは、ご本人様の任意のご意思によります。ただし、ご本人様が個人情報の提供を拒否された場合は、上記１．個人情報の取得・利用目的に記載の業務に支障をきたし、ご本人が不利益を被る可能性があります。（給与支払、福利厚生が受けられない等）また、これによりご本人様が被った損害（逸失利益を含む）、不利益等について、当社は何らの賠償責任等を負いません。<br><br>
+                <strong>５．開示等の受付・窓口</strong><br>ご提供いただいた保有個人データについては、開示等（利用目的の通知、開示、内容の訂正・追加または削除、利用停止、消去および第三者提供の停止、第三者への提供記録の開示）のご請求ができます。お申し出は、以下の窓口にて受付けます。<br><br>
+                <strong>６．求人情報の通知について</strong><br>採用選考後登録希望の方には、時期にもよりますが月２回程度 求人情報の通知させて戴く場合があります。<br><br>
+                <strong>７．個人情報の提供</strong><br>当社は、法令に基づく場合及び下記の場合を除いては提供しません。<br>
+                <div class="table-responsive"><table><thead><tr><th>第三者に提供する目的</th><th>提供する個人情報の項目</th><th>提供の手段又は方法</th><th>当該情報の提供を受ける者又は提供を受ける者の組織の種類、及び属性</th><th>個人情報の取扱いに関する契約がある場合はその旨</th></tr></thead><tbody><tr><td>給与振込みのため</td><td>口座番号<br>氏名</td><td>銀行窓口及びWebにて</td><td>当社取引銀行</td><td>取引銀行の個人情報の取扱い規約</td></tr><tr><td>税務/社会保険のため</td><td>氏名、性別、住所、生年月日、支払額、税額、個人番号</td><td>郵送、電子申請にて</td><td>役所等の公的機関</td><td>ー</td></tr><tr><td>派遣先・委託元セキュリティ登録のため</td><td>氏名、性別、住所、生年月日、国籍、電話番号、証明写真（顔写真）等</td><td>電子メール<br>（パスワード付）<br>郵送</td><td>派遣先・委託元等就業場所</td><td>各種機密保持契約書</td></tr></tbody></table></div>
+                <br>私は、上記すべての事項に同意し、私の個人情報を提供致します。
+              </div>
+            <p class="scroll-hint" id="kariHint">※一番下までスクロールしてください</p>
+          </div>
+          <div class="checkbox-item" onclick="toggleCheckboxFromBox('kariConsentCheck')">
+            <input type="checkbox" id="kariConsentCheck" disabled onchange="toggleAgreeStyle(this)"> 
+            <label for="kariConsentCheck">同意します</label>
+          </div>
+          <p class="error-message" id="kariCheckError">「同意します」にチェックを入れてください。</p>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="nextKariStep(2)">次へ</button>
+            <button class="btn btn-gray" onclick="showView('viewStart')">戻る</button>
+          </div>
+        </div>
+        <div id="kariStep2" style="display:none;">
+          <h3>2. 基本情報の登録</h3>
+          <label>氏名（漢字・アルファベット）<span class="error-message" id="kariNameError">（必須）</span></label>
+          <div style="display:flex; gap:10px; margin-bottom: 20px;">
+            <input type="text" id="kariLastName" placeholder="姓">
+            <input type="text" id="kariFirstName" placeholder="名">
+          </div>
+          <label>氏名（カタカナ）<span class="error-message" id="kariKanaError">（必須）</span></label>
+          <div style="display:flex; gap:10px; margin-bottom: 20px;">
+            <input type="text" id="kariLastKana" placeholder="セイ">
+            <input type="text" id="kariFirstKana" placeholder="メイ">
+          </div>
+          <div class="form-group">
+            <label>生年月日 <span class="error-message" id="kariDobError">（必須）</span></label>
+            <input type="date" id="kariDob">
+          </div>
+          <div class="form-group">
+            <label>性別 <span class="error-message" id="kariGenderError">（必須）</span></label>
+            <select id="kariGender">
+              <option value="" disabled selected>選択してください</option>
+              <option value="男">男性</option>
+              <option value="女">女性</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>国籍 <span class="error-message" id="kariNatError">（必須）</span></label>
+            <select id="kariNationality" onchange="toggleCountryInput(this.value)">
+              <option value="" disabled selected>選択してください</option>
+              <option value="日本">日本</option>
+              <option value="外国籍">外国籍</option>
+            </select>
+          </div>
+          <div id="kariCountryDiv" class="form-group" style="display:none;">
+            <label>国名<span class="error-message" id="kariCountryError">（必須）</span></label>
+            <input type="text" id="kariCountry" placeholder="例: アメリカ">
+          </div>
+          <div class="btn-group">
+              <button class="btn btn-primary" onclick="nextKariStep(3)">次へ</button>
+              <button class="btn btn-gray" onclick="nextKariStep(1)">戻る</button>
+          </div>
+        </div>
+        <div id="kariStep3" style="display:none;">
+          <h3>3. 連絡先・住所</h3>
+          <div class="form-group">
+            <label>電話番号 <span class="error-message" id="kariPhoneError">（いずれか一方は入力必須です）</span></label>
+            <div style="margin-bottom: 10px;">
+              <input type="tel" id="kariPhone" placeholder="携帯電話 (例: 090-1234-5678)">
+            </div>
+            <div id="landlineArea" style="display:none; margin-bottom: 10px;">
+              <input type="tel" id="kariLandline" placeholder="固定電話 (例: 03-1234-5678)">
+            </div>
+            <div id="toggleLandlineBtn" style="text-align: right;">
+              <button type="button" class="btn btn-outline" style="width:auto; height:30px; font-size:12px; padding:0 15px; margin:0;" onclick="showLandlineField()">
+                ＋ 固定電話を追加する
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>メールアドレス <span class="error-message" id="kariEmailError">（必須・正しい形式で入力）</span></label>
+            <input type="email" id="kariEmail" placeholder="example@mail.com">
+          </div>
+          <div class="form-group">
+            <label>郵便番号 <span class="error-message" id="kariZipError">（7桁で入力してください）</span></label>
+            <div style="display:flex; gap:10px;">
+              <input type="tel" id="kariZip" style="flex:1;" placeholder="1234567">
+              <button type="button" class="btn btn-outline" style="width:100px; height:50px; margin:0;" onclick="searchKariAddress()">検索</button>
+            </div>
+          </div>
+          <div class="form-group"><label>住所1 <span class="error-message" id="kariAddr1Error">（検索してください）</span></label><input type="text" id="kariAddr1" disabled></div>
+          <div class="form-group"><label>住所2（番地） <span class="error-message" id="kariAddr2Error">（必須）</span></label><input type="text" id="kariAddr2"></div>
+          <div class="form-group"><label>住所3（建物・部屋番号）</label><input type="text" id="kariAddr3"></div>
+          <div class="btn-group">
+              <button class="btn btn-primary" onclick="nextKariStep(4)">次へ</button>
+              <button class="btn btn-gray" onclick="nextKariStep(2)">戻る</button>
+          </div>
+        </div>
+        <div id="kariStep4" style="display:none;">
+          <h3>4. 履歴書のアップロード</h3>
+          <p style="font-size:13px; color:#5f6368; margin-bottom:15px;">
+            履歴書・職務経歴書等の画像またはPDFファイルをご提出ください。<span style="color:var(--error); font-weight:bold;">（必須）</span>
+          </p>
+          <p style="font-size:11px; color:var(--error); margin-bottom:15px; line-height:1.4;">
+            ※ ファイルの容量が大きい場合（PDF等）、アップロードに時間がかかることがあります。画面を閉じずにお待ちください。
+          </p>
+          <div id="kariUploadZone">
+            <div class="upload-box dynamic-upload" id="kariBox_1">
+              <label>履歴書 <span class="error-message" id="kariError_1" style="display:none;">（ファイルを選択してください）</span></label>
+              <div class="file-input-wrapper">
+                <input type="file" id="kari_f1" accept="image/*,.pdf,.doc,.docx" onchange="previewDynamicImg(this, 'kari_p1', 1)">
+              </div>
+              <div class="preview-container" id="kari_p1-c">
+                <button type="button" class="btn-remove-img" onclick="clearFirstBoxImg()">✕</button>
+                <img id="kari_p1" class="preview-img">
+                <p id="kari_pdf1" class="pdf-label"></p>
+              </div>
+            </div>
+          </div>
+          <div style="text-align:center; margin-bottom: 25px;">
+            <button type="button" class="btn btn-outline" style="width:auto; display:inline-block; padding:10px 20px; font-size:14px; margin:0;" onclick="addUploadBox()">
+              ＋ ファイルを追加する
+            </button>
+          </div>
+          <div class="btn-group">
+              <button class="btn btn-primary" onclick="prepareKariConfirm()">入力内容を確認する</button>
+              <button class="btn btn-gray" onclick="nextKariStep(3)">戻る</button>
+          </div>
+        </div>
+        <div id="kariStep5" style="display:none;">
+          <h3>5. 入力内容の確認</h3>
+          <p style="font-size: 14px; margin-bottom: 15px; color: #5f6368;">以下の内容で登録します。間違いがないかご確認ください。</p>
+          <div class="confirm-box" id="kariConfirmDataBox">
+          </div>
+          <div class="btn-group">
+              <button class="btn btn-primary" onclick="handleKariRegister()">この内容で登録する</button>
+              <button class="btn btn-gray" onclick="nextKariStep(4)">修正する</button>
+          </div>
+        </div>
+      </div>
+      <div id="viewKariSuccess" class="view">
+        <div style="text-align:center; padding: 40px 0;">
+          <div style="font-size: 60px; color: var(--success); margin-bottom: 20px;">✓</div>
+          <h2 style="color: var(--success); font-size: 22px;">STEP 1 が完了しました</h2>
+          <div style="background: #f8f9fa; border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin: 20px 0; text-align: left;">
+            <p style="font-size: 13px; color: #333; margin-bottom: 10px; font-weight: bold;">■ これから選考に進む方</p>
+            <p style="font-size: 12px; color: #5f6368; margin: 0 0 15px 0;">担当者より面接等に関するご案内をお電話またはメールにてご連絡します。</p>
+            <p style="font-size: 13px; color: #333; margin-bottom: 10px; font-weight: bold;">■ すでに採用が決まっている方</p>
+            <p style="font-size: 12px; color: #5f6368; margin: 0;">引き続き、トップページに戻り<br><b>「STEP 2：入社手続き」</b>へお進みください。</p>
+          </div>
+          <button class="btn btn-primary" onclick="showView('viewStart')">トップページへ戻る</button>
+        </div>
+      </div>
+      <div id="viewHonSuccess" class="view">
+        <div style="text-align:center; padding: 40px 0;">
+          <div style="font-size: 60px; color: var(--success); margin-bottom: 20px;">✓</div>
+          <h2 style="color: var(--success); font-size: 20px;">入社手続きが完了しました</h2>
+          <p style="color:#5f6368; font-size:14px; line-height:1.6; margin-top:15px; margin-bottom:30px;">
+            手続きありがとうございます。<br>
+            続けて、マイページにログインし、<br>
+            <b>「本人確認書類」や「口座情報」</b>等の<br>
+            ご提出をお願いいたします。
+          </p>
+          <button class="btn btn-primary" style="margin-bottom: 12px;" onclick="showView('viewLogin')">マイページへログインする</button>
+          <button class="btn btn-gray" onclick="showView('viewStart')">トップページへ戻る</button>
+        </div>
+      </div>
+      <div id="viewHonLogin" class="view">
+        <h3>入社手続き</h3>
+        <div id="honLoginErrorBox" style="display:none; background:#fff8e1; border:1px solid #ffe082; padding:15px; border-radius:12px; margin-bottom:20px;">
+          <p style="color:#b07a00; font-size:13px; font-weight:700; margin:0 0 10px 0;">⚠️ プロフィール登録が確認できません</p>
+          <p style="font-size:12px; color:#5f6368; line-height:1.5; margin:0 0 15px 0;">
+            入社手続きを始める前に、まずは「STEP 1：プロフィール登録」を完了させる必要があります。
+          </p>
+          <button class="btn btn-primary" style="height:44px; font-size:14px; margin:0;" onclick="resetKariForm(); showView('viewKari')">STEP 1へ進む</button>
+        </div>
+        <p style="font-size:13px; color:#5f6368; margin-bottom:20px;">
+          採用担当より案内を受けた方は、STEP 1で登録した電話番号と生年月日を入力してください。
+        </p>
+        <div class="form-group">
+          <label>電話番号</label>
+          <input type="tel" id="honLoginPhone" placeholder="携帯電話または固定電話">
+        </div>
+        <div class="form-group">
+          <label>生年月日</label>
+          <input type="date" id="honLoginDob">
+        </div>
+        <button class="btn btn-primary" onclick="handleHonLogin()">次へ進む</button>
+        <button class="btn btn-gray" onclick="showView('viewStart')">戻る</button>
+      </div>
+      <div id="viewHonRegister" class="view">
+        <div style="background:var(--bg); border:1px solid var(--border); border-left:4px solid var(--primary); padding:15px; border-radius:8px; margin-bottom:25px;">
+          <p style="font-size:12px; color:#666; margin:0 0 5px 0;">以下のご本人様でお間違いないでしょうか？</p>
+          <h3 id="honConfirmName" style="margin:0; color:var(--primary-dark); font-size:18px;">--- 様</h3>
+          <div id="honSubmitErrorBox" class="alert-box alert-box-error" style="display:none; margin-top:10px;"></div>
+        </div>
+        <div id="honStep1">
+          <h3>1. 雇用形態の選択</h3>
+          <div class="form-group">
+            <label>希望する雇用形態を選択してください</label>
+            <select id="honEmpType">
+              <option value="メイン">メイン（主となるお仕事）</option>
+              <option value="ダブルワーク">ダブルワーク（副業としてのお仕事）</option>
+              <option value="フリーランス">フリーランス（業務委託・個人事業主）</option> <!-- ĐÃ SỬA -->
+              <option value="ワーキングホリデー">ワーキングホリデー（特定活動ビザ等での就労）</option> <!-- ĐÃ THÊM -->
+            </select>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="nextHonStep(2)">次へ</button>
+            <button class="btn btn-gray" onclick="showView('viewHonLogin')">戻る</button>
+          </div>
+        </div>
+        <div id="honStep2" style="display:none;">
+          <h3>2. 個人情報の取扱いについて「告知書兼同意書」</h3>
+          <div class="scroll-container">
+            <div class="scroll-box" id="honConsentBox" onscroll="handleScrollStrict(this, 'honConsentCheck', 'honConsentHint')">
+            </div>
+            <p class="scroll-hint" id="honConsentHint">※一番下までスクロールしてください</p>
+          </div>
+          <div class="checkbox-item" onclick="toggleCheckboxFromBox('honConsentCheck')">
+            <input type="checkbox" id="honConsentCheck" disabled onchange="toggleAgreeStyle(this)">
+            <label for="honConsentCheck">同意します</label>
+          </div>
+          <p class="error-message" id="honConsentCheckError">「同意します」にチェックを入れてください。</p>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="nextHonStep(3)">次へ</button>
+            <button class="btn btn-gray" onclick="nextHonStep(1)">戻る</button>
+          </div>
+        </div>
+        <div id="honStep3" style="display:none;">
+          <h3>3. 承諾書</h3>
+          <div class="scroll-container">
+            <div class="scroll-box" id="honAgreementBox" onscroll="handleScrollStrict(this, 'honAgreementCheck', 'honAgreementHint')">
+            </div>
+            <p class="scroll-hint" id="honAgreementHint">※一番下までスクロールしてください</p>
+          </div>
+          <div class="checkbox-item" onclick="toggleCheckboxFromBox('honAgreementCheck')">
+            <input type="checkbox" id="honAgreementCheck" disabled onchange="toggleAgreeStyle(this)">
+            <label for="honAgreementCheck">同意します</label>
+          </div>
+          <p class="error-message" id="honAgreementCheckError">「同意します」にチェックを入れてください。</p>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="nextHonStep(4)">次へ</button>
+            <button class="btn btn-gray" onclick="nextHonStep(2)">戻る</button>
+          </div>
+        </div>
+        <div id="honStep4" style="display:none;">
+          <h3>4. 秘密保持契約書</h3>
+          <div class="scroll-container">
+            <div class="scroll-box" id="honNdaBox" onscroll="handleScrollStrict(this, 'honNdaCheck', 'honNdaHint')">
+            </div>
+            <p class="scroll-hint" id="honNdaHint">※一番下までスクロールしてください</p>
+          </div>
+          <div class="checkbox-item" onclick="toggleCheckboxFromBox('honNdaCheck')">
+            <input type="checkbox" id="honNdaCheck" disabled onchange="toggleAgreeStyle(this)">
+            <label for="honNdaCheck">同意します</label>
+          </div>
+          <p class="error-message" id="honNdaCheckError">「同意します」にチェックを入れてください。</p>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="nextHonStep(5)">次へ</button>
+            <button class="btn btn-gray" onclick="nextHonStep(3)">戻る</button>
+          </div>
+        </div>
+        <div id="honStep5" style="display:none;">
+          <h3>5. 個人情報保護教育</h3>
+          <div class="scroll-container">
+            <div class="scroll-box" id="honEduBox" onscroll="handleScrollStrict(this, 'honEduCheck', 'honEduHint')">
+            </div>
+            <p class="scroll-hint" id="honEduHint">※一番下までスクロールしてください</p>
+          </div>
+          <div class="checkbox-item" onclick="toggleCheckboxFromBox('honEduCheck')">
+            <input type="checkbox" id="honEduCheck" disabled onchange="toggleEduTest(this)">
+            <label for="honEduCheck">内容を確認しました</label>
+          </div>
+          <p class="error-message" id="honEduCheckError">「内容を確認しました」にチェックを入れてください。</p>
+          <div id="testArea" style="display:none;">
+            <h4 style="font-size:14px; color:var(--primary); margin: 20px 0 10px;">【理解度テスト】正しい方にチェック</h4>
+            <div id="honEduTestArea"></div>
+          </div>
+          <div class="btn-group" style="margin-top:20px;">
+            <button class="btn btn-primary" onclick="handleHonSubmit()">入社手続きを完了する</button>
+            <button class="btn btn-gray" onclick="nextHonStep(4)">戻る</button>
+          </div>
+        </div>
+      </div>
+      <div id="viewLogin" class="view">
+        <h3>ログイン</h3>
+        <p class="error-message" id="loginError" style="background:#fff1f0; padding:12px; border-radius:10px; border:1px solid #ffa39e; margin-bottom:20px; font-size:13px;"></p>
+        <div class="form-group">
+          <label>電話番号</label>
+          <input type="tel" id="loginPhone" placeholder="携帯電話または固定電話">
+        </div>
+        <div class="form-group"><label>生年月日</label><input type="date" id="loginDob"></div>
+        <button class="btn btn-primary" onclick="handleLogin()">ログイン</button>
+        <button class="btn btn-gray" onclick="showView('viewStart')">戻る</button>
+      </div>
+      <div id="viewMyPage" class="view">
+      <div class="mypage-header">
+        <h2 id="mpUserName" style="margin:0; font-size: 22px;">--- 様</h2>
+        <span id="mpUserType" style="font-size: 14px; opacity: 0.9; font-weight: 500; display: block; margin-top: 4px;">---</span>
+      </div>
+        <div id="shinkokushoAlert" style="display:none; background:#fff8e1; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #ffe082;">
+          <p style="margin:0 0 12px 0; font-size:13px; color:#b07a00; font-weight:700;">
+            <span style="font-size:16px; margin-right:8px;">⚠️</span> 扶養控除等申告書の提出が必要です。
+          </p>
+          <button class="btn btn-primary" style="height:48px; font-size:14px; margin:0;" onclick="openFuyoForm()">
+            申告書を入力する
+          </button>
+        </div>
+        <div id="taskList"></div>
+        <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
+          <button class="btn btn-gray" onclick="routeUser()">戻る</button>
+          <button class="btn btn-gray" onclick="currentUser = null; resetHonForm(); resetKariForm(); showView('viewStart');">ログアウト</button>
+        </div>
+      </div>
+      <div id="viewRegSuccess" class="view">
+        <div style="text-align:center; padding: 40px 0;">
+          <div style="font-size: 60px; color: var(--success); margin-bottom: 20px;">✓</div>
+          <h2 style="color: var(--success);">登録が完了しました</h2>
+          <p style="color:#5f6368; font-size:14px; line-height:1.6;">
+            スタッフ登録の初期設定が完了しました。<br>
+            続けて、マイページにログインして<br>
+            <b>身分証・口座情報の提出</b>を行ってください。
+          </p>
+          <button class="btn btn-primary" style="margin-top:30px;" onclick="showView('viewLogin')">ログイン画面へ</button>
+        </div>
+      </div>
+      <div id="viewTaskDetail" class="view"><h3 id="taskDetailTitle" style="color:var(--primary); border-bottom:2px solid var(--primary); padding-bottom:10px;">---</h3><div id="taskDetailContent"></div><div id="taskDetailActions" style="margin-top:20px;"></div><button class="btn btn-gray" onclick="showView('viewMyPage')" style="margin-top:20px;">戻る</button></div>
+      <div id="viewHistory" class="view">
+        <h3 style="text-align: center;">勤怠履歴</h3>
+        <div class="form-group" style="display:flex; gap:10px;">
+          <input type="month" id="historyMonthFilter" style="flex:2; margin-bottom:0;" onchange="loadFilteredHistory()">
+          <button class="btn btn-primary" style="flex:1; margin-bottom:0; height:54px;" onclick="openManualModal()">追加</button>
+        </div>
+        <div id="historySummary" style="display:none; background: var(--md-secondary-container); color: var(--md-on-secondary-container); padding: 15px; border-radius: var(--shape-medium); margin-bottom: 20px; display:flex; justify-content:space-around; text-align:center;">
+          <div>
+            <span style="font-size:12px; display:block;">合計時間</span>
+            <strong id="summaryTotalTime" style="font-size:20px;">0:00</strong>
+          </div>
+          <div>
+            <span style="font-size:12px; display:block;">合計交通費</span>
+            <strong id="summaryTotalFee" style="font-size:20px;">0</strong>
+          </div>
+        </div>
+        <div id="historyListContainer" style="margin-bottom:20px;"></div>
+        <button class="btn btn-gray" onclick="routeUser()">戻る</button>
+      </div>
+      <div id="viewManual" class="view">
+        <h3 id="manualModalTitle" style="text-align:center; margin-bottom: 20px;">勤務記録の修正</h3>
+        <div style="background: var(--md-surface-container); padding: 20px; border-radius: var(--shape-large); border: 1px solid var(--md-outline-variant); margin-bottom: 24px;">
+          <label style="margin-bottom: 4px;">日付</label>
+          <input type="date" id="manualDate" style="margin-bottom: 12px; height: 48px;">
+          <label style="margin-bottom: 4px;">勤務地</label>
+          <select id="manualLocation" style="margin-bottom: 12px; height: 48px;"></select>
+          <div style="display:flex; gap:10px; margin-bottom: 12px;">
+            <div style="flex:1;">
+              <label style="margin-bottom: 4px;">出勤時間</label>
+              <input type="time" id="manualIn" style="height: 48px;">
+            </div>
+            <div style="flex:1;">
+              <label style="margin-bottom: 4px;">退勤時間</label>
+              <input type="time" id="manualOut" style="height: 48px;">
+            </div>
+          </div>
+          <label style="margin-bottom: 4px;">交通費</label>
+          <input type="tel" id="manualFee" inputmode="numeric" style="margin-bottom: 20px; height: 48px;">
+          <input type="hidden" id="manualRowIndex">
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-gray" style="flex:1; margin:0;" onclick="showView('viewHistory')">キャンセル</button>
+            <button class="btn btn-primary" style="flex:1; margin:0;" onclick="saveManualData()">保存</button>
+          </div>
+        </div>
+      </div>
+      <div id="viewShonin" class="view">
+        <h3 style="text-align:center; color: var(--md-primary);">勤怠承認</h3>
+        <div style="background: var(--md-surface-container); padding: 20px; border-radius: var(--shape-large); border: 1px solid var(--md-outline-variant); text-align: center; margin-bottom: 24px;">
+          <p id="shoninModalDesc" style="font-size: 14px; margin-bottom: 20px; color: var(--md-on-surface-variant);"></p>
+          <input type="text" id="shoninApproverName" placeholder="承認者名" style="margin-bottom: 15px; text-align: center; height: 48px;">
+          <input type="password" id="shoninPassword" placeholder="パスワード" style="margin-bottom: 25px; text-align: center; width: 100%; height: 48px; padding: 0 16px; border: 1px solid var(--md-outline); border-radius: var(--shape-medium); font-size: 16px;">
+          <input type="hidden" id="shoninMode">
+          <input type="hidden" id="shoninTargetDate">
+          <input type="hidden" id="shoninTargetLoc">
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-gray" style="flex:1; margin:0;" onclick="showView('viewHistory')">キャンセル</button>
+            <button class="btn btn-secondary" style="flex:1; margin:0;" onclick="submitShonin()">承認する</button>
+          </div>
+        </div>
+      </div>
+      <div id="viewAttendance" class="view">
+        <div class="mypage-header">
+          <h2 id="attUserName" style="margin:0; font-size: 22px;">--- 様</h2>
+        </div>
+        <div style="text-align: center; margin: 30px 0;">
+          <div id="attDateDisplay" style="font-size: 16px; color: var(--md-on-surface-variant); font-weight: 500;">----/--/-- (-)</div>
+          <div id="attClockDisplay" style="font-size: 42px; font-weight: 900; color: var(--md-primary); letter-spacing: 2px; font-variant-numeric: tabular-nums;">--:--:--</div>
+        </div>
+        <div id="attStatusBox" style="display:none; background: var(--md-primary-container); color: var(--md-on-primary-container); padding: 20px; border-radius: var(--shape-large); text-align: center; font-size: 16px; font-weight: 700; margin-bottom: 24px;"></div>
+        <div class="form-group">
+          <label>勤務地を選択</label>
+          <select id="attLocationSelect">
+            <option value="" disabled selected>読み込み中...</option>
+          </select>
+        </div>
+        <div class="form-group" id="attFeeGroup" style="display:none;">
+          <label>往復交通費</label>
+          <input type="tel" id="attCommuteFee" placeholder="半角数字のみ (例: 500)" inputmode="numeric">
+        </div>
+        <div style="display: flex; gap: 16px; margin-top: 30px;">
+          <button id="btnCheckIn" class="btn btn-primary" style="flex:1; height: 70px; font-size: 20px; border-radius: 16px;" onclick="handleCheckInOut('出勤')">出勤</button>
+          <button id="btnCheckOut" class="btn btn-outline" style="flex:1; height: 70px; font-size: 20px; border-radius: 16px; border-width: 2px;" onclick="handleCheckInOut('退勤')" disabled>退勤</button>
+        </div>
+        <div style="display: flex; gap: 16px; margin-top: 20px;">
+          <button class="btn btn-tonal" style="flex:1; margin:0; height:54px; font-weight:bold;" onclick="showShiftView()">シフト管理</button>
+          <button class="btn btn-tonal" style="flex:1; margin:0; height:54px; font-weight:bold;" onclick="showHistoryView()">勤怠履歴</button>
+        </div>
+        <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
+          <button class="btn btn-gray" onclick="showView('viewMyPage')">登録情報・書類</button>
+          <button class="btn btn-gray" onclick="currentUser = null; resetHonForm(); resetKariForm(); showView('viewStart');">ログアウト</button>
+        </div>
+      </div>
+      <div id="viewShift" class="view">
+        <h3 style="text-align: center;">シフト管理</h3>
+        <div class="shift-nav">
+          <button onclick="navigateShiftMonth(-1, 'selection')">◀ 前月</button>
+          <div id="shiftMonthDisplay">----年 --月</div>
+          <button onclick="navigateShiftMonth(1, 'selection')">次月 ▶</button>
+        </div>
+        <div id="shiftDeadlineDisplay" style="text-align:center; font-size:14px; font-weight:700; color:var(--md-error); margin-bottom:12px;"></div>
+        <div id="quickSelectControls" style="display:flex; gap:8px; margin-bottom:16px;">
+          <button class="btn-outline shift-quick-btn" onclick="handleQuickSelect('weekdays')">平日選択</button>
+          <button class="btn-outline shift-quick-btn" onclick="handleQuickSelect('weekends')">土日選択</button>
+          <button class="btn-gray shift-quick-btn" onclick="handleQuickSelect('clear')">クリア</button>
+        </div>
+        <div id="shiftListContainer" class="scroll-box" style="padding:12px; margin-bottom:16px; height: 50vh;"></div>
+        <div style="display:flex; justify-content:center; gap:16px; font-size:13px; margin-bottom: 20px;">
+          <span style="display:flex; align-items:center; gap:4px;"><div style="width:16px; height:16px; background:var(--md-surface-variant); border-radius:4px;"></div> 募集</span>
+          <span style="display:flex; align-items:center; gap:4px;"><div style="width:16px; height:16px; background:var(--md-secondary); border-radius:4px;"></div> 選択中</span>
+          <span style="display:flex; align-items:center; gap:4px;"><div style="width:16px; height:16px; background:var(--md-success); border-radius:4px;"></div> 確定</span>
+        </div>
+        <button id="btnKiboReview" class="btn btn-secondary" style="display:none;" onclick="showKiboReviewView()">選択したシフトを確認 (<span id="stagedCount">0</span>)</button>
+        <div style="display:flex; gap:12px; margin-top:20px; padding-top:20px; border-top:1px solid var(--md-outline-variant);">
+          <button class="btn btn-gray" style="flex:1; margin:0;" onclick="routeUser()">戻る</button>
+          <button class="btn btn-primary" style="flex:1; margin:0;" onclick="showKakuteiView()">確定シフト</button>
+        </div>
+      </div>
+      <div id="viewKiboReview" class="view">
+        <h3 style="text-align:center;">希望シフトの確認</h3>
+        <p style="font-size:13px; text-align:center;">以下の内容で提出します。</p>
+        <div id="reviewCalendarContainer" style="margin-bottom:16px;"></div>
+        <div class="form-group">
+        <label>連絡事項</label>
+          <textarea id="contactNotes" rows="3" style="width:100%; padding:12px; border-radius:var(--shape-medium); border:1px solid var(--md-outline); font-family:inherit; resize:vertical;"></textarea>
+        </div>
+        <div style="display:flex; gap:12px;">
+          <button class="btn btn-gray" style="flex:1; margin:0;" onclick="showView('viewShift')">修正する</button>
+          <button class="btn btn-secondary" style="flex:1; margin:0;" onclick="kiboConfirmSubmit()">提出する</button>
+        </div>
+      </div>
+      <div id="viewKakutei" class="view">
+        <h3 style="text-align:center;">確定シフト</h3>
+        <div class="shift-nav">
+          <button onclick="navigateShiftMonth(-1, 'kakutei')">◀ 前月</button>
+          <div id="kakuteiMonthDisplay">----年 --月</div>
+          <button onclick="navigateShiftMonth(1, 'kakutei')">次月 ▶</button>
+        </div>
+        <div id="kakuteiListContainer" class="scroll-box" style="padding:12px; height: 60vh;"></div>
+        <button class="btn btn-gray" style="margin-top:20px;" onclick="showView('viewShift')">シフト管理に戻る</button>
+      </div>
+
+      <div id="bottomNav" class="bottom-nav" style="display:none;">
+        <div class="nav-item active" id="navAttendance" onclick="routeUser()">
+          <span class="icon">⏱️</span><span>出退勤</span>
+        </div>
+        <div class="nav-item" id="navShift" onclick="showShiftView(); updateNav('navShift')">
+          <span class="icon">📅</span><span>シフト</span>
+        </div>
+        <div class="nav-item" id="navHistory" onclick="showHistoryView(); updateNav('navHistory')">
+          <span class="icon">📜</span><span>履歴</span>
+        </div>
+        <div class="nav-item" id="navDocs" onclick="showView('viewMyPage'); updateNav('navDocs')">
+          <span class="icon">📁</span><span>書類</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <script>
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxC71cAofv5QXr-pjKkmK8ehgNzo4M5wRMMjtG1enU-5w62j0slyK56XJtDvMimAlvE/exec";
+
+    class GASRunner {
+      constructor() { this.successCb = null; this.failureCb = null; }
+      withSuccessHandler(cb) { this.successCb = cb; return this.getProxy(); }
+      withFailureHandler(cb) { this.failureCb = cb; return this.getProxy(); }
+      getProxy() {
+        return new Proxy(this, {
+          get: (target, prop) => {
+            if (prop === 'withSuccessHandler' || prop === 'withFailureHandler') return target[prop].bind(target);
+            return (...args) => {
+              fetch(GAS_WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                body: JSON.stringify({ action: prop, params: args })
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.error) { if (target.failureCb) target.failureCb(data.error); else console.error(data.error); } 
+                else { if (target.successCb) target.successCb(data.result); }
+              })
+              .catch(err => { if (target.failureCb) target.failureCb(err); else console.error(err); });
+            };
+          }
+        });
+      }
+    }
+    const google = { script: { run: new GASRunner().getProxy() } };
+    let currentUser = null;
+    window.showView = function(id) {
+      if (id === 'viewStart') {
+        resetKariForm();
+        if (typeof resetHonForm === 'function') resetHonForm();
+      }
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      const target = document.getElementById(id);
+      if(target) target.classList.add('active');
+      window.scrollTo(0,0);
+      const header = document.querySelector('header');
+      if(header) {
+        header.style.display = (id === 'viewStart') ? 'none' : 'block';
+      }
+    };
+
+    function searchAddress() {
+      const zip = document.getElementById('regZip').value.replace(/[^0-9]/g, "");
+      if(zip.length !== 7) return alert("郵便番号は7桁で入力してください。"); 
+      const addr1Input = document.getElementById('regAddr1');
+      addr1Input.value = "検索中...";
+      fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode=' + zip)
+        .then(r => r.json()).then(d => {
+          if (d.results) {
+            addr1Input.value = d.results[0].address1 + d.results[0].address2 + d.results[0].address3;
+          } else {
+            addr1Input.value = ""; 
+            alert("住所が見つかりませんでした。");
+          }
+        });
+    }
+
+    function handleLogin() {
+      const phoneInput = document.getElementById('loginPhone');
+      const dobInput = document.getElementById('loginDob');
+      const errorEl = document.getElementById('loginError');
+      phoneInput.classList.remove('input-error');
+      dobInput.classList.remove('input-error');
+      errorEl.style.display = 'none';
+      if(!phoneInput.value.trim() || !dobInput.value) {
+        if(!phoneInput.value.trim()) phoneInput.classList.add('input-error');
+        if(!dobInput.value) dobInput.classList.add('input-error');
+        return;
+      }
+      setLoading(true);
+      google.script.run.withSuccessHandler(res => {
+        setLoading(false);
+        if(res.success) { 
+          currentUser = res.user; 
+          routeUser(); 
+        } else {
+          errorEl.innerText = "⚠️ " + res.message;
+          errorEl.style.display = 'block';
+          phoneInput.classList.add('input-error');
+          dobInput.classList.add('input-error');
+        }
+      }).loginUser(phoneInput.value, dobInput.value);
+    }
+
+    function renderMyPage() {
+      showView('viewMyPage');
+      document.getElementById('mpUserName').innerText = currentUser.name.replace(/\//g, ' ') + " 様";
+      document.getElementById('mpUserType').innerText = currentUser.employmentType;
+      let fuyoStatus = currentUser.statusFuyo || "";
+      let isMainEmployee = (currentUser.employmentType === 'メイン');
+      let needsFuyo = (isMainEmployee && fuyoStatus.indexOf('提出済') === -1);
+      document.getElementById('shinkokushoAlert').style.display = needsFuyo ? 'block' : 'none';
+      const isForeigner = (currentUser.nationality !== '日本');
+      const idTitle = isForeigner ? '在留カード' : '本人確認書類';
+      let myNumDesc = "マイナンバーカード、通知カード、またはマイナンバー入り住民票を提出してください。";
+      let idDesc = isForeigner ? "必ず『表面』と『裏面』の両方を提出してください。" : "免許証（表・裏）、または個人番号を隠したマイナンバーカードの表面を提出してください。";
+      let bankDesc = "給与振込先となる通帳の口座情報ページ、またはキャッシュカードの表面を提出してください。";
+      const allPossibleTasks = [
+        { id: 'mynumber',  title: 'マイナンバー', status: currentUser.statusMyNumber, desc: myNumDesc },
+        { id: 'id',        title: idTitle, status: currentUser.statusID, desc: idDesc },
+        { id: 'bank',      title: '銀行口座情報', status: currentUser.statusBank, desc: bankDesc }
+      ];
+      if (isMainEmployee) {
+        allPossibleTasks.push({ 
+          id: 'fuyo', 
+          title: '扶養控除等申告書', 
+          status: fuyoStatus, 
+          desc: "税務署へ提出する給与所得者の扶養控除申告書", 
+          action: openFuyoForm 
+        });
+      }
+      allPossibleTasks.push(
+        { id: 'consent',   title: '告知書兼同意書', status: currentUser.statusConsent, desc: "個人情報の取扱いに関する同意" },
+        { id: 'agreement', title: '承諾書', status: currentUser.statusAgreement, desc: "労働条件の電子明示に関する承諾" },
+        { id: 'nda',       title: '秘密保持契約書', status: currentUser.statusNDA, desc: "機密情報の取扱いに関する契約" },
+        { id: 'edu',       title: '個人情報保護教育', status: currentUser.statusEdu, desc: "Pマーク教育資料の確認とテスト" }
+      );
+      const sortedTasks = [
+          ...allPossibleTasks.filter(t => ['mynumber', 'id', 'bank', 'fuyo'].includes(t.id)),
+          ...allPossibleTasks.filter(t => !['mynumber', 'id', 'bank', 'fuyo'].includes(t.id))
+      ];
+      let html = '';
+      sortedTasks.forEach(t => {
+        let statusText = t.status || "";
+        let isSkipped = statusText.includes('提出不要');
+        let isRefused = statusText.includes('提供拒否');
+        let isDone = statusText.includes('同意済') || statusText.includes('完了') || statusText.includes('提出済');
+        let badgeClass = 'status-wait';
+        let badgeText = '未提出';
+        if (isSkipped) { badgeClass = 'status-skip'; badgeText = '提出不要'; } 
+        else if (isRefused) { badgeClass = 'status-refuse'; badgeText = '提供拒否'; } 
+        else if (isDone) { badgeClass = 'status-done'; badgeText = '完了'; }
+        let canClick = true;
+        if (isSkipped || isRefused) canClick = false;
+        if (['consent', 'agreement', 'nda', 'edu'].includes(t.id) && isDone) canClick = false;
+        let clickAction = "";
+        if (canClick) {
+          if (t.id === 'fuyo') {
+            clickAction = `onclick="openFuyoForm()"`;
+          } else {
+            clickAction = `onclick="openTask('${t.id}')"`;
+          }
+        }
+        let cardClass = !canClick ? "task-card is-done" : "task-card";
+        html += `
+          <div class="${cardClass}" ${clickAction}>
+            <div style="flex:1; padding-right:15px;">
+              <h4>${t.title}</h4>
+              <p style="font-size:11px; color:#666; margin:4px 0 0;">${t.desc}</p>
+            </div>
+            <div class="status-badge ${badgeClass}">${badgeText}</div>
+          </div>
+        `;
+      });
+      document.getElementById('taskList').innerHTML = html;
+    }
+
+    function openTask(id) {
+      showView('viewTaskDetail');
+      const title = document.getElementById('taskDetailTitle');
+      const content = document.getElementById('taskDetailContent');
+      const actions = document.getElementById('taskDetailActions');
+      content.innerHTML = ''; actions.innerHTML = '';
+      let historyHtml = '';
+      let currentStatus = '';
+      if(id === 'id') currentStatus = currentUser.statusID;
+      if(id === 'bank') currentStatus = currentUser.statusBank;
+      if(id === 'mynumber') currentStatus = currentUser.statusMyNumber;
+      if (currentStatus && currentStatus.includes('提出済')) {
+        const lines = currentStatus.split('\n');
+        let logItems = '';
+        lines.forEach(line => {
+          let cleanLine = line.trim();
+          if (cleanLine && cleanLine !== '提出済' && cleanLine !== '旧システムで提出済') {
+             logItems += `<span style="display:block; margin-left:8px; margin-bottom:8px; font-size:14px; font-weight:500;">✓ ${cleanLine}</span>`;
+          }
+        });
+        if (logItems === '') {
+           logItems = `<span style="display:block; margin-left:8px; margin-bottom:8px; font-size:14px; font-weight:500;">✓ 提出済 (Đã nộp)</span>`;
+        }
+        historyHtml = `
+          <div style="margin-top: 16px; margin-bottom: 24px; padding: 20px; background: var(--md-primary-container); border-radius: var(--shape-large); color: var(--md-on-primary-container);">
+            <p style="margin: 0 0 12px; font-size: 15px; font-weight: 700;">📝 提出履歴</p>
+            ${logItems}
+            <div style="font-size: 12px; margin-top: 16px; color: var(--md-on-primary-container); opacity: 0.8;">※変更や更新がある場合は、下から再度アップロードしてください。</div>
+          </div>
+        `;
+      }
+      if (id === 'agreement' || id === 'nda') {
+        title.innerText = (id==='agreement' ? '1. 承諾書' : '3. 秘密保持契約書');
+        content.innerHTML = `
+          <div class="scroll-container">
+            <div class="scroll-box" id="docBox" onscroll="handleScrollStrict(this, 'taskCheck', 'hintText')">${getDocContent(id)}</div>
+            <p class="scroll-hint" id="hintText">※一番下までスクロールしてください</p>
+          </div>
+          <div class="checkbox-item" id="checkGroup" onclick="toggleCheckboxFromBox('taskCheck')">
+            <input type="checkbox" id="taskCheck" disabled onchange="toggleAgreeStyle(this)">
+            <label for="taskCheck">同意します</label>
+          </div>
+          <p class="error-message" id="taskCheckError">「同意します」にチェックを入れてください。</p>
+          <div class="form-group" style="margin-top:15px;">
+            <label>署名 <span class="error-message" id="taskSignError">（氏名を入力してください）</span></label>
+            <input type="text" id="taskSign" placeholder="例: 山田 太郎">
+          </div>
+        `;
+        actions.innerHTML = `<button class="btn btn-primary" onclick="submitSignature('${id}')">送信する</button>`;
+        setTimeout(() => checkInitialVisibility('docBox', 'taskCheck', 'hintText'), 300);
+      } 
+      else if (id === 'edu') {
+        title.innerText = '個人情報保護教育';
+        content.innerHTML = `
+          <div class="scroll-container">
+            <div class="scroll-box" id="docBox" onscroll="handleScrollStrict(this, 'taskCheck', 'hintText')">${getDocContent('edu')}</div>
+            <p class="scroll-hint" id="hintText">※一番下までスクロールしてください</p>
+          </div>
+          <div class="checkbox-item" id="checkGroup" onclick="toggleCheckboxFromBox('taskCheck')">
+            <input type="checkbox" id="taskCheck" disabled onchange="toggleEduTest(this)"> 
+            <label for="taskCheck">内容を確認しました</label>
+          </div>
+          <p class="error-message" id="eduCheckError">「内容を確認しました」にチェックを入れてください。</p>
+          <div id="testArea" style="display:none;">
+            <h4 style="font-size:14px; color:var(--primary); margin: 20px 0 10px;">【理解度テスト】正しい方にチェック</h4>
+            ${renderTestQuestions()}
+          </div>
+        `;
+        actions.innerHTML = `<button class="btn btn-primary" onclick="submitEdu()">完了する</button>`;
+        setTimeout(() => checkInitialVisibility('docBox', 'taskCheck', 'hintText'), 300);
+      }
+      else if (id === 'mynumber') {
+        title.innerText = '4. マイナンバー提供';
+        const isForeigner = (currentUser.nationality === "外国籍");
+        let warningText = isForeigner ? "" : `<div style="font-size:12px; background:#e8f0fe; color:var(--primary-dark); padding:10px; border-radius:8px; margin-bottom:15px;">💡「マイナンバーカード（写真付き）」をご提出いただいた場合、「本人確認書類」の提出は不要となります。</div>`;
+        content.innerHTML = historyHtml + warningText + `
+          <div class="form-group">
+            <select id="mnChoice" onchange="toggleMnMode(this.value)">
+              <option value="" disabled selected>提出方法を選択してください</option>
+              <option value="マイナンバーカード">マイナンバーカード（写真付き・表裏両面）</option>
+              <option value="通知カード">通知カード（表面のみ）</option>
+              <option value="マイナンバー入り住民票">マイナンバー入り住民票（1枚目のみ）</option>
+              <option value="提供を拒否する">提供を拒否する（署名のみ）</option>
+            </select>
+          </div>
+          <div id="mnUploadZone" style="display:none;">
+            <div class="upload-box" id="box_f1">
+              <label>表面画像 <span class="error-message" id="error_f1" style="display:none; color:var(--error); font-weight:bold; margin-left:8px;">(画像を選択してください)</span></label>
+              <div class="file-input-wrapper"><input type="file" onchange="previewImg(this, 'p1')"></div>
+              <div class="preview-container" id="p1-c"><img id="p1" class="preview-img"></div>
+            </div>
+            <div class="upload-box" id="box_f2" style="display:none;">
+              <label>裏面画像 <span class="error-message" id="error_f2" style="display:none; color:var(--error); font-weight:bold; margin-left:8px;">(裏面も必須です)</span></label>
+              <div class="file-input-wrapper"><input type="file" onchange="previewImg(this, 'p2')"></div>
+              <div class="preview-container" id="p2-c"><img id="p2" class="preview-img"></div>
+            </div>
+          </div>
+          <div id="mnRefuseZone" style="display:none; background:#fff1f0; padding:15px; border-radius:12px; border:1px solid #ffa39e;">
+            <p style="font-size:13.5px; color:var(--text); line-height:1.6; margin-top:0;">私は、株式会社アレスコ から周知された「マイナンバー提供依頼書」及び通知された利用目的について説明を受け、内容を確認し、マイナンバーの提供について拒否いたします。<br><br>本マイナンバー提供の拒否により、私が被る一切の不利益について理解し、株式会社アレスコに対して損害賠償等の法的措置を行うことはいたしません。</p>
+            <div class="form-group" style="margin-top:15px; margin-bottom:0;">
+              <label for="mnRefuseSign">署名 <span class="error-message" id="mnSignError" style="display:none; color:var(--error); font-weight:bold; margin-left:8px;">(氏名を入力してください)</span></label>
+              <input type="text" id="mnRefuseSign" placeholder="氏名を入力してください">
+            </div>
+          </div>
+        `;
+        actions.innerHTML = `<button class="btn btn-primary" onclick="submitMyNumber()">送信する</button>`;
+      }
+      else {
+        title.innerText = (id==='id' ? '本人確認書類' : '銀行口座情報');
+        let html = historyHtml + `
+          <div class="upload-box" id="box_f1">
+            <label>1枚目の画像 <span class="error-message" id="error_f1" style="display:none; color:var(--error);">(画像を選択してください)</span></label>
+            <div class="file-input-wrapper"><input type="file" onchange="previewImg(this, 'p1')"></div>
+            <div class="preview-container" id="p1-c"><img id="p1" class="preview-img"></div>
+          </div>
+        `;
+        if(id==='id') {
+          html += `
+            <div class="upload-box" id="box_f2">
+              <label>2枚目の画像 (裏面等) <span class="error-message" id="error_f2" style="display:none; color:var(--error);">(裏面も必須です)</span></label>
+              <div class="file-input-wrapper"><input type="file" onchange="previewImg(this, 'p2')"></div>
+              <div class="preview-container" id="p2-c"><img id="p2" class="preview-img"></div>
+            </div>
+          `;
+        }
+        content.innerHTML = html;
+        actions.innerHTML = `<button class="btn btn-primary" onclick="handleFileUpload('${id}')">提出する</button>`;
+      }
+    }
+
+    function handleScrollStrict(el, checkId, hintId) {
+      if (el.scrollHeight - el.scrollTop <= el.clientHeight + 5) enableCheckbox(checkId, hintId);
+    }
+
+    function checkInitialVisibility(boxId, checkId, hintId) {
+      const el = document.getElementById(boxId);
+      if (el && el.scrollHeight <= el.clientHeight + 5) enableCheckbox(checkId, hintId);
+    }
+
+    function enableCheckbox(checkId, hintId) {
+      document.getElementById(checkId).disabled = false;
+      const hint = document.getElementById(hintId);
+      if(hint) { hint.innerText = "✓ 確認完了"; hint.style.color = "var(--success)"; }
+    }
+
+    function toggleAgreeStyle(cb) { cb.parentElement.classList.toggle('active-box', cb.checked); }
+
+    function toggleEduTest(cb) { toggleAgreeStyle(cb); document.getElementById('testArea').style.display = cb.checked ? 'block' : 'none'; }
+
+    function toggleCheckboxFromBox(checkId) {
+      const cb = document.getElementById(checkId);
+      if(cb && !cb.disabled) {
+        cb.checked = !cb.checked;
+        cb.dispatchEvent(new Event('change')); 
+      }
+    }
+
+    function toggleMnMode(v) {
+      if(!v) return;
+      const uploadZone = document.getElementById('mnUploadZone');
+      const refuseZone = document.getElementById('mnRefuseZone');
+      const box2 = document.getElementById('box_f2');
+      if (v === '提供を拒否する') {
+        uploadZone.style.display = 'none';
+        refuseZone.style.display = 'block';
+      } else {
+        uploadZone.style.display = 'block';
+        refuseZone.style.display = 'none';
+        if (v === 'マイナンバーカード') {
+          box2.style.display = 'flex'; 
+        } else {
+          box2.style.display = 'none';
+        }
+      }
+    }
+
+    function previewImg(input, imgId) {
+      const f = input.files[0];
+      if(f) {
+        const r = new FileReader();
+        r.onload = e => { document.getElementById(imgId).src = e.target.result; document.getElementById(imgId+'-c').style.display = 'block'; };
+        r.readAsDataURL(f);
+      }
+    }
+
+    function selectOption(el, name, val) {
+      document.querySelectorAll(`[name="${name}"]`).forEach(inp => inp.parentElement.classList.remove('selected'));
+      el.classList.add('selected');
+      el.querySelector('input').checked = true;
+      const qBox = el.closest('.test-q-box');
+      if (qBox) qBox.classList.remove('error');
+    }
+
+    async function handleFileUpload(id, extraInfo = null) {
+      const inputs = document.querySelectorAll('#taskDetailContent input[type="file"]');
+      const box1 = document.getElementById('box_f1');
+      const error1 = document.getElementById('error_f1');
+      const box2 = document.getElementById('box_f2');
+      const error2 = document.getElementById('error_f2');
+      if(box1) box1.classList.remove('input-error');
+      if(error1) error1.style.display = 'none';
+      if(box2) box2.classList.remove('input-error');
+      if(error2) error2.style.display = 'none';
+      if (!inputs[0] || !inputs[0].files[0]) {
+        if(box1) box1.classList.add('input-error');
+        if(error1) error1.style.display = 'inline';
+        return;
+      }
+      const isMandatoryF2 = (id === 'id') || (id === 'mynumber' && extraInfo === 'マイナンバーカード');
+      if (isMandatoryF2) {
+        if (!inputs[1] || !inputs[1].files[0]) {
+          if(box2) {
+            box2.classList.add('input-error');
+            box2.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          if(error2) {
+            error2.innerText = "（裏面の提出も必須です）";
+            error2.style.display = 'inline';
+          }
+          return;
+        }
+      }
+      let docTypeLabel = extraInfo;
+      if (!docTypeLabel) {
+        if (id === 'bank') docTypeLabel = "口座情報";
+        if (id === 'id') docTypeLabel = (currentUser.nationality === "外国籍") ? "在留カード" : "身分証明書";
+      }
+      setLoading(true);
+      const files = { f1: { data: await processImg(inputs[0].files[0]), label: "f1" } };
+      if (inputs[1] && inputs[1].files[0]) {
+        files.f2 = { data: await processImg(inputs[1].files[0]), label: "f2" };
+      }
+      google.script.run.withSuccessHandler(res => {
+        setLoading(false);
+        let isSuccess = false;
+        let newValue = "";
+        if (res && res.success) {
+            isSuccess = true;
+            newValue = res.newVal;
+        } else if (typeof res === 'string') {
+            isSuccess = true;
+            newValue = res;
+        } else if (res && !res.error && !res.message) {
+            isSuccess = true;
+            newValue = "提出済"; 
+        }
+        if (isSuccess) {
+          if (id === 'id') {
+            currentUser.statusID = newValue;
+          } else if (id === 'bank') {
+            currentUser.statusBank = newValue;
+          } else if (id === 'mynumber') {
+            currentUser.statusMyNumber = newValue;
+          }
+          if (res && res.autoIdSkipped) {
+            currentUser.statusID = "提出不要";
+          }
+          renderMyPage();
+          showView('viewMyPage');
+        } else {
+          let errMsg = "不明なエラー (Lỗi không xác định)";
+          if (res && res.message) errMsg = res.message;
+          else if (res && res.error) errMsg = res.error;
+          else errMsg = JSON.stringify(res);
+          setLoading(true, "⚠️ エラー: " + errMsg, "もう一度お試しください");
+          setTimeout(() => setLoading(false), 3000);
+        }
+      }).withFailureHandler(err => {
+          setLoading(false);
+          showCustomAlert("通信エラー: " + err, true);
+      }).uploadFiles(currentUser.id, files, id, docTypeLabel);
+    }
+
+    function openFuyoForm() {
+      const baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdbGr6tn2GQ6a7Fyg8v6IxN1Uies_Q35EWoehULIgrXGifkXA/viewform";
+      const entry_Kanji = "entry.971256660";
+      const entry_Kana  = "entry.821590571";
+      const entry_Dob   = "entry.1086113988";
+      const entry_Zip   = "entry.1909395110";
+      const entry_Addr  = "entry.426383806";
+      const cleanName = currentUser.name ? currentUser.name.replace(/\//g, ' ') : '';
+      const cleanKana = currentUser.kana ? currentUser.kana.replace(/\//g, ' ') : '';
+      let dobFormatted = "";
+      if (currentUser.dob) {
+        const dObj = new Date(currentUser.dob); 
+        const y = dObj.getFullYear();
+        const m = String(dObj.getMonth() + 1).padStart(2, '0');
+        const d = String(dObj.getDate()).padStart(2, '0');
+        dobFormatted = `${y}-${m}-${d}`;
+      }
+      let url = baseUrl + "?usp=pp_url";
+      url += `&${entry_Kanji}=${encodeURIComponent(cleanName)}`;
+      url += `&${entry_Kana}=${encodeURIComponent(cleanKana)}`;
+      url += `&${entry_Dob}=${dobFormatted}`;
+      url += `&${entry_Zip}=${encodeURIComponent(currentUser.zip || '')}`;
+      url += `&${entry_Addr}=${encodeURIComponent(currentUser.addr || '')}`;
+      window.open(url, '_blank');
+    }
+
+    function submitSignature(type) {
+      const signInput = document.getElementById('taskSign');
+      const checkInput = document.getElementById('taskCheck');
+      signInput.classList.remove('input-error');
+      document.getElementById('taskSignError').style.display = 'none';
+      document.getElementById('taskCheckError').style.display = 'none';
+      let hasError = false;
+      if (!checkInput.checked) {
+        document.getElementById('taskCheckError').style.display = 'block';
+        hasError = true;
+      }
+      if (!signInput.value.trim()) {
+        signInput.classList.add('input-error');
+        document.getElementById('taskSignError').style.display = 'inline'; 
+        hasError = true;
+      }
+      if (hasError) return;
+      setLoading(true);
+      google.script.run.withSuccessHandler(res => {
+        setLoading(false);
+        if(type === 'agreement') currentUser.statusAgreement = res.newVal;
+        if(type === 'nda') currentUser.statusNDA = res.newVal;
+        renderMyPage();
+      }).updateStaffData(currentUser.id, type, signInput.value);
+    }
+
+    function submitEdu() {
+      const checkInput = document.getElementById('taskCheck');
+      const errorMsg = document.getElementById('eduCheckError');
+      errorMsg.style.display = 'none';
+      if(!checkInput.checked) {
+        errorMsg.style.display = 'block';
+        return;
+      }
+      let results = [];
+      let firstMissingQ = null;
+      for (let i = 0; i < 10; i++) {
+        const qBox = document.querySelectorAll('.test-q-box')[i];
+        const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
+        qBox.classList.remove('error'); 
+        if (!selectedOption) {
+          qBox.classList.add('error'); 
+          if (!firstMissingQ) firstMissingQ = qBox;
+        } else {
+          results.push(`Q${i+1}:${selectedOption.value}`);
+        }
+      }
+      if (firstMissingQ) {
+        firstMissingQ.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      const resultString = results.join(', ');
+      setLoading(true);
+      google.script.run.withSuccessHandler(res => {
+        setLoading(false);
+        currentUser.statusEdu = res.newVal;
+        renderMyPage();
+      }).updateStaffData(currentUser.id, 'pmark', resultString);
+    }
+
+    async function submitMyNumber() {
+      const mode = document.getElementById('mnChoice').value;
+      if(!mode) {
+          document.getElementById('mnChoice').classList.add('input-error');
+          return; 
+      }
+      if (mode === '提供を拒否する') {
+        const signInput = document.getElementById('mnRefuseSign');
+        const errorMsg = document.getElementById('mnSignError');
+        signInput.classList.remove('input-error');
+        errorMsg.style.display = 'none';
+        if (!signInput.value.trim()) {
+          signInput.classList.add('input-error'); 
+          errorMsg.style.display = 'inline';      
+          return; 
+        }
+        setLoading(true);
+        google.script.run.withSuccessHandler(res => {
+          setLoading(false);
+          currentUser.statusMyNumber = res.newVal;
+          renderMyPage();
+          google.script.run.generateMyNumberPdfBackground(currentUser.id); 
+        }).updateStaffData(currentUser.id, 'mynumber', signInput.value);
+      } else {
+        await handleFileUpload('mynumber', mode);
+      }
+    }
+
+    async function processImg(file, addWatermark = true) {
+      return new Promise(res => {
+        const r = new FileReader(); r.readAsDataURL(file);
+        r.onload = e => {
+          const img = new Image(); img.src = e.target.result;
+          img.onload = () => {
+            const c = document.createElement('canvas'); const ctx = c.getContext('2d');
+            const MAX = 1400; let w=img.width, h=img.height;
+            if(w>h) { if(w>MAX) { h*=MAX/w; w=MAX; } } else { if(h>MAX) { w*=MAX/h; h=MAX; } }
+            c.width=w; c.height=h; ctx.drawImage(img, 0,0,w,h);
+            if (addWatermark) {
+              const dateStr = new Date().toLocaleDateString('ja-JP');
+              const watermarkText = "株式会社アレスコ / 社外秘 / " + dateStr;
+              const fontSize = Math.floor(w / 20);
+              ctx.font = "bold " + fontSize + "px 'Noto Sans JP', sans-serif";
+              ctx.fillStyle = "rgba(200, 200, 200, 0.35)"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+              ctx.translate(w / 2, h / 2); ctx.rotate(-45 * Math.PI / 180);
+              ctx.fillText(watermarkText, 0, -h/4); ctx.fillText(watermarkText, 0, 0); ctx.fillText(watermarkText, 0, h/4);
+            }
+            res(c.toDataURL('image/jpeg', 0.75));
+          };
+        };
+      });
+    }
+
+    function renderTestQuestions(questionPrefix = 'q') {
+      let html = '<div style="margin-bottom: 20px;"><strong style="color:var(--md-primary); font-size:16px;">１．個人情報保護教育</strong><br>以下の問題について、正しいと思う選択肢を１つ選んでください。</div>';
+      const part1 = [
+        { q: "（１）Pマークにおいて決めたルール通りにすることの重要性及び利点とは？", options: ["①取引先や社会からの信用を得ることができ、会社の利益にもつながる。", "②税制面で優遇を受けることができ、会社の利益にもつながる。", "③全国各地の教育施設や保養施設を利用することができ、従業員の福利厚生につながる。"] },
+        { q: "（２）お預かりしている個人情報を保護するための自分の役割とは？", options: ["①他の部署の仕事の内容を監視すること。", "②社内で決められたルールに従って行動すること。", "③取引先を増やすこと。"] },
+        { q: "（３）Pマークにおいて決めたルールに違反した際に予想される結果とは？", options: ["①経営陣は責任問題になるが、従業員にとっては何の影響もない。", "②受注が増え、会社の利益にもつながる。", "③故意にルールに違反した場合、罰金や解雇もあり得る。"] },
+        { q: "（４）当社の個人情報保護方針はどこに掲載しているか？", options: ["①当社のHPに掲載している", "②代表者のPC内に保管している", "③掲示、掲載していない"] }
+      ];
+      part1.forEach((item, i) => {
+        let index = i; // Q0 -> Q3
+        html += `<div class="test-q-box"><p style="font-size:14px; font-weight:bold; margin:0 0 12px 0;">${item.q}</p>`;
+        item.options.forEach((opt, j) => {
+          let val = ['①', '②', '③'][j];
+          html += `<div class="option-item" style="height:auto; min-height:54px; padding:12px 16px; margin-bottom:8px; justify-content:flex-start; text-align:left; font-weight:normal;" onclick="selectOption(this, '${questionPrefix}${index}', '${val}')">
+            <input type="radio" name="${questionPrefix}${index}" value="${val}">
+            <span style="font-size:14px; line-height:1.5;">${opt}</span>
+          </div>`;
+        });
+        html += `</div>`;
+      });
+      html += '<div style="margin: 30px 0 20px;"><strong style="color:var(--md-primary); font-size:16px;">２．運用ルール問題</strong><br>正しいものには〇、間違っているものには×を選択してください。</div>';
+      const part2 = [
+        "（１）個人情報が記載された紙を使用して、メモ帳として使用した。",
+        "（２）就業先でゴミの中を無断でチェックしてはいけない。",
+        "（３）ゴミを指定された場所以外に廃棄した。",
+        "（４）業務の過程の中で聞いた個人情報を外で話さない。",
+        "（５）従業者は、会社の管理する個人情報を営利目的などで故意に流出した場合、懲戒処分に処せられる場合がある。",
+        "（６）取引先で業務している際に、お客様の個人情報に係る書類は無断で触らない。"
+      ];
+      part2.forEach((q, i) => {
+        let index = i + 4; // Q4 -> Q9
+        html += `<div class="test-q-box">
+          <p style="font-size:14px; font-weight:bold; margin:0;">${q}</p>
+          <div class="test-options">
+            <div class="option-item" onclick="selectOption(this, '${questionPrefix}${index}', '〇')"><input type="radio" name="${questionPrefix}${index}" value="〇"><span>〇</span></div>
+            <div class="option-item" onclick="selectOption(this, '${questionPrefix}${index}', '✕')"><input type="radio" name="${questionPrefix}${index}" value="✕"><span>✕</span></div>
+          </div>
+        </div>`;
+      });
+      return html;
+    }
+
+    function setLoading(v, statusText = "処理中...", progressText = "") {
+      document.getElementById('loading').style.display = v ? 'flex' : 'none';
+      document.getElementById('loadingStatus').innerText = statusText;
+      document.getElementById('loadingProgress').innerText = progressText;
+      if (v) {
+        document.getElementById('loadingStatus').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function getDocContent(id) {
+      if(id==='hon-consent') return `
+        <div style="text-align: center; margin-bottom: 15px;">
+          <strong style="font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 2px;">
+            派遣スタッフの個人情報取扱いについて「告知書兼同意書」
+          </strong>
+        </div>
+        当社は、従業者に関する個人情報の取扱について、以下の様に定めます。<br><br>
+        <strong>１．個人情報の取得・利用目的</strong><br>当社は、ご提供いただく個人情報は下記の必要な範囲内で利用致します。<br>・人材派遣・請負に関する業務<br>・入社・退社手続、給与支払、勤怠管理、社会保険及び労働保険関係手続<br>・取引先への業務上必要な連絡等<br><br>
+        <strong>２．個人情報の委託</strong><br>当社は、利用目的の達成に必要な範囲内において、従業者の個人情報の取扱いを委託します。その場合は、個人情報保護体制が整備された委託先を選定して利用致します。<br><br>
+        <strong>３．個人情報の安全管理</strong><br>個人情報の漏洩等がなされないよう、適切に安全管理対策を実施します。<br><br>
+        <strong>４．個人情報の任意性</strong><br>当社に個人情報を提供いただくことは、ご本人様の任意のご意思によります。ただし、ご本人様が個人情報の提供を拒否された場合は、上記１．個人情報の取得・利用目的に記載の業務に支障をきたし、ご本人が不利益を被る可能性があります。（給与支払、福利厚生が受けられない等）また、これによりご本人様が被った損害（逸失利益を含む）、不利益等について、当社は何らの賠償責任等を負いません。<br><br>
+        <strong>５．開示等の受付・窓口</strong><br>ご提供いただいた保有個人データについては、開示等（利用目的の通知、開示、内容の訂正・追加または削除、利用停止、消去および第三者提供の停止、第三者への提供記録の開示）のご請求ができます。お申し出は、以下の窓口にて受付けます。<br><br>
+        <strong>６．求人情報の通知について</strong><br>採用選考後登録希望の方には、時期にもよりますが月２回程度 求人情報の通知させて戴く場合があります。<br><br>
+        <strong>７．個人情報の提供</strong><br>当社は、法令に基づく場合及び下記の場合を除いては提供しません。<br>
+        <div class="table-responsive"><table><thead><tr><th>第三者に提供する目的</th><th>提供する個人情報の項目</th><th>提供の手段又は方法</th><th>当該情報の提供を受ける者又は提供を受ける者の組織の種類、及び属性</th><th>個人情報の取扱いに関する契約がある場合はその旨</th></tr></thead><tbody><tr><td>給与振込みのため</td><td>口座番号<br>氏名</td><td>銀行窓口及びWebにて</td><td>当社取引銀行</td><td>取引銀行の個人情報の取扱い規約</td></tr><tr><td>税務/社会保険のため</td><td>氏名、性別、住所、生年月日、支払額、税額、個人番号</td><td>郵送、電子申請にて</td><td>役所等の公的機関</td><td>ー</td></tr><tr><td>派遣先・委託元セキュリティ登録のため</td><td>氏名、性別、住所、生年月日、国籍、電話番号、証明写真（顔写真）等</td><td>電子メール<br>（パスワード付）<br>郵送</td><td>派遣先・委託元等就業場所</td><td>各種機密保持契約書</td></tr></tbody></table></div>
+        <br>私は、上記すべての事項に同意し、私の個人情報を提供致します。
+      `;
+      if(id==='agreement') return `私は、派遣期間の開始日が2020 年 4 月 1 日以降の(株)アレスコが発行する「労働条件通知書（兼）就業条件明示書」ついて、以下の方法での明示となる事を承諾いたします。<br><br>・FAX<br>・Eメールや Yahoo! メール、 Gmail 等の Web メールサービス<br>・LINE や WeChat 、メッセンジャー等の SNS メッセージ機能`;
+      if(id==='nda') return `株式会社アレスコ（以下「甲」という。）と氏名＿＿＿＿＿＿＿＿＿＿（以下「乙」という。）は、甲乙間において開示される秘密情報について、次のとおり秘密保持契約を締結する。<br><br><strong>（目的）</strong><br>第1条 甲及び乙は、甲から委託・派遣する業務を目的として、相互に必要と認められる範囲で、相手方に対し、秘密情報を開示する。<br><br><strong>（秘密情報の定義）</strong><br>第2条 本契約において秘密情報とは、書面、口頭その他方法を問わず、相手方に開示された、開示者の営業上、技術上その他業務上の一切の情報及び個人情報をいう。<br>2 前項の規定にかかわらず、個人情報以外で、次の各号のいずれかに該当するものは秘密情報に該当しない。<br>(1) 相手方から開示される以前に公知であったもの<br>(2) 相手方から開示された後に、自らの責めによらず、公知となったもの<br>(3) 相手方から開示される以前から自ら保有していたもの<br>(4) 正当な権限を有する第三者から秘密保持義務を負わずに取得したもの<br>(5) 相手方から開示された秘密情報によることなく、独自に開発したもの<br><br><strong>（目的外使用の禁止）</strong><br>第3条 甲及び乙は、相手方から提供された秘密情報を第1条で規定する目的以外に使用してはならない。<br><br><strong>（秘密保持義務）</strong><br>第4条 甲及び乙は、相手方から開示された秘密情報を厳重に保管及び管理するものとする。<br>2 甲及び乙は、事前に相手方から書面による承諾を得た場合を除き、秘密情報を第三者に開示又は漏洩しない。ただし、裁判所からの命令、その他法令に基づき開示が義務付けられる場合はこの限りでない。<br>3 甲及び乙は、前項ただし書に基づき、秘密情報を第三者に開示する場合は、事前に相手方に通知するものとする。<br><br><strong>（複製）</strong><br>第5条 甲及び乙は、事前に相手方から書面による承諾を得た場合を除き、秘密情報を複製しない。<br><br><strong>（開示の範囲）</strong><br>第6条 甲及び乙は、相手方から開示された秘密情報を、自己の役員又は従業員に開示する場合には、秘密情報を知る必要がある者に限り、その必要な範囲内でのみ開示するものとする。なお、この場合甲及び乙は、当該役員又は従業員に対して本契約による自己と同等の義務を遵守させるものとし、かつ、当該役員又は従業員の行為について全責任を負う。<br><br><strong>（秘密情報の帰属）</strong><br>第7条 甲又は乙から相手方へ開示された全ての秘密情報は、各開示者に帰属するものとし、相手方に対する秘密情報の開示により、特許権、商標権、著作権その他のいかなる知的財産権も譲渡されるものではなく、また、使用許諾その他いかなる権限も与えられるものではない。<br><br><strong>（秘密情報の返還）</strong><br>第8条 甲及び乙は、第10条1項で規定する期間が満了したとき又は相手方から要求があったときは、秘密情報（第5条に基づき複製された場合はその複製物を含む。）を相手方の指示に従い、返還又は破棄するものとする。<br><br><strong>（損害賠償義務）</strong><br>第9条 甲及び乙は、本契約に違反して、相手方に損害を与えた場合には、相手方に対し、損害（相手方の弁護士費用を含む。）の賠償をしなければならない。<br><br><strong>（期間等）</strong><br>第10条 本契約の有効期限は、契約締結の日から1年間とする。但し、期間満了の1ヶ月前までに甲または乙より異議申し立てのない場合は、本契約は同一条件にて更に1年間延長されるものとし、以後についても同様とする。<br>2 第3条ないし第9条、第11条及び第12条の規定は、契約終了後といえども存続するものとする。<br><br><strong>（禁止行為）</strong><br>第11条 乙は相手方との派遣期間中、甲から相手方への直接連絡を指示された場合を除き、直接連絡を行ってはならない。なお、甲への事前申し出なく、甲を介さず直接相手方と連絡を取り合った結果、トラブル等が発生した場合においては、甲は一切の責任を負わないものとする。<br><br><strong>（準拠法）</strong><br>第12条 本契約は、日本国法に準拠するものとする。<br><br><strong>（合意管轄）</strong><br>第13条 本契約に関し、甲乙間に紛争が生じた場合は、大阪地方裁判所を第一審の専属的合意管轄裁判所とする。<br><br><strong>（協議）</strong><br>第14条 本契約に定めのない事項又は本契約に関して疑義が生じた場合は、甲乙誠意を持って協議し、その解決に当たるものとする。<br><br>以上のとおり契約が成立したので、その成立を証するため本契約書を2通作成し、甲乙記名捺印の上、各1通ずつ保有する。<br><br>甲　株式会社アレスコ<br>　　代表取締役　全 允子`;
+      if(id==='edu') return `<strong>①個人情報保護方針</strong><br>弊社ホームページ、および本社に掲載しています。<br><br><strong>②PMSの重要性及び利点</strong><br>直接お客様から個人情報を預かる企業ではお客様が安心して個人情報を預けていただき、信頼されます。<br>お取引先企業から個人情報を預かる企業では委託、提供先企業としての選定基準をクリアできます。<br>入札、見積りで排除されにくくなります。<br>コンプライアンス経営企業としてイメージが向上します。<br>どの企業にも共通したメリットは、社員の個人情報に対する意識が高まります。<br>リスクマネジメントが強化され、情報漏え等のリスクが低減します。<br>名刺やパンフレット、ホームページ上でPマークが使用できます。<br><br><strong>③PMSのための役割及び責任</strong><br><div class="table-responsive"><table><thead><tr><th>主な活動</th><th>役割</th></tr></thead><tbody><tr><td>トップマネジメント<br>福山 允子</td><td>Pマークに関するリーダーシップの発揮、方針の確立、責任・役割・権限の割り当てと社内伝達、Pマークのパフォーマンスの報告を受ける、マネジメントレビューの実施</td></tr><tr><td>個人情報保護管理者<br>田中 圭美</td><td>Pマークの運用における、マニュアル監査、コミュニケーション、是正処置、教育、内部監査を監視</td></tr><tr><td>個人情報保護監査責任者<br>青戸 梨恵</td><td>内部監査の計画〜実施・報告</td></tr><tr><td>システム管理者<br>田中 圭美</td><td>自社のPCの初期設定やシステム面の管理</td></tr><tr><td>事務取扱担当者<br>田中 圭美</td><td>当社規程に従い、Pマークを維持するための特定個人情報の管理</td></tr><tr><td>窓口責任者<br>田中 圭美</td><td>開示請求や苦情等の問合せ対応全般</td></tr></tbody></table></div><br><strong>④PMSに違反した際に予想される結果</strong><br>社会的な信用の失墜<br>・顧客や取引先の信用を失う<br>経済的な損失<br>・再発防止策への投資<br>・本人への補償<br>・業務の停止<br>事業継続へのダメージ<br>・経営状況の悪化<br>従業員が違反した場合<br>・減給、罰金、解雇<br><br><div style="background:#fff1f0; border:2px solid var(--error); padding:15px; border-radius:10px; margin-top:15px;"><div style="background:var(--error); color:white; padding:8px; text-align:center; border-radius:4px; font-weight:bold; margin-bottom:12px;">過去５年間メール誤送信の割合が最も多い</div><strong style="color:var(--error);">危ないと思ったら報告する事</strong><br>・違う人のメールアドレスを選択していないか？<br><br><strong style="color:var(--error);">規則を守る事</strong><br>・不用意にお客様の話はしないようにしましょう。</div>`;
+      return "";
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const kariPhoneInput = document.getElementById('kariPhone');
+      if (kariPhoneInput) {
+        kariPhoneInput.addEventListener('input', function (e) {
+          var x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,4})(\d{0,4})/);
+          e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
+      }
+      const simplePhoneInputs = ['loginPhone', 'honLoginPhone', 'kariLandline'];
+      simplePhoneInputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+          input.addEventListener('input', function (e) {
+            // Chỉ cho phép nhập số và dấu gạch ngang, xóa mọi ký tự khác.
+            e.target.value = e.target.value.replace(/[^0-9-]/g, '');
+          });
+        }
+      });
+      const zipInputs = ['kariZip'];
+      zipInputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+          input.addEventListener('input', function (e) {
+            var x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2];
+          });
+        }
+      });
+    });
+    
+    window.nextKariStep = function(step) {
+      try {
+        document.querySelectorAll('#viewKari .error-message').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('#viewKari .input-error').forEach(el => el.classList.remove('input-error'));
+        if (step === 2) {
+          if (!document.getElementById('kariConsentCheck').checked) {
+            document.getElementById('kariCheckError').style.display = 'block';
+            return;
+          }
+        }
+        if (step === 3) {
+          const elements = {
+            ln: document.getElementById('kariLastName'),
+            fn: document.getElementById('kariFirstName'),
+            lk: document.getElementById('kariLastKana'),
+            fk: document.getElementById('kariFirstKana'),
+            dob: document.getElementById('kariDob'),
+            nat: document.getElementById('kariNationality'),
+            gender: document.getElementById('kariGender'),
+            country: document.getElementById('kariCountry')
+          };
+          const errors = {
+            name: document.getElementById('kariNameError'),
+            kana: document.getElementById('kariKanaError'),
+            dob: document.getElementById('kariDobError'),
+            gender: document.getElementById('kariGenderError'),
+            nat: document.getElementById('kariNatError'),
+            country: document.getElementById('kariCountryError')
+          };
+          let hasErr = false;
+          Object.values(elements).forEach(el => el && el.classList.remove('input-error'));
+          Object.values(errors).forEach(err => {
+            if (err) {
+              err.style.display = 'none';
+              if (err.id === 'kariCountryError') err.innerText = "";
+            }
+          });
+          if (!elements.ln.value.trim() || !elements.fn.value.trim()) {
+            if (!elements.ln.value.trim()) elements.ln.classList.add('input-error');
+            if (!elements.fn.value.trim()) elements.fn.classList.add('input-error');
+            errors.name.style.display = 'inline';
+            hasErr = true;
+          }
+          if (!elements.lk.value.trim() || !elements.fk.value.trim()) {
+            if (!elements.lk.value.trim()) elements.lk.classList.add('input-error');
+            if (!elements.fk.value.trim()) elements.fk.classList.add('input-error');
+            errors.kana.style.display = 'inline';
+            hasErr = true;
+          }
+          if (!elements.dob.value) {
+            elements.dob.classList.add('input-error');
+            errors.dob.style.display = 'inline';
+            hasErr = true;
+          }
+          if (!elements.gender.value) {
+            elements.gender.classList.add('input-error');
+            errors.gender.style.display = 'inline';
+            hasErr = true;
+          }
+          if (!elements.nat.value) {
+            elements.nat.classList.add('input-error');
+            errors.nat.style.display = 'inline';
+            hasErr = true;
+          }
+          else if (elements.nat.value === '外国籍') {
+            const countryVal = elements.country.value.trim();
+            const forbidden = ["日本", "にほん", "ニホン", "Japan", "japan", "JAPAN", "nihon", "NIHON", "Nihon"];
+            if (!countryVal) {
+              elements.country.classList.add('input-error');
+              errors.country.innerText = "（国籍名を入力してください）";
+              errors.country.style.display = 'inline';
+              hasErr = true;
+            } else if (forbidden.includes(countryVal)) {
+              elements.country.classList.add('input-error');
+              errors.country.innerText = "（日本国籍の方は、上の選択肢で「日本」を選択してください）";
+              errors.country.style.display = 'inline';
+              hasErr = true;
+            }
+          }
+          if (hasErr) return;
+        }
+        if (step === 4) {
+          const el = {
+            zip: document.getElementById('kariZip'), phone: document.getElementById('kariPhone'),
+            landline: document.getElementById('kariLandline'), email: document.getElementById('kariEmail'),
+            addr1: document.getElementById('kariAddr1'), addr2: document.getElementById('kariAddr2')
+          };
+          const err = {
+            phone: document.getElementById('kariPhoneError'), zip: document.getElementById('kariZipError'),
+            email: document.getElementById('kariEmailError'), addr1: document.getElementById('kariAddr1Error'),
+            addr2: document.getElementById('kariAddr2Error')
+          };
+          let hasErr = false;
+          Object.values(el).forEach(input => input && input.classList.remove('input-error'));
+          Object.values(err).forEach(errorText => { 
+            if (errorText) {
+              errorText.style.display = 'none'; 
+              if (errorText.id === 'kariPhoneError') errorText.innerText = "（いずれか一方は入力必須です）"; 
+            }
+          });
+          const phoneVal = el.phone.value.trim(); const landlineVal = el.landline.value.trim();
+          if (!phoneVal && !landlineVal) {
+            el.phone.classList.add('input-error'); el.landline.classList.add('input-error');
+            err.phone.style.display = 'inline'; hasErr = true;
+          }
+          if (!el.zip.value.trim() || el.zip.value.length < 8) { el.zip.classList.add('input-error'); err.zip.style.display = 'inline'; hasErr = true; }
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!el.email.value.trim() || !emailRegex.test(el.email.value)) { el.email.classList.add('input-error'); err.email.style.display = 'inline'; hasErr = true; }
+          if (!el.addr1.value.trim()) { el.addr1.classList.add('input-error'); err.addr1.style.display = 'inline'; hasErr = true; }
+          if (!el.addr2.value.trim()) { el.addr2.classList.add('input-error'); err.addr2.style.display = 'inline'; hasErr = true; }
+          if (hasErr) return;
+          const phoneToCheck = phoneVal ? phoneVal : landlineVal;
+          const nextBtn = document.querySelector('#kariStep3 .btn-primary');
+          const originalBtnText = nextBtn.innerText;
+          nextBtn.disabled = true;
+          nextBtn.innerText = "確認中..."; 
+          google.script.run.withSuccessHandler(function(isExist) {
+            nextBtn.disabled = false;
+            nextBtn.innerText = originalBtnText;
+            if (isExist) {
+              if (phoneVal) el.phone.classList.add('input-error');
+              if (!phoneVal && landlineVal) el.landline.classList.add('input-error'); 
+              err.phone.innerText = "（この電話番号は既に登録されています）"; 
+              err.phone.style.display = 'inline';
+              (phoneVal ? el.phone : el.landline).scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+              for(let i=1; i<=5; i++) {
+                const stepEl = document.getElementById('kariStep' + i);
+                if(stepEl) stepEl.style.display = (i === 4) ? 'block' : 'none';
+              }
+              window.scrollTo(0,0);
+            }
+          }).withFailureHandler(function() {
+              nextBtn.disabled = false;
+              nextBtn.innerText = originalBtnText;
+              alert("通信エラーが発生しました。");
+          }).checkPhoneExists(phoneToCheck);
+          return; 
+        }
+        if (step === 5) {
+            prepareKariConfirm();
+        }
+        for(let i=1; i<=5; i++) {
+          const el = document.getElementById('kariStep' + i);
+          if(el) el.style.display = (i === step) ? 'block' : 'none';
+        }
+        if(step === 1) setTimeout(() => checkInitialVisibility('kariBox', 'kariConsentCheck', 'kariHint'), 300);
+        window.scrollTo(0,0);
+      } catch (e) { 
+        console.error("Lỗi trong nextKariStep:", e); 
+      }
+    };
+
+    function searchKariAddress() {
+      const zipInput = document.getElementById('kariZip');
+      const zipError = document.getElementById('kariZipError');
+      const zip = zipInput.value.replace(/[^0-9]/g, "");
+      zipInput.classList.remove('input-error');
+      zipError.style.display = 'none';
+      zipError.innerText = "（7桁で入力してください）";
+      if(zip.length !== 7) {
+        zipInput.classList.add('input-error');
+        zipError.style.display = 'inline';
+        return;
+      }
+      const addr1Input = document.getElementById('kariAddr1');
+      addr1Input.value = "検索中...";
+      fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode=' + zip)
+        .then(r => r.json()).then(d => {
+          if (d.results) {
+            addr1Input.value = d.results[0].address1 + d.results[0].address2 + d.results[0].address3;
+            zipInput.classList.remove('input-error');
+            zipError.style.display = 'none';
+          } else {
+            addr1Input.value = ""; 
+            zipInput.classList.add('input-error');
+            zipError.innerText = "（住所が見つかりませんでした）";
+            zipError.style.display = 'inline';
+          }
+        });
+    }
+
+    let uploadBoxCount = 1; 
+
+    function addUploadBox() {
+      uploadBoxCount++;
+      const boxId = uploadBoxCount;
+      const html = `
+        <div class="upload-box dynamic-upload" id="kariBox_${boxId}">
+          <button type="button" class="btn-remove-img" onclick="removeUploadBox(${boxId})">✕</button>
+          <label>追加ファイル ${boxId} <span style="font-size:12px; color:#5f6368; font-weight:normal;">(職務経歴書・資格証等)</span></label>
+          <div class="file-input-wrapper">
+            <input type="file" id="kari_f${boxId}" accept="image/*,.pdf,.doc,.docx" onchange="previewDynamicImg(this, 'kari_p${boxId}', ${boxId})">
+          </div>
+          <div class="preview-container" id="kari_p${boxId}-c">
+            <img id="kari_p${boxId}" class="preview-img">
+            <p id="kari_pdf${boxId}" class="pdf-label"></p>
+          </div>
+        </div>
+      `;
+      document.getElementById('kariUploadZone').insertAdjacentHTML('beforeend', html);
+    }
+
+    function removeUploadBox(boxId) {
+      const box = document.getElementById(`kariBox_${boxId}`);
+      if (box) box.remove();
+    }
+    
+    function previewDynamicImg(input, imgId, boxId) {
+      const f = input.files[0];
+      const container = document.getElementById(`${imgId}-c`);
+      const imgEl = document.getElementById(imgId);
+      const pdfText = document.getElementById(`kari_pdf${boxId}`);
+      if(f) {
+        container.style.display = 'block';
+        if (f.type.startsWith('image/')) {
+          const r = new FileReader();
+          r.onload = e => { imgEl.src = e.target.result; imgEl.style.display = 'block'; pdfText.style.display = 'none'; };
+          r.readAsDataURL(f);
+        } 
+        else {
+          imgEl.style.display = 'none';
+          pdfText.innerText = "📄 " + f.name;
+          pdfText.style.display = 'block';
+        }
+      }
+    }
+
+    function removeDynamicImg(boxId) {
+      const input = document.getElementById(`kari_f${boxId}`);
+      if(input) input.value = ''; 
+      document.getElementById(`kari_p${boxId}-c`).style.display = 'none';
+    }
+
+    function prepareKariConfirm() {
+      try {
+        const box1 = document.getElementById('kariBox_1');
+        const error1 = document.getElementById('kariError_1');
+        const firstInput = document.getElementById('kari_f1');
+        if (box1) box1.classList.remove('input-error');
+        if (error1) error1.style.display = 'none';
+        if (!firstInput || !firstInput.files || firstInput.files.length === 0) {
+          if (box1) box1.classList.add('input-error');
+          if (error1) error1.style.display = 'inline';
+          return;
+        }
+        const nameKanji = document.getElementById('kariLastName').value + " " + document.getElementById('kariFirstName').value;
+        const nameKana = document.getElementById('kariLastKana').value + " " + document.getElementById('kariFirstKana').value;
+        const dob = document.getElementById('kariDob').value;
+        const gender = document.getElementById('kariGender').value;
+        const nat = document.getElementById('kariNationality').value;
+        const foreignCtry = document.getElementById('kariCountry').value;
+        const natDisplay = (nat === '外国籍' && foreignCtry) ? `外国籍（${foreignCtry}）` : nat;
+        const phone = document.getElementById('kariPhone').value;
+        const email = document.getElementById('kariEmail').value || '（未入力）';
+        const zip = document.getElementById('kariZip').value;
+        const addr1 = document.getElementById('kariAddr1').value;
+        const addr2 = document.getElementById('kariAddr2').value;
+        const addr3 = document.getElementById('kariAddr3').value;
+        const allInputs = document.querySelectorAll('#kariUploadZone input[type="file"]');
+        let fileCount = 0;
+        for (let input of allInputs) { if (input.files && input.files.length > 0) fileCount++; }
+        const confirmHtml = `
+          <div class="confirm-box">
+            <div class="confirm-row"><span class="confirm-label">氏名</span><span class="confirm-val">${nameKanji}（${nameKana}）</span></div>
+            <div class="confirm-row"><span class="confirm-label">生年月日</span><span class="confirm-val">${dob}</span></div>
+            <div class="confirm-row"><span class="confirm-label">性別</span><span class="confirm-val">${gender}</span></div>
+            <div class="confirm-row"><span class="confirm-label">国籍</span><span class="confirm-val">${natDisplay}</span></div>
+            <div class="confirm-row"><span class="confirm-label">電話番号</span><span class="confirm-val">${phone}</span></div>
+            <div class="confirm-row"><span class="confirm-label">メールアドレス</span><span class="confirm-val">${email}</span></div>
+            <div class="confirm-row"><span class="confirm-label">現住所</span><span class="confirm-val">〒${zip}<br>${addr1}${addr2}<br>${addr3}</span></div>
+            <div class="confirm-row"><span class="confirm-label">添付ファイル</span><span class="confirm-val">履歴書等（計 ${fileCount} 件）</span></div>
+          </div>
+        `;
+        document.getElementById('kariConfirmDataBox').innerHTML = confirmHtml;
+        for(let i=1; i<=5; i++) {
+          const el = document.getElementById('kariStep' + i);
+          if(el) el.style.display = (i === 5) ? 'block' : 'none';
+        }
+        window.scrollTo(0,0);
+      } catch(e) {
+        console.error("Lỗi tại prepareKariConfirm:", e);
+      }
+    }
+
+    async function handleKariRegister() {
+      try {
+        let finalNationality;
+        const nationalityChoice = document.getElementById('kariNationality').value;
+        if (nationalityChoice === '外国籍') {
+          finalNationality = document.getElementById('kariCountry').value.trim();
+        } else {
+          finalNationality = nationalityChoice;
+        }
+        const formData = {
+          nameKanji: document.getElementById('kariLastName').value.trim() + "/" + document.getElementById('kariFirstName').value.trim(),
+          nameKana: document.getElementById('kariLastKana').value.trim() + "/" + document.getElementById('kariFirstKana').value.trim(),
+          dob: document.getElementById('kariDob').value,
+          gender: document.getElementById('kariGender').value,
+          nationality: finalNationality, // SỬ DỤNG BIẾN ĐÃ XỬ LÝ LOGIC
+          phone: document.getElementById('kariPhone').value,
+          landline: document.getElementById('kariLandline').value.trim(),
+          email: document.getElementById('kariEmail').value,
+          zipcode: document.getElementById('kariZip').value,
+          address1: document.getElementById('kariAddr1').value,
+          address2: document.getElementById('kariAddr2').value,
+          address3: document.getElementById('kariAddr3').value
+        };
+        setLoading(true, "データを送信中...", "少々お待ちください");
+        google.script.run.withSuccessHandler(async (res) => {
+          if (res.success) {
+            const allInputs = document.querySelectorAll('#kariUploadZone input[type="file"]');
+            let filesToUpload = [];
+            allInputs.forEach(input => {
+              if (input.files && input.files[0]) filesToUpload.push(input.files[0]);
+            });
+            const totalFiles = filesToUpload.length;
+            for (let i = 0; i < totalFiles; i++) {
+              const file = filesToUpload[i];
+              const isImage = file.type.startsWith("image/");
+              setLoading(true, `ファイルを送信中... (${i + 1} / ${totalFiles})`, `「${file.name}」をアップロードしています`);
+              let base64Data = "";
+              if (isImage) {
+                base64Data = await processImg(file, false);
+              } else {
+                base64Data = await new Promise(resolve => {
+                  const reader = new FileReader();
+                  reader.onload = e => resolve(e.target.result);
+                  reader.readAsDataURL(file);
+                });
+              }
+              await new Promise(resolve => {
+                google.script.run.withSuccessHandler(() => resolve())
+                  .saveSingleKariFile(res.folderName, {data: base64Data, isImage: isImage}, formData.nameKanji, (i + 1));
+              });
+            }
+            setLoading(true, "最終処理を行っています...", "まもなく完了します");
+            google.script.run.withSuccessHandler(() => {
+              setLoading(false);
+              resetKariForm();
+              showView('viewKariSuccess');
+            }).finalCheckKari(res.rowIndex);
+          }
+        }).createKariRecord(formData);
+      } catch (e) {
+        setLoading(false);
+        console.error(e);
+      }
+    }
+
+    function clearFirstBoxImg() {
+      const input = document.getElementById('kari_f1');
+      if(input) input.value = '';
+      document.getElementById('kari_p1-c').style.display = 'none';
+      document.getElementById('kari_p1').src = '';
+      document.getElementById('kari_pdf1').innerText = '';
+    }
+    
+    let pendingKariData = null;
+    let pendingKariRowIndex = -1;
+
+    function handleHonLogin() {
+      const phoneInput = document.getElementById('honLoginPhone');
+      const dobInput = document.getElementById('honLoginDob');
+      const errorBox = document.getElementById('honLoginErrorBox');
+      phoneInput.classList.remove('input-error');
+      dobInput.classList.remove('input-error');
+      errorBox.style.display = 'none';
+      if(!phoneInput.value || !dobInput.value) {
+        if(!phoneInput.value) phoneInput.classList.add('input-error');
+        if(!dobInput.value) dobInput.classList.add('input-error');
+        return;
+      }
+      setLoading(true);
+      google.script.run.withSuccessHandler(res => {
+        setLoading(false);
+        if(res.success) {
+          pendingKariData = res.kariData;
+          pendingKariRowIndex = res.kariRowIndex;
+          document.getElementById('honConfirmName').innerText = pendingKariData.nameKanji.replace(/\//g, ' ') + " 様";
+          showView('viewHonRegister');
+          nextHonStep(1); 
+        } else {
+          errorBox.style.display = 'block';
+          phoneInput.classList.add('input-error');
+          dobInput.classList.add('input-error');
+          window.scrollTo(0, 0);
+        }
+      }).findKariUser(phoneInput.value, dobInput.value);
+    }
+
+    function nextHonStep(step) {
+      document.querySelectorAll('#viewHonRegister .error-message').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('#viewHonRegister .input-error').forEach(el => el.classList.remove('input-error'));
+      let currentStep = step - 1;
+      let hasError = false;
+      if (currentStep === 2) {
+        if (!document.getElementById('honConsentCheck').checked) {
+          document.getElementById('honConsentCheckError').style.display = 'block'; hasError = true;
+        }
+      }
+      if (currentStep === 3) {
+        if (!document.getElementById('honAgreementCheck').checked) {
+          document.getElementById('honAgreementCheckError').style.display = 'block'; hasError = true;
+        }
+      }
+      if (currentStep === 4) {
+        if (!document.getElementById('honNdaCheck').checked) {
+          document.getElementById('honNdaCheckError').style.display = 'block'; hasError = true;
+        }
+      }
+      if (hasError) return;
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById('honStep' + i).style.display = (i === step) ? 'block' : 'none';
+      }
+      if(step === 2) {
+        document.getElementById('honConsentBox').innerHTML = getDocContent('hon-consent');
+        setTimeout(() => checkInitialVisibility('honConsentBox', 'honConsentCheck', 'honConsentHint'), 100);
+      }
+      if(step === 3) {
+        document.getElementById('honAgreementBox').innerHTML = getDocContent('agreement');
+        setTimeout(() => checkInitialVisibility('honAgreementBox', 'honAgreementCheck', 'honAgreementHint'), 100);
+      }
+      if(step === 4) {
+        document.getElementById('honNdaBox').innerHTML = getDocContent('nda');
+        setTimeout(() => checkInitialVisibility('honNdaBox', 'honNdaCheck', 'honNdaHint'), 100);
+      }
+      if(step === 5) {
+        document.getElementById('honEduBox').innerHTML = getDocContent('edu');
+        document.getElementById('honEduTestArea').innerHTML = renderTestQuestions('hon_q'); 
+        setTimeout(() => checkInitialVisibility('honEduBox', 'honEduCheck', 'honEduHint'), 100);
+      }
+      window.scrollTo(0, 0);
+    }
+
+    function handleHonSubmit() {
+      let hasError = false;
+      if (!document.getElementById('honEduCheck').checked) {
+        document.getElementById('honEduCheckError').style.display = 'block';
+        hasError = true;
+      }
+      let eduResults = [];
+      let firstMissingQ = null;
+      for (let i = 0; i < 10; i++) {
+        const qBox = document.querySelectorAll('#honEduTestArea .test-q-box')[i];
+        const selectedOption = document.querySelector(`input[name="hon_q${i}"]:checked`);
+        if(qBox) qBox.classList.remove('error');
+        if (!selectedOption) {
+          if(qBox) { qBox.classList.add('error'); if (!firstMissingQ) firstMissingQ = qBox; }
+          hasError = true;
+        } else { eduResults.push(`Q${i+1}:${selectedOption.value}`); }
+      }
+      if (firstMissingQ) firstMissingQ.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (hasError) return;
+      const newHonData = {
+        employmentType: document.getElementById('honEmpType').value,
+        eduResult: eduResults.join(', ')
+      };
+      const errBox = document.getElementById('honSubmitErrorBox');
+      errBox.style.display = 'none'; // Reset box lỗi trước khi gửi
+      setLoading(true, "登録情報を送信中...");
+      google.script.run.withSuccessHandler(res => {
+        setLoading(false);
+        if(res.success && res.user) {
+          currentUser = res.user;
+          resetHonForm();
+          renderMyPage();
+          showView('viewMyPage');
+          google.script.run.generateHonPdfBackground(currentUser.id);
+        } else {
+          errBox.innerText = "⚠️ " + (res.message || "エラーが発生しました。");
+          errBox.style.display = 'block';
+          errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }).withFailureHandler(err => {
+        setLoading(false);
+        errBox.innerText = "⚠️ 通信エラーが発生しました。接続を確認してください。";
+        errBox.style.display = 'block';
+      }).submitHon(pendingKariRowIndex, pendingKariData, newHonData);
+    }
+
+    function resetKariForm() {
+      const inputIds = [
+        'kariLastName', 'kariFirstName', 'kariLastKana', 'kariFirstKana', 
+        'kariDob', 'kariPhone', 'kariLandline', 'kariEmail', 
+        'kariZip', 'kariAddr1', 'kariAddr2', 'kariAddr3', 'kariCountry'
+      ];
+      inputIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.value = '';
+          el.classList.remove('input-error');
+        }
+      });
+      if(document.getElementById('kariGender')) document.getElementById('kariGender').selectedIndex = 0;
+      if(document.getElementById('kariNationality')) document.getElementById('kariNationality').selectedIndex = 0;
+      const countryDiv = document.getElementById('kariCountryDiv');
+      if(countryDiv) countryDiv.style.display = 'none';
+      const landlineArea = document.getElementById('landlineArea');
+      if(landlineArea) landlineArea.style.display = 'none';
+      const toggleBtn = document.getElementById('toggleLandlineBtn');
+      if(toggleBtn) toggleBtn.style.display = 'block';
+      const dynamicBoxes = document.querySelectorAll('.dynamic-upload');
+      dynamicBoxes.forEach(box => { if (box.id !== 'kariBox_1') box.remove(); });
+      uploadBoxCount = 1; 
+      clearFirstBoxImg();
+      const box = document.getElementById('kariBox');
+      if (box) {
+        box.style.display = 'block';
+        box.scrollTop = 0;
+        box.scrollTo(0, 0);
+      }
+      const cb = document.getElementById('kariConsentCheck');
+      if (cb) {
+        cb.checked = false;
+        cb.disabled = true;
+        cb.parentElement.classList.remove('active-box');
+      }
+      const hint = document.getElementById('kariHint');
+      if (hint) { 
+        hint.innerText = "※一番下までスクロールしてください"; 
+        hint.style.color = "var(--error)"; 
+      }
+      for (let i = 1; i <= 5; i++) {
+        const stepEl = document.getElementById('kariStep' + i);
+        if (stepEl) stepEl.style.display = (i === 1) ? 'block' : 'none';
+      }
+      window.scrollTo(0,0);
+    }
+
+    function resetHonForm() {
+      const loginFields = ['honLoginPhone', 'honLoginDob', 'loginPhone', 'loginDob'];
+      loginFields.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) { el.value = ''; el.classList.remove('input-error'); }
+      });
+      const errEls = ['loginError', 'honLoginError'];
+      errEls.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) { el.innerText = ''; el.style.display = 'none'; }
+      });
+      ['honConsentCheck', 'honAgreementCheck', 'honNdaCheck', 'honEduCheck'].forEach(id => {
+        const cb = document.getElementById(id);
+        if(cb) { cb.checked = false; cb.disabled = true; if(cb.parentElement) cb.parentElement.classList.remove('active-box'); }
+      });
+      const testArea = document.getElementById('honEduTestArea');
+      if(testArea) testArea.innerHTML = '';
+      pendingKariData = null;
+      pendingKariRowIndex = -1;
+      nextHonStep(1);
+    }
+
+    function toggleCountryInput(val) {
+      const div = document.getElementById('kariCountryDiv');
+      const input = document.getElementById('kariCountry');
+      if (val === '外国籍') {
+        div.style.display = 'block';
+        input.focus();
+      } else {
+        div.style.display = 'none';
+        input.value = '';
+      }
+    }
+
+    function showLandlineField() {
+      document.getElementById('landlineArea').style.display = 'block';
+      document.getElementById('toggleLandlineBtn').style.display = 'none';
+      document.getElementById('kariLandline').focus();
+    }
+    window.addEventListener("focus", () => {
+      if (currentUser && document.getElementById('viewMyPage').classList.contains('active')) {
+        console.log("Tab được focus lại, kiểm tra cập nhật...");
+        checkAndUpdateStatus();
+      }
+    });
+
+    function checkAndUpdateStatus() {
+      if (!currentUser || !currentUser.id) return;
+      google.script.run.withSuccessHandler(res => {
+        if (res.success) {
+          if (currentUser.statusFuyo !== res.user.statusFuyo) {
+            console.log("Phát hiện trạng thái Tờ khai thuế đã thay đổi! Cập nhật giao diện.");
+            currentUser = res.user;
+            renderMyPage();
+          }
+        }
+      }).getUserStatusById(currentUser.id);
+    }
+
+    let clockInterval;
+    let locationCoordsObj = {};
+    let cachedPosition = null;
+    
+    function routeUser() {
+      if (currentUser && currentUser.progress && currentUser.progress.includes("完了")) {
+        renderMyPage();
+        renderAttendanceView(); 
+      } else {
+        renderMyPage();
+      }
+    }
+    
+    function startClock() {
+      if (clockInterval) clearInterval(clockInterval);
+      const days = ['日', '月', '火', '水', '木', '金', '土'];
+      clockInterval = setInterval(() => {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        const day = days[now.getDay()];
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        const ss = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('attDateDisplay').innerText = `${y}/${m}/${d} (${day})`;
+        document.getElementById('attClockDisplay').innerText = `${hh}:${mm}:${ss}`;
+      }, 1000);
+    }
+
+    function renderAttendanceView() {
+      showView('viewAttendance');
+      document.getElementById('attUserName').innerText = currentUser.name.replace(/\//g, ' ') + " 様";
+      startClock();
+      getCurrentPosition().then(pos => { cachedPosition = pos; }).catch(e => { console.log("Lấy GPS ngầm thất bại:", e); });
+      const locSelect = document.getElementById('attLocationSelect');
+      const feeGroup = document.getElementById('attFeeGroup');
+      const btnIn = document.getElementById('btnCheckIn');
+      const btnOut = document.getElementById('btnCheckOut');
+      const statusBox = document.getElementById('attStatusBox');
+      if (currentUser.attendanceInfo && currentUser.attendanceInfo.status && currentUser.attendanceInfo.status.checkedIn) {
+        let status = currentUser.attendanceInfo.status;
+        statusBox.innerHTML = `<strong>${status.location}</strong>に<br><strong>${status.checkInTime}</strong> に出勤しました。`;
+        statusBox.style.display = 'block';
+        feeGroup.style.display = 'block';
+        document.getElementById('attCommuteFee').value = currentUser.attendanceInfo.lastCommuteFee || '';
+        locSelect.innerHTML = `<option value="${status.location}" selected>${status.location}</option>`;
+        locSelect.disabled = true;
+        btnIn.disabled = true;
+        btnOut.disabled = false;
+        btnOut.classList.replace('btn-outline', 'btn-primary'); // Highlight nút out
+        btnIn.classList.replace('btn-primary', 'btn-outline');
+      } else {
+        statusBox.style.display = 'none';
+        feeGroup.style.display = 'none';
+        document.getElementById('attCommuteFee').value = '';
+        locSelect.disabled = true;
+        locSelect.innerHTML = '<option value="">読み込み中...</option>';
+        btnIn.disabled = false;
+        btnOut.disabled = true;
+        btnIn.classList.replace('btn-outline', 'btn-primary');
+        btnOut.classList.replace('btn-primary', 'btn-outline');
+        google.script.run.withSuccessHandler(locations => {
+          locationCoordsObj = {};
+          if (locations && locations.length > 0) {
+            locSelect.innerHTML = '<option value="" disabled selected>勤務地を選択してください</option>';
+            locations.forEach(loc => {
+              locSelect.innerHTML += `<option value="${loc.name}">${loc.name}</option>`;
+              locationCoordsObj[loc.name] = { lat: loc.lat, lng: loc.lng, radius: loc.radius };
+            });
+            locSelect.disabled = false;
+          } else {
+            locSelect.innerHTML = '<option value="">利用可能な勤務地がありません</option>';
+          }
+        }).getLocationsData(currentUser.allowedLocIds);
+      }
+    }
+
+    function showCustomAlert(msg, isError = false) {
+      const activeView = document.querySelector('.view.active');
+      if (!activeView) return alert(msg);
+      let alertBox = activeView.querySelector('.dynamic-alert-box');
+      if (!alertBox) {
+        alertBox = document.createElement('div');
+        alertBox.className = 'dynamic-alert-box';
+        activeView.insertBefore(alertBox, activeView.children[1]);
+      }
+      const bgColor = isError ? 'var(--md-error-container)' : 'var(--md-success-container)';
+      const textColor = isError ? 'var(--md-error)' : 'var(--md-on-success-container)';
+      const icon = isError ? '⚠️ ' : '✅ ';
+      alertBox.style.cssText = `background: ${bgColor}; color: ${textColor}; padding: 15px; border-radius: 12px; margin: 16px 0; text-align: center; font-weight: bold; font-size: 15px; animation: fadeIn 0.3s ease; display: block;`;
+      alertBox.innerHTML = icon + msg.replace(/\n/g, '<br>');
+      setTimeout(() => { 
+        alertBox.style.display = 'none'; 
+      }, 5000);
+    }
+
+    function handleCheckInOut(type) {
+      const locationName = document.getElementById('attLocationSelect').value;
+      const commuteFeeInput = document.getElementById('attCommuteFee').value;
+      if (!locationName) {
+        showCustomAlert("勤務地を選択してください。", true);
+        return;
+      }
+      let commuteFee = 0;
+      if (type === '退勤') {
+        if (!commuteFeeInput) {
+          showCustomAlert("退勤する前に往復交通費を入力してください。", true);
+          return;
+        }
+        commuteFee = parseInt(commuteFeeInput, 10);
+        if (isNaN(commuteFee) || commuteFee < 0) {
+          showCustomAlert("交通費は有効な半角数字で入力してください。", true);
+          return;
+        }
+      }
+      setLoading(true, "記録を送信中…", "");
+      const getPosTask = cachedPosition ? Promise.resolve(cachedPosition) : getCurrentPosition();
+      getPosTask
+        .then(position => {
+          const userLat = position.coords.latitude;
+          const userLng = position.coords.longitude;
+          const target = locationCoordsObj[locationName] || (currentUser.attendanceInfo && currentUser.attendanceInfo.status ? locationCoordsObj[currentUser.attendanceInfo.status.location] : null); 
+          if (!target && type === '出勤') throw new Error(`「${locationName}」の座標情報が設定されていません。`); 
+          if (target && target.lat && target.lng) {
+            const maxDist = (target.radius && !isNaN(target.radius)) ? Number(target.radius) : 1000; 
+            const distance = calculateDistance(userLat, userLng, target.lat, target.lng);
+            if (distance > maxDist) throw new Error(`現在地が「${locationName}」から離れすぎています。`);
+          }
+          cachedPosition = null; 
+          return new Promise((resolve, reject) => {
+            google.script.run.withSuccessHandler(res => {
+              if (res.success) resolve(res); else reject(new Error(res.message));
+            }).withFailureHandler(err => reject(err))
+              .submitAttendanceToOldApp(currentUser.id, currentUser.name, type, locationName, userLat, userLng, commuteFee);
+          });
+        })
+        .then(res => {
+          showCustomAlert(res.message);
+          if (!currentUser.attendanceInfo) currentUser.attendanceInfo = {};
+          currentUser.attendanceInfo.status = res.newStatus;
+          if (type === '退勤') currentUser.attendanceInfo.lastCommuteFee = commuteFeeInput;
+          renderAttendanceView();
+        })
+        .catch(err => {
+          showCustomAlert(err.message, true);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+
+    function getCurrentPosition() { 
+      return new Promise((resolve, reject) => { 
+        if (!navigator.geolocation) return reject(new Error("この端末では位置情報が取得できません。")); 
+        navigator.geolocation.getCurrentPosition(
+          resolve, 
+          error => reject(new Error(`位置情報の取得に失敗しました。スマホの設定を確認してください (コード: ${error.code})`)), 
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+        ); 
+      }); 
+    }
+    
+    function calculateDistance(lat1, lon1, lat2, lon2) { 
+      const R = 6371e3; const p1 = lat1 * Math.PI/180; const p2 = lat2 * Math.PI/180; const dp = (lat2-lat1) * Math.PI/180; const dl = (lon2-lon1) * Math.PI/180; const a = Math.sin(dp/2) * Math.sin(dp/2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl/2) * Math.sin(dl/2); const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); return R * c; 
+    }
+
+    function showHistoryView() {
+      showView('viewHistory');
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      document.getElementById('historyMonthFilter').value = `${y}-${m}`;
+      loadFilteredHistory();
+    }
+
+    function loadFilteredHistory() {
+      const container = document.getElementById('historyListContainer');
+      container.innerHTML = '<p style="text-align:center;">読み込み中...</p>';
+      const monthValue = document.getElementById('historyMonthFilter').value;
+      if (!monthValue) return container.innerHTML = '';
+      const [year, month] = monthValue.split('-');
+      google.script.run.withSuccessHandler(data => {
+        let html = '';
+        let totalMinutes = 0;
+        let totalFee = 0;
+        if (data && data.length > 0) {
+          const days = ['日','月','火','水','木','金','土'];
+          data.forEach(item => {
+            const dateObj = new Date(item.dateFull);
+            const dayStr = `${dateObj.getDate()}日 (${days[dateObj.getDay()]})`;
+            const statusBadge = item.isApproved 
+              ? `<span style="background:var(--md-surface-variant); color:var(--md-on-surface-variant); padding:4px 10px; border-radius:6px; font-size:13px; font-weight:bold;">承認済</span>`
+              : `<span style="background:var(--md-error-container); color:var(--md-error); padding:4px 10px; border-radius:6px; font-size:13px; font-weight:bold;">未承認</span>`;
+            const timeParts = item.totalDuration.split(':');
+            if (timeParts.length === 2) {
+              totalMinutes += (parseInt(timeParts[0],10)*60) + parseInt(timeParts[1],10);
+            }
+            totalFee += Number(item.fee) || 0;
+            const editBtn = item.isApproved ? '' : `<button style="background:none; border:2px solid var(--md-primary); color:var(--md-primary); border-radius:8px; padding:8px 24px; font-size:14px; font-weight:bold; cursor:pointer;" onclick="openManualModal('${item.dateFull}', '${item.location}', '${item.checkIn}', '${item.checkOut}', '${item.fee}', '${item.rowIndex}')">修正</button>`;
+            const shoninBtn = item.isApproved ? '' : `<button style="background:var(--md-secondary); border:none; color:#fff; border-radius:8px; padding:8px 24px; font-size:14px; font-weight:bold; cursor:pointer;" onclick="openShoninModal('single', '${item.dateFull}', '')">承認する</button>`;
+            html += `
+              <div class="task-card" style="flex-direction:column; align-items:stretch; gap:12px; padding:20px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--md-outline-variant); padding-bottom:12px;">
+                  <strong style="color:var(--md-primary); font-size:18px;">${dayStr}</strong>
+                  ${statusBadge}
+                </div>
+                <div style="font-size:16px; color:var(--md-on-surface); font-weight:700;">${item.location}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:15px; color:var(--md-on-surface-variant);">
+                  <span>出: ${item.checkIn || '--:--'} ~ 退: ${item.checkOut || '--:--'}</span>
+                  <span style="color:var(--md-secondary); font-weight:700; font-size:16px;">¥${item.fee}</span>
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
+                  ${editBtn}
+                  ${shoninBtn}
+                </div>
+              </div>
+            `;
+            if (!item.isApproved && item.checkIn && item.checkOut) {
+              if (!window.pendingLocations) window.pendingLocations = {};
+              if (!window.pendingLocations[item.location]) window.pendingLocations[item.location] = 0;
+              window.pendingLocations[item.location]++;
+            }
+          });
+          document.getElementById('summaryTotalTime').innerText = Math.floor(totalMinutes/60) + ":" + String(totalMinutes%60).padStart(2, '0');
+          document.getElementById('summaryTotalFee').innerText = totalFee.toLocaleString() + '円';
+          document.getElementById('historySummary').style.display = 'flex';
+        } else {
+          html = '<p style="text-align:center;">データがありません。</p>';
+          document.getElementById('historySummary').style.display = 'none';
+        }
+        let bulkHtml = '';
+        if (window.pendingLocations) {
+          Object.keys(window.pendingLocations).forEach(loc => {
+            bulkHtml += `<button class="btn btn-secondary" style="height:45px; margin-bottom:12px; font-size:14px;" onclick="openShoninModal('bulk', '', '${loc}')">⚠️ ${loc} 一括承認 (${window.pendingLocations[loc]}件)</button>`;
+          });
+          window.pendingLocations = {}; // Xóa bộ nhớ sau khi in xong
+        }
+        container.innerHTML = html;
+      }).getEmployeeAttendanceHistory(currentUser.id, parseInt(year, 10), parseInt(month, 10));
+    }
+
+    function openManualModal(date='', loc='', inTime='', outTime='', fee='', rowIndex='') {
+      document.getElementById('manualModalTitle').innerText = date ? "勤務記録の修正" : "勤務記録の追加";
+      document.getElementById('manualDate').value = date;
+      document.getElementById('manualIn').value = inTime;
+      document.getElementById('manualOut').value = outTime;
+      document.getElementById('manualFee').value = fee;
+      document.getElementById('manualRowIndex').value = rowIndex;
+      const locSelect = document.getElementById('manualLocation');
+      locSelect.innerHTML = '<option value="" disabled selected>読み込み中...</option>';
+      showView('viewManual'); window.scrollTo(0,0);
+      google.script.run.withSuccessHandler(locations => {
+        let options = '<option value="" disabled selected>選択してください</option>';
+        if (locations && locations.length > 0) {
+          locations.forEach(l => {
+            const isSelected = (l.name === loc) ? 'selected' : '';
+            options += `<option value="${l.name}" ${isSelected}>${l.name}</option>`;
+          });
+        }
+        locSelect.innerHTML = options;
+      }).getLocationsData(currentUser.allowedLocIds);
+    }
+
+    function saveManualData() {
+      const data = {
+        empId: currentUser.id,
+        empName: currentUser.name,
+        date: document.getElementById('manualDate').value,
+        location: document.getElementById('manualLocation').value,
+        checkIn: document.getElementById('manualIn').value,
+        checkOut: document.getElementById('manualOut').value,
+        fee: document.getElementById('manualFee').value,
+        rowIndex: document.getElementById('manualRowIndex').value
+      };
+      if (!data.date || !data.location || !data.checkIn) {
+        showCustomAlert("日付、勤務地、出勤時間は必須です。", true);
+        return;
+      }
+      setLoading(true, "保存中...");
+      google.script.run.withSuccessHandler(res => {
+        setLoading(false);
+        if (res.success) {
+          showView('viewHistory'); // Chuyển về trang Lịch sử
+          window.scrollTo(0,0);
+          showCustomAlert(res.message); // Xanh lá
+          loadFilteredHistory(); // Tải lại danh sách
+        } else {
+          showCustomAlert(res.message, true); // Đỏ (BÁO LỖI)
+        }
+      }).saveManualAttendanceRecord(data);
+    }
+    
+    function openShoninModal(mode, dateStr, locName) {
+      document.getElementById('shoninMode').value = mode;
+      document.getElementById('shoninTargetDate').value = dateStr;
+      document.getElementById('shoninTargetLoc').value = locName;
+      document.getElementById('shoninApproverName').value = '';
+      document.getElementById('shoninPassword').value = '';
+      const desc = (mode === 'bulk') ? `【一括承認】<br>拠点: ${locName}<br>対象月: ${document.getElementById('historyMonthFilter').value}` : `【個別承認】<br>日付: ${dateStr}`;
+      document.getElementById('shoninModalDesc').innerHTML = desc;
+      showView('viewShonin'); window.scrollTo(0,0);
+    }
+
+    function submitShonin() {
+      const mode = document.getElementById('shoninMode').value;
+      const dateStr = document.getElementById('shoninTargetDate').value;
+      const locName = document.getElementById('shoninTargetLoc').value;
+      const name = document.getElementById('shoninApproverName').value.trim();
+      const pass = document.getElementById('shoninPassword').value.trim();
+      const monthStr = document.getElementById('historyMonthFilter').value;
+      if (!name || !pass) {
+        showCustomAlert('承認者名とパスワードは必須です。', true); // Sửa alert thành đỏ
+        return;
+      }
+      setLoading(true, "承認処理中...");
+      let serverTask;
+      if (mode === 'bulk') {
+        serverTask = new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(rej).approveAllPendingForLocation(currentUser.id, monthStr, name, pass, locName));
+      } else {
+        serverTask = new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(rej).approveAttendanceRecord(currentUser.id, dateStr, name, pass));
+      }
+      serverTask.then(res => {
+        setLoading(false);
+        if (res.success) {
+          showView('viewHistory');
+          window.scrollTo(0,0);
+          showCustomAlert(res.message); // Xanh lá
+          loadFilteredHistory(); // Tải lại danh sách
+        } else {
+          showCustomAlert("エラー: " + res.message, true); // Đỏ (BÁO LỖI)
+        }
+      }).catch(err => {
+        setLoading(false);
+        showCustomAlert("通信エラー: " + err.message, true); // Đỏ (BÁO LỖI)
+      });
+    }
+
+    let shiftYear = new Date().getFullYear();
+    let shiftMonth = new Date().getMonth() + 2; 
+    let shiftData = { templates: [], kibo: new Set(), kakutei: new Set(), shiftsAvailableByDay: {}, deadline: null, contactNotes: '' };
+    let stagedAdditions = new Set();
+    let stagedDeletions = new Set();
+
+    function showShiftView() {
+      const nextM = new Date();
+      nextM.setMonth(nextM.getMonth() + 1);
+      shiftYear = nextM.getFullYear();
+      shiftMonth = nextM.getMonth() + 1;
+      showView('viewShift');
+      stagedAdditions.clear();
+      stagedDeletions.clear();
+      updateSubmitButtonVisibility();
+      loadAndRenderAllShifts();
+    }
+
+    function navigateShiftMonth(dir, mode) {
+      shiftMonth += dir;
+      if (shiftMonth > 12) { shiftMonth = 1; shiftYear++; }
+      if (shiftMonth < 1) { shiftMonth = 12; shiftYear--; }
+      if (mode === 'selection') {
+        stagedAdditions.clear(); stagedDeletions.clear(); updateSubmitButtonVisibility();
+        loadAndRenderAllShifts();
+      } else {
+        loadAndRenderKakuteiList();
+      }
+    }
+
+    function loadAndRenderAllShifts() {
+      document.getElementById('shiftMonthDisplay').innerText = `${shiftYear}年 ${shiftMonth}月`;
+      const container = document.getElementById('shiftListContainer');
+      container.innerHTML = '<p style="text-align:center;">読み込み中...</p>';
+      setLoading(true, "シフト取得中...");
+      google.script.run.withSuccessHandler(res => {
+        setLoading(false);
+        if (res.success) {
+          shiftData.templates = res.templates;
+          shiftData.kibo = new Set(res.kibo);
+          shiftData.kakutei = new Set(res.kakutei);
+          shiftData.shiftsAvailableByDay = res.shiftsAvailableByDay;
+          shiftData.deadline = res.deadline;
+          document.getElementById('contactNotes').value = res.contactNotes || '';
+          updateDeadlineUI();
+          renderShiftList();
+        } else {
+          container.innerHTML = `<p style="text-align:center; color:red;">${res.message}</p>`;
+        }
+      }).getAggregatedShiftCalendarData(currentUser.id, shiftYear, shiftMonth);
+    }
+
+    function updateDeadlineUI() {
+      const display = document.getElementById('shiftDeadlineDisplay');
+      const controls = document.getElementById('quickSelectControls');
+      const list = document.getElementById('shiftListContainer');
+      if (!shiftData.deadline) {
+        display.innerText = ''; list.style.pointerEvents = 'auto'; controls.style.display = 'flex'; return;
+      }
+      const dl = new Date(shiftData.deadline);
+      const now = new Date();
+      const dlStr = `${dl.getMonth()+1}/${dl.getDate()} ${String(dl.getHours()).padStart(2,'0')}:${String(dl.getMinutes()).padStart(2,'0')}`;
+      if (now > dl) {
+        display.innerText = `提出期限（${dlStr}）を過ぎました`;
+        list.style.pointerEvents = 'none'; controls.style.display = 'none';
+        document.getElementById('btnKiboReview').style.display = 'none';
+      } else {
+        display.innerText = `提出期限: ${dlStr}`;
+        list.style.pointerEvents = 'auto'; controls.style.display = 'flex';
+      }
+    }
+
+    function renderShiftList() {
+      const container = document.getElementById('shiftListContainer');
+      if (!shiftData.templates || shiftData.templates.length === 0) {
+        container.innerHTML = '<p style="text-align:center;">勤務可能な拠点がありません。</p>'; return;
+      }
+      const tempByLoc = shiftData.templates.reduce((acc, t) => {
+        if (!acc[t.locationId]) acc[t.locationId] = { name: t.locationName, shifts: [] };
+        acc[t.locationId].shifts.push(t); return acc;
+      }, {});
+      let html = '';
+      const days = new Date(shiftYear, shiftMonth, 0).getDate();
+      const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+      for (let d = 1; d <= days; d++) {
+        const date = new Date(shiftYear, shiftMonth - 1, d);
+        const dateStr = `${shiftYear}-${String(shiftMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const dayOfWeek = dayNames[date.getDay()];
+        const availIds = new Set(shiftData.shiftsAvailableByDay[dateStr] || []);
+        if (availIds.size === 0) continue;
+        let dayHtml = Object.entries(tempByLoc).map(([locId, locData]) => {
+          const validShifts = locData.shifts.filter(t => availIds.has(t.id));
+          if (validShifts.length === 0) return '';
+          let shiftHtml = validShifts.map(t => {
+            const key = `${locId}|${dateStr}|${t.id}`;
+            const isKibo = shiftData.kibo.has(key);
+            const isKakutei = Array.from(shiftData.kakutei).some(k => k.startsWith(key));
+            let cls = 'available';
+            if (isKakutei) cls = 'confirmed';
+            else if (stagedAdditions.has(key)) cls = 'staging';
+            else if (stagedDeletions.has(key)) cls = 'available';
+            else if (isKibo) cls = 'requested';
+            return `<div class="shift-slot ${cls}" onclick="handleShiftClick(this, '${key}', '${isKibo}', '${isKakutei}')">${t.name}</div>`;
+          }).join('');
+          return `<div style="margin-bottom:12px;"><div class="location-header">${locData.name}</div><div class="shift-items-wrapper">${shiftHtml}</div></div>`;
+        }).join('');
+        if (dayHtml) html += `<div class="shift-list-day"><div class="day-header">${shiftMonth}/${d} (${dayOfWeek})</div>${dayHtml}</div>`;
+      }
+      container.innerHTML = html || '<p style="text-align:center;">募集中のシフトはありません。</p>';
+    }
+
+    function handleShiftClick(el, key, wasKibo, isKakutei) {
+      if (isKakutei === 'true') return;
+      wasKibo = (wasKibo === 'true');
+      const cls = el.classList;
+      if (cls.contains('staging')) {
+        stagedAdditions.delete(key); cls.replace('staging', 'available');
+      } else if (cls.contains('requested')) {
+        stagedDeletions.add(key); cls.replace('requested', 'available');
+      } else {
+        if (wasKibo) { stagedDeletions.delete(key); cls.replace('available', 'requested'); } 
+        else { stagedAdditions.add(key); cls.replace('available', 'staging'); }
+      }
+      updateSubmitButtonVisibility();
+    }
+
+    function handleQuickSelect(mode) {
+      const slots = document.querySelectorAll('.shift-slot');
+      slots.forEach(slot => {
+        if (slot.classList.contains('confirmed')) return;
+        const key = slot.getAttribute('onclick').match(/'([^']+)'/)[1]; // Lấy key từ string onclick
+        const dateStr = key.split('|')[1];
+        const dayOfWeek = new Date(dateStr + 'T00:00:00').getDay();
+        const wasKibo = shiftData.kibo.has(key);
+        if (mode === 'weekdays' && dayOfWeek >= 1 && dayOfWeek <= 5) {
+          stagedDeletions.delete(key); if (!wasKibo) stagedAdditions.add(key);
+        } else if (mode === 'weekends' && (dayOfWeek === 0 || dayOfWeek === 6)) {
+          stagedDeletions.delete(key); if (!wasKibo) stagedAdditions.add(key);
+        } else if (mode === 'clear') {
+          stagedAdditions.delete(key); if (wasKibo) stagedDeletions.add(key);
+        }
+      });
+      renderShiftList(); updateSubmitButtonVisibility();
+    }
+
+    function updateSubmitButtonVisibility() {
+      const count = stagedAdditions.size + stagedDeletions.size;
+      document.getElementById('stagedCount').innerText = count;
+      document.getElementById('btnKiboReview').style.display = (count > 0) ? 'flex' : 'none';
+    }
+
+    function showKiboReviewView() {
+      showView('viewKiboReview');
+      const finalKeys = new Set(shiftData.kibo);
+      stagedDeletions.forEach(k => finalKeys.delete(k));
+      stagedAdditions.forEach(k => finalKeys.add(k));
+      const tMap = shiftData.templates.reduce((m, t) => { m[`${t.locationId}|${t.id}`] = t; return m; }, {});
+      const shiftsToDisplay = Array.from(finalKeys).map(k => {
+        const [lId, d, tId] = k.split('|');
+        const t = tMap[`${lId}|${tId}`];
+        return t ? { ...t, date: d, status: 'staging' } : null;
+      }).filter(Boolean);
+      const byDate = shiftsToDisplay.reduce((acc, s) => { (acc[s.date] = acc[s.date] || []).push(s); return acc; }, {});
+      const fDay = new Date(shiftYear, shiftMonth - 1, 1).getDay();
+      const mDays = new Date(shiftYear, shiftMonth, 0).getDate();
+      let html = `<div class="calendar-header">${['日','月','火','水','木','金','土'].map(d=>`<div>${d}</div>`).join('')}</div><div class="calendar-grid">`;
+      html += ''.padStart(fDay * 28, '<div class="calendar-day"></div>');
+      for (let i = 1; i <= mDays; i++) {
+        const dStr = `${shiftYear}-${String(shiftMonth).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+        const sHtml = (byDate[dStr] || []).map(s => `<div class="shift-entry">${s.startTime}<br>${s.locationName}</div>`).join('');
+        html += `<div class="calendar-day"><div class="day-number">${i}</div>${sHtml}</div>`;
+      }
+      html += '</div>';
+      document.getElementById('reviewCalendarContainer').innerHTML = html;
+    }
+
+    function kiboConfirmSubmit() {
+      const tMap = shiftData.templates.reduce((m, t) => { m[`${t.locationId}|${t.id}`] = t; return m; }, {});
+      const reqAdd = Array.from(stagedAdditions).map(k => {
+        const [l, d, t] = k.split('|'); const obj = tMap[`${l}|${t}`];
+        return { locationId: l, date: d, templateId: t, locationName: obj.locationName, startTime: obj.startTime, endTime: obj.endTime };
+      });
+      const reqDel = Array.from(stagedDeletions).map(k => { const [l, d, t] = k.split('|'); return { locationId: l, date: d, templateId: t }; });
+      const notes = document.getElementById('contactNotes').value;
+      setLoading(true, "提出中...");
+      google.script.run.withSuccessHandler(res => {
+        setLoading(false);
+        if (res.success) { 
+          showCustomAlert(res.message);
+          showView('viewShift');
+          window.scrollTo(0,0);
+          loadAndRenderAllShifts(); 
+        } else { 
+          showCustomAlert(res.message, true); 
+        }
+      }).submitShiftRequestsWithNotes(currentUser.id, currentUser.name.replace(/\//g, " "), reqAdd, reqDel, notes, shiftYear, shiftMonth);
+    }
+    function showKakuteiView() {
+      const now = new Date(); shiftYear = now.getFullYear(); shiftMonth = now.getMonth() + 1;
+      showView('viewKakutei'); loadAndRenderKakuteiList();
+    }
+
+    function loadAndRenderKakuteiList() {
+      document.getElementById('kakuteiMonthDisplay').innerText = `${shiftYear}年 ${shiftMonth}月`;
+      const container = document.getElementById('kakuteiListContainer');
+      container.innerHTML = '<p style="text-align:center;">読み込み中...</p>';
+      setLoading(true, "取得中...");
+      google.script.run.withSuccessHandler(res => {
+        setLoading(false);
+        if (!res.success) return container.innerHTML = `<p style="text-align:center; color:red;">${res.message}</p>`;
+        const tMap = res.templates.reduce((m, t) => { m[`${t.locationId}|${t.id}`] = t; return m; }, {});
+        const byDate = {};
+        res.kakutei.forEach(k => {
+          const p = k.split('|'); const lId = p[0], d = p[1], tId = p[2], rm = p.slice(3).join('|');
+          const t = tMap[`${lId}|${tId}`];
+          if (t) (byDate[d] = byDate[d] || []).push({ ...t, remarks: rm });
+        });
+        const sortedDays = Object.keys(byDate).sort();
+        if (sortedDays.length === 0) return container.innerHTML = '<p style="text-align:center;">確定シフトはありません。</p>';
+        const days = ['日', '月', '火', '水', '木', '金', '土'];
+        let html = sortedDays.map(dStr => {
+          const dObj = new Date(dStr + 'T00:00:00');
+          const byLoc = byDate[dStr].reduce((acc, s) => { (acc[s.locationName] = acc[s.locationName] || []).push(s); return acc; }, {});
+          const locHtml = Object.entries(byLoc).map(([lName, shifts]) => {
+            const sHtml = shifts.map(s => `<div class="confirmed-shift-item">${s.startTime} - ${s.endTime}${s.remarks ? `<div class="shift-remarks">備考: ${s.remarks}</div>` : ''}</div>`).join('');
+            return `<div style="margin-bottom:8px;"><div class="location-header">${lName}</div>${sHtml}</div>`;
+          }).join('');
+          return `<div class="shift-list-day"><div class="day-header">${shiftMonth}/${dObj.getDate()} (${days[dObj.getDay()]})</div>${locHtml}</div>`;
+        }).join('');
+        container.innerHTML = html;
+      }).getAggregatedShiftCalendarData(currentUser.id, shiftYear, shiftMonth);
+    }
+  </script>
+</body>
+</html>
