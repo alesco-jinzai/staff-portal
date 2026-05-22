@@ -57,11 +57,11 @@
       position: relative;
     }
     .content { 
-      padding: 20px; 
+      padding: 24px; 
       flex: 1; 
-      overflow-y: auto;   /* Chỉ cho phép cuộn nội dung ở giữa */
-      padding-bottom: 80px; /* Chừa chỗ cho thanh Menu đáy không bị che mất chữ */
-    } 
+      overflow-y: auto; 
+      padding-bottom: 120px; /* Bắt buộc phải có để chữ không bị chui tọt xuống dưới Menu */
+    }
       font-family: 'Noto Sans JP', sans-serif; 
       background: #ffffff;
       color: var(--md-on-surface); 
@@ -406,19 +406,23 @@
       text-align: center;
     }
 
-    /* ===== BOTTOM NAVIGATION BAR ===== */
+    /* ===== BOTTOM NAVIGATION BAR (BẢN FIX MOBILE) ===== */
     .bottom-nav {
-      position: absolute;
+      position: fixed; /* Khóa chết vào mặt kính điện thoại */
       bottom: 0;
+      left: 50%;
+      transform: translateX(-50%); /* Luôn căn giữa theo khung 500px */
       width: 100%;
-      height: 65px;
+      max-width: 500px;
+      height: calc(65px + env(safe-area-inset-bottom)); /* Tự động cao lên nếu là iPhone tai thỏ */
+      padding-bottom: env(safe-area-inset-bottom); /* Né dải đen vuốt về Home của iOS/Android */
       background: #ffffff;
       border-top: 1px solid var(--md-outline-variant);
       display: flex;
       justify-content: space-around;
       align-items: center;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-      z-index: 1000;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08); /* Đổ bóng hắt lên trên */
+      z-index: 9999; /* Luôn nằm trên cùng mọi thứ */
     }
     .nav-item {
       flex: 1;
@@ -428,14 +432,14 @@
       justify-content: center;
       color: var(--md-on-surface-variant);
       text-decoration: none;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
       cursor: pointer;
-      height: 100%;
+      height: 65px;
       transition: 0.2s;
     }
     .nav-item .icon {
-      font-size: 20px;
+      font-size: 22px;
       margin-bottom: 4px;
       padding: 4px 16px;
       border-radius: 16px;
@@ -942,19 +946,20 @@
         <div id="kakuteiListContainer" class="scroll-box" style="padding:12px; height: 60vh;"></div>
         <button class="btn btn-gray" style="margin-top:20px;" onclick="showView('viewShift')">シフト管理に戻る</button>
       </div>
-      <div id="bottomNav" class="bottom-nav" style="display:none;">
-        <div class="nav-item active" id="navAttendance" onclick="routeUser()">
-          <span class="icon">⏱️</span><span>出退勤</span>
-        </div>
-        <div class="nav-item" id="navShift" onclick="showShiftView(); updateNav('navShift')">
-          <span class="icon">📅</span><span>シフト</span>
-        </div>
-        <div class="nav-item" id="navHistory" onclick="showHistoryView(); updateNav('navHistory')">
-          <span class="icon">📜</span><span>履歴</span>
-        </div>
-        <div class="nav-item" id="navDocs" onclick="showView('viewMyPage'); updateNav('navDocs')">
-          <span class="icon">📁</span><span>書類</span>
-        </div>
+    </div>
+
+    <div id="bottomNav" class="bottom-nav" style="display:none;">
+      <div class="nav-item active" id="navAttendance" onclick="routeUser()">
+        <span class="icon">⏱️</span><span>出退勤</span>
+      </div>
+      <div class="nav-item" id="navShift" onclick="showShiftView(); updateNav('navShift')">
+        <span class="icon">📅</span><span>シフト</span>
+      </div>
+      <div class="nav-item" id="navHistory" onclick="showHistoryView(); updateNav('navHistory')">
+        <span class="icon">📜</span><span>履歴</span>
+      </div>
+      <div class="nav-item" id="navDocs" onclick="showView('viewMyPage'); updateNav('navDocs')">
+        <span class="icon">📁</span><span>書類</span>
       </div>
     </div>
   </div>
