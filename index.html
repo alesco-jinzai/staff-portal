@@ -1,8 +1,3 @@
-<?php
-/*
-Template Name: Staff Portal App
-*/
-?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -10,7 +5,6 @@ Template Name: Staff Portal App
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>株式会社アレスコ - スタッフ専用ポータル</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-  
   <style>
     :root {
       --md-primary: #0061A4;
@@ -356,28 +350,21 @@ Template Name: Staff Portal App
       animation: spin 0.8s linear infinite; /* Chạy animation spin */
       margin-bottom: 20px; 
     }
-
-    /* ===== CSS SHIFT (CA LÀM) SIÊU MỎNG ===== */
     .shift-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: var(--md-surface-container); padding: 8px; border-radius: var(--shape-full); border: 1px solid var(--md-outline-variant); }
     .shift-nav button { background: none; border: none; font-size: 14px; font-weight: 700; color: var(--md-primary); cursor: pointer; padding: 8px 16px; }
     #shiftMonthDisplay, #kakuteiMonthDisplay { font-size: 18px; font-weight: 700; color: var(--md-on-surface); }
     .shift-quick-btn { flex: 1; height: 40px; border-radius: var(--shape-small); font-size: 13px; font-weight: 700; cursor: pointer; }
-    
     .shift-list-day { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px dashed var(--md-outline-variant); }
     .shift-list-day:last-child { border-bottom: none; }
     .day-header { font-size: 15px; font-weight: 700; color: var(--md-primary); margin-bottom: 10px; }
     .location-header { font-size: 13px; font-weight: 700; color: var(--md-on-primary-container); background: var(--md-primary-container); padding: 4px 10px; border-radius: 4px; margin-bottom: 8px; display: inline-block;}
-    
     .shift-items-wrapper { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
     .shift-slot { padding: 10px; border-radius: 8px; font-size: 14px; cursor: pointer; text-align: center; border: 2px solid transparent; transition: 0.1s; font-weight: 500;}
     .shift-slot.available { background: var(--md-surface-variant); color: var(--md-on-surface-variant); }
     .shift-slot.staging, .shift-slot.requested { background: var(--md-secondary); color: #fff; font-weight: 700; }
     .shift-slot.confirmed { background: var(--md-success); color: #fff; font-weight: 700; opacity: 0.7; pointer-events: none;}
-    
     .confirmed-shift-item { background: var(--md-success-container); color: var(--md-on-success-container); padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 700; margin-bottom: 8px; border-left: 4px solid var(--md-success); }
     .shift-remarks { font-size: 12px; color: var(--md-on-surface-variant); margin-top: 6px; font-weight: 400; border-top: 1px dashed var(--md-outline); padding-top: 6px;}
-
-    /* Lịch nhỏ ở màn hình Review */
     .calendar-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: 700; margin-bottom: 4px; }
     .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); border-top: 1px solid #ddd; border-left: 1px solid #ddd; }
     .calendar-day { border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 4px; min-height: 50px; }
@@ -389,12 +376,11 @@ Template Name: Staff Portal App
       padding: 4px; 
       border-radius: 4px; 
       margin-bottom: 2px; 
-      white-space: normal;      /* Cho phép rớt dòng tự nhiên */
-      word-break: break-word;   /* Tự động ngắt chữ nếu tên cửa hàng quá dài */
+      white-space: normal;
+      word-break: break-word;
       line-height: 1.2;
       text-align: center;
     }
-
   </style>
 </head>
 <body>
@@ -745,8 +731,6 @@ Template Name: Staff Portal App
           </button>
         </div>
         <div id="taskList"></div>
-
-        <!-- Nút Quay lại và Đăng xuất cho màn hình Hồ sơ -->
         <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
           <button class="btn btn-gray" onclick="routeUser()">戻る</button>
           <button class="btn btn-gray" onclick="currentUser = null; resetHonForm(); resetKariForm(); showView('viewStart');">ログアウト</button>
@@ -765,18 +749,12 @@ Template Name: Staff Portal App
         </div>
       </div>
       <div id="viewTaskDetail" class="view"><h3 id="taskDetailTitle" style="color:var(--primary); border-bottom:2px solid var(--primary); padding-bottom:10px;">---</h3><div id="taskDetailContent"></div><div id="taskDetailActions" style="margin-top:20px;"></div><button class="btn btn-gray" onclick="showView('viewMyPage')" style="margin-top:20px;">戻る</button></div>
-
-      <!-- ============================================== -->
-      <!-- MÀN HÌNH LỊCH SỬ CHẤM CÔNG -->
-      <!-- ============================================== -->
       <div id="viewHistory" class="view">
         <h3 style="text-align: center;">勤怠履歴</h3>
-        
         <div class="form-group" style="display:flex; gap:10px;">
           <input type="month" id="historyMonthFilter" style="flex:2; margin-bottom:0;" onchange="loadFilteredHistory()">
           <button class="btn btn-primary" style="flex:1; margin-bottom:0; height:54px;" onclick="openManualModal()">追加</button>
         </div>
-
         <div id="historySummary" style="display:none; background: var(--md-secondary-container); color: var(--md-on-secondary-container); padding: 15px; border-radius: var(--shape-medium); margin-bottom: 20px; display:flex; justify-content:space-around; text-align:center;">
           <div>
             <span style="font-size:12px; display:block;">合計時間</span>
@@ -787,25 +765,16 @@ Template Name: Staff Portal App
             <strong id="summaryTotalFee" style="font-size:20px;">0</strong>
           </div>
         </div>
-
         <div id="historyListContainer" style="margin-bottom:20px;"></div>
-
         <button class="btn btn-gray" onclick="routeUser()">戻る</button>
       </div>
-
-      <!-- ============================================== -->
-      <!-- TRANG: SỬA/THÊM CHẤM CÔNG THỦ CÔNG (Thay cho Pop-up) -->
-      <!-- ============================================== -->
       <div id="viewManual" class="view">
         <h3 id="manualModalTitle" style="text-align:center; margin-bottom: 20px;">勤務記録の修正</h3>
-        
         <div style="background: var(--md-surface-container); padding: 20px; border-radius: var(--shape-large); border: 1px solid var(--md-outline-variant); margin-bottom: 24px;">
           <label style="margin-bottom: 4px;">日付</label>
           <input type="date" id="manualDate" style="margin-bottom: 12px; height: 48px;">
-          
           <label style="margin-bottom: 4px;">勤務地</label>
           <select id="manualLocation" style="margin-bottom: 12px; height: 48px;"></select>
-          
           <div style="display:flex; gap:10px; margin-bottom: 12px;">
             <div style="flex:1;">
               <label style="margin-bottom: 4px;">出勤時間</label>
@@ -816,75 +785,52 @@ Template Name: Staff Portal App
               <input type="time" id="manualOut" style="height: 48px;">
             </div>
           </div>
-
           <label style="margin-bottom: 4px;">交通費</label>
           <input type="tel" id="manualFee" inputmode="numeric" style="margin-bottom: 20px; height: 48px;">
-          
           <input type="hidden" id="manualRowIndex">
-
           <div style="display:flex; gap:10px;">
             <button class="btn btn-gray" style="flex:1; margin:0;" onclick="showView('viewHistory')">キャンセル</button>
             <button class="btn btn-primary" style="flex:1; margin:0;" onclick="saveManualData()">保存</button>
           </div>
         </div>
       </div>
-
-      <!-- ============================================== -->
-      <!-- TRANG: PHÊ DUYỆT (SHONIN) CHO QUẢN LÝ -->
-      <!-- ============================================== -->
       <div id="viewShonin" class="view">
         <h3 style="text-align:center; color: var(--md-primary);">勤怠承認</h3>
-        
         <div style="background: var(--md-surface-container); padding: 20px; border-radius: var(--shape-large); border: 1px solid var(--md-outline-variant); text-align: center; margin-bottom: 24px;">
           <p id="shoninModalDesc" style="font-size: 14px; margin-bottom: 20px; color: var(--md-on-surface-variant);"></p>
-          
           <input type="text" id="shoninApproverName" placeholder="承認者名" style="margin-bottom: 15px; text-align: center; height: 48px;">
           <input type="password" id="shoninPassword" placeholder="パスワード" style="margin-bottom: 25px; text-align: center; width: 100%; height: 48px; padding: 0 16px; border: 1px solid var(--md-outline); border-radius: var(--shape-medium); font-size: 16px;">
-          
           <input type="hidden" id="shoninMode">
           <input type="hidden" id="shoninTargetDate">
           <input type="hidden" id="shoninTargetLoc">
-
           <div style="display:flex; gap:10px;">
             <button class="btn btn-gray" style="flex:1; margin:0;" onclick="showView('viewHistory')">キャンセル</button>
             <button class="btn btn-secondary" style="flex:1; margin:0;" onclick="submitShonin()">承認する</button>
           </div>
         </div>
       </div>
-
-      <!-- ============================================== -->
-      <!-- MÀN HÌNH CHẤM CÔNG (THAY THẾ KHI HỒ SƠ ĐÃ XONG)  -->
-      <!-- ============================================== -->
       <div id="viewAttendance" class="view">
         <div class="mypage-header">
           <h2 id="attUserName" style="margin:0; font-size: 22px;">--- 様</h2>
         </div>
-
-        <!-- Đồng hồ điện tử -->
         <div style="text-align: center; margin: 30px 0;">
           <div id="attDateDisplay" style="font-size: 16px; color: var(--md-on-surface-variant); font-weight: 500;">----/--/-- (-)</div>
           <div id="attClockDisplay" style="font-size: 42px; font-weight: 900; color: var(--md-primary); letter-spacing: 2px; font-variant-numeric: tabular-nums;">--:--:--</div>
         </div>
-
-        <!-- Trạng thái (hiện khi đã check in) -->
         <div id="attStatusBox" style="display:none; background: var(--md-primary-container); color: var(--md-on-primary-container); padding: 20px; border-radius: var(--shape-large); text-align: center; font-size: 16px; font-weight: 700; margin-bottom: 24px;"></div>
-
         <div class="form-group">
           <label>勤務地を選択</label>
           <select id="attLocationSelect">
             <option value="" disabled selected>読み込み中...</option>
           </select>
         </div>
-
         <div class="form-group" id="attFeeGroup" style="display:none;">
           <label>往復交通費</label>
           <input type="tel" id="attCommuteFee" placeholder="半角数字のみ (例: 500)" inputmode="numeric">
         </div>
-
         <div style="display: flex; gap: 16px; margin-top: 30px;">
           <button id="btnCheckIn" class="btn btn-primary" style="flex:1; height: 70px; font-size: 20px; border-radius: 16px;" onclick="handleCheckInOut('出勤')">出勤</button>
           <button id="btnCheckOut" class="btn btn-outline" style="flex:1; height: 70px; font-size: 20px; border-radius: 16px; border-width: 2px;" onclick="handleCheckInOut('退勤')" disabled>退勤</button>
-          
         </div>
         <div style="display: flex; gap: 16px; margin-top: 20px;">
           <button class="btn btn-tonal" style="flex:1; margin:0; height:54px; font-weight:bold;" onclick="showShiftView()">シフト管理</button>
@@ -895,62 +841,44 @@ Template Name: Staff Portal App
           <button class="btn btn-gray" onclick="currentUser = null; resetHonForm(); resetKariForm(); showView('viewStart');">ログアウト</button>
         </div>
       </div>
-
-      <!-- ============================================== -->
-      <!-- MÀN HÌNH QUẢN LÝ CA (SHIFT) -->
-      <!-- ============================================== -->
       <div id="viewShift" class="view">
         <h3 style="text-align: center;">シフト管理</h3>
-        
         <div class="shift-nav">
           <button onclick="navigateShiftMonth(-1, 'selection')">◀ 前月</button>
           <div id="shiftMonthDisplay">----年 --月</div>
           <button onclick="navigateShiftMonth(1, 'selection')">次月 ▶</button>
         </div>
-
         <div id="shiftDeadlineDisplay" style="text-align:center; font-size:14px; font-weight:700; color:var(--md-error); margin-bottom:12px;"></div>
-        
         <div id="quickSelectControls" style="display:flex; gap:8px; margin-bottom:16px;">
           <button class="btn-outline shift-quick-btn" onclick="handleQuickSelect('weekdays')">平日選択</button>
           <button class="btn-outline shift-quick-btn" onclick="handleQuickSelect('weekends')">土日選択</button>
           <button class="btn-gray shift-quick-btn" onclick="handleQuickSelect('clear')">クリア</button>
         </div>
-
         <div id="shiftListContainer" class="scroll-box" style="padding:12px; margin-bottom:16px; height: 50vh;"></div>
-
         <div style="display:flex; justify-content:center; gap:16px; font-size:13px; margin-bottom: 20px;">
           <span style="display:flex; align-items:center; gap:4px;"><div style="width:16px; height:16px; background:var(--md-surface-variant); border-radius:4px;"></div> 募集</span>
           <span style="display:flex; align-items:center; gap:4px;"><div style="width:16px; height:16px; background:var(--md-secondary); border-radius:4px;"></div> 選択中</span>
           <span style="display:flex; align-items:center; gap:4px;"><div style="width:16px; height:16px; background:var(--md-success); border-radius:4px;"></div> 確定</span>
         </div>
-
         <button id="btnKiboReview" class="btn btn-secondary" style="display:none;" onclick="showKiboReviewView()">選択したシフトを確認 (<span id="stagedCount">0</span>)</button>
-        
         <div style="display:flex; gap:12px; margin-top:20px; padding-top:20px; border-top:1px solid var(--md-outline-variant);">
           <button class="btn btn-gray" style="flex:1; margin:0;" onclick="routeUser()">戻る</button>
           <button class="btn btn-primary" style="flex:1; margin:0;" onclick="showKakuteiView()">確定シフト</button>
         </div>
       </div>
-
-      <!-- MÀN HÌNH XÁC NHẬN CA (REVIEW) -->
       <div id="viewKiboReview" class="view">
         <h3 style="text-align:center;">希望シフトの確認</h3>
         <p style="font-size:13px; text-align:center;">以下の内容で提出します。</p>
-        
         <div id="reviewCalendarContainer" style="margin-bottom:16px;"></div>
-        
         <div class="form-group">
         <label>連絡事項</label>
           <textarea id="contactNotes" rows="3" style="width:100%; padding:12px; border-radius:var(--shape-medium); border:1px solid var(--md-outline); font-family:inherit; resize:vertical;"></textarea>
         </div>
-
         <div style="display:flex; gap:12px;">
           <button class="btn btn-gray" style="flex:1; margin:0;" onclick="showView('viewShift')">修正する</button>
           <button class="btn btn-secondary" style="flex:1; margin:0;" onclick="kiboConfirmSubmit()">提出する</button>
         </div>
       </div>
-
-      <!-- MÀN HÌNH XEM CA ĐÃ CHỐT (KAKUTEI) -->
       <div id="viewKakutei" class="view">
         <h3 style="text-align:center;">確定シフト</h3>
         <div class="shift-nav">
@@ -961,11 +889,9 @@ Template Name: Staff Portal App
         <div id="kakuteiListContainer" class="scroll-box" style="padding:12px; height: 60vh;"></div>
         <button class="btn btn-gray" style="margin-top:20px;" onclick="showView('viewShift')">シフト管理に戻る</button>
       </div>
-
     </div>
   </div>
   <script>
-
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxC71cAofv5QXr-pjKkmK8ehgNzo4M5wRMMjtG1enU-5w62j0slyK56XJtDvMimAlvE/exec";
 
     class GASRunner {
@@ -994,9 +920,7 @@ Template Name: Staff Portal App
       }
     }
     const google = { script: { run: new GASRunner().getProxy() } };
-
     let currentUser = null;
-
     window.showView = function(id) {
       if (id === 'viewStart') {
         resetKariForm();
@@ -1140,25 +1064,17 @@ Template Name: Staff Portal App
       if(id === 'bank') currentStatus = currentUser.statusBank;
       if(id === 'mynumber') currentStatus = currentUser.statusMyNumber;
       if (currentStatus && currentStatus.includes('提出済')) {
-        // 1. Tách chuỗi bằng \n
         const lines = currentStatus.split('\n');
-        
-        // 2. Lọc bỏ các dòng trống hoặc dòng chỉ có mỗi chữ "提出済" (Do data cũ từ hệ thống khác sang)
         let logItems = '';
         lines.forEach(line => {
           let cleanLine = line.trim();
-          // Chỉ in ra những dòng có chứa ngày tháng hoặc thông tin cụ thể.
-          // Bỏ qua dòng chỉ ghi cộc lốc "提出済" hoặc "旧システムで提出済"
           if (cleanLine && cleanLine !== '提出済' && cleanLine !== '旧システムで提出済') {
              logItems += `<span style="display:block; margin-left:8px; margin-bottom:8px; font-size:14px; font-weight:500;">✓ ${cleanLine}</span>`;
           }
         });
-  
-        // Nếu sau khi lọc mà không có dòng lịch sử nào cụ thể, in ra 1 dòng mặc định.
         if (logItems === '') {
            logItems = `<span style="display:block; margin-left:8px; margin-bottom:8px; font-size:14px; font-weight:500;">✓ 提出済 (Đã nộp)</span>`;
         }
-  
         historyHtml = `
           <div style="margin-top: 16px; margin-bottom: 24px; padding: 20px; background: var(--md-primary-container); border-radius: var(--shape-large); color: var(--md-on-primary-container);">
             <p style="margin: 0 0 12px; font-size: 15px; font-weight: 700;">📝 提出履歴</p>
@@ -1370,25 +1286,18 @@ Template Name: Staff Portal App
       }
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
-        
-        // 1. Phân tích kết quả trả về từ Backend
         let isSuccess = false;
         let newValue = "";
-        
         if (res && res.success) {
             isSuccess = true;
             newValue = res.newVal;
         } else if (typeof res === 'string') {
-            // Trường hợp Backend chỉ trả về chuỗi (vd: "提出済")
             isSuccess = true;
             newValue = res;
         } else if (res && !res.error && !res.message) {
-            // Trường hợp Backend trả về Object rỗng {} nhưng data đã lưu thành công
             isSuccess = true;
             newValue = "提出済"; 
         }
-
-        // 2. Cập nhật giao diện nếu thành công
         if (isSuccess) {
           if (id === 'id') {
             currentUser.statusID = newValue;
@@ -1402,14 +1311,11 @@ Template Name: Staff Portal App
           }
           renderMyPage();
           showView('viewMyPage');
-          
         } else {
-          // 3. Bắt đúng lỗi thực tế nếu có
           let errMsg = "不明なエラー (Lỗi không xác định)";
           if (res && res.message) errMsg = res.message;
           else if (res && res.error) errMsg = res.error;
           else errMsg = JSON.stringify(res);
-          
           setLoading(true, "⚠️ エラー: " + errMsg, "もう一度お試しください");
           setTimeout(() => setLoading(false), 3000);
         }
@@ -1560,15 +1466,12 @@ Template Name: Staff Portal App
 
     function renderTestQuestions(questionPrefix = 'q') {
       let html = '<div style="margin-bottom: 20px;"><strong style="color:var(--md-primary); font-size:16px;">１．個人情報保護教育</strong><br>以下の問題について、正しいと思う選択肢を１つ選んでください。</div>';
-
-      // 4 câu trắc nghiệm (3 đáp án)
       const part1 = [
         { q: "（１）Pマークにおいて決めたルール通りにすることの重要性及び利点とは？", options: ["①取引先や社会からの信用を得ることができ、会社の利益にもつながる。", "②税制面で優遇を受けることができ、会社の利益にもつながる。", "③全国各地の教育施設や保養施設を利用することができ、従業員の福利厚生につながる。"] },
         { q: "（２）お預かりしている個人情報を保護するための自分の役割とは？", options: ["①他の部署の仕事の内容を監視すること。", "②社内で決められたルールに従って行動すること。", "③取引先を増やすこと。"] },
         { q: "（３）Pマークにおいて決めたルールに違反した際に予想される結果とは？", options: ["①経営陣は責任問題になるが、従業員にとっては何の影響もない。", "②受注が増え、会社の利益にもつながる。", "③故意にルールに違反した場合、罰金や解雇もあり得る。"] },
         { q: "（４）当社の個人情報保護方針はどこに掲載しているか？", options: ["①当社のHPに掲載している", "②代表者のPC内に保管している", "③掲示、掲載していない"] }
       ];
-
       part1.forEach((item, i) => {
         let index = i; // Q0 -> Q3
         html += `<div class="test-q-box"><p style="font-size:14px; font-weight:bold; margin:0 0 12px 0;">${item.q}</p>`;
@@ -1581,10 +1484,7 @@ Template Name: Staff Portal App
         });
         html += `</div>`;
       });
-
       html += '<div style="margin: 30px 0 20px;"><strong style="color:var(--md-primary); font-size:16px;">２．運用ルール問題</strong><br>正しいものには〇、間違っているものには×を選択してください。</div>';
-
-      // 6 câu Đúng/Sai
       const part2 = [
         "（１）個人情報が記載された紙を使用して、メモ帳として使用した。",
         "（２）就業先でゴミの中を無断でチェックしてはいけない。",
@@ -1593,7 +1493,6 @@ Template Name: Staff Portal App
         "（５）従業者は、会社の管理する個人情報を営利目的などで故意に流出した場合、懲戒処分に処せられる場合がある。",
         "（６）取引先で業務している際に、お客様の個人情報に係る書類は無断で触らない。"
       ];
-
       part2.forEach((q, i) => {
         let index = i + 4; // Q4 -> Q9
         html += `<div class="test-q-box">
@@ -1604,7 +1503,6 @@ Template Name: Staff Portal App
           </div>
         </div>`;
       });
-
       return html;
     }
 
@@ -1635,15 +1533,11 @@ Template Name: Staff Portal App
         <div class="table-responsive"><table><thead><tr><th>第三者に提供する目的</th><th>提供する個人情報の項目</th><th>提供の手段又は方法</th><th>当該情報の提供を受ける者又は提供を受ける者の組織の種類、及び属性</th><th>個人情報の取扱いに関する契約がある場合はその旨</th></tr></thead><tbody><tr><td>給与振込みのため</td><td>口座番号<br>氏名</td><td>銀行窓口及びWebにて</td><td>当社取引銀行</td><td>取引銀行の個人情報の取扱い規約</td></tr><tr><td>税務/社会保険のため</td><td>氏名、性別、住所、生年月日、支払額、税額、個人番号</td><td>郵送、電子申請にて</td><td>役所等の公的機関</td><td>ー</td></tr><tr><td>派遣先・委託元セキュリティ登録のため</td><td>氏名、性別、住所、生年月日、国籍、電話番号、証明写真（顔写真）等</td><td>電子メール<br>（パスワード付）<br>郵送</td><td>派遣先・委託元等就業場所</td><td>各種機密保持契約書</td></tr></tbody></table></div>
         <br>私は、上記すべての事項に同意し、私の個人情報を提供致します。
       `;
-
       if(id==='agreement') return `私は、派遣期間の開始日が2020 年 4 月 1 日以降の(株)アレスコが発行する「労働条件通知書（兼）就業条件明示書」ついて、以下の方法での明示となる事を承諾いたします。<br><br>・FAX<br>・Eメールや Yahoo! メール、 Gmail 等の Web メールサービス<br>・LINE や WeChat 、メッセンジャー等の SNS メッセージ機能`;
-      
       if(id==='nda') return `株式会社アレスコ（以下「甲」という。）と氏名＿＿＿＿＿＿＿＿＿＿（以下「乙」という。）は、甲乙間において開示される秘密情報について、次のとおり秘密保持契約を締結する。<br><br><strong>（目的）</strong><br>第1条 甲及び乙は、甲から委託・派遣する業務を目的として、相互に必要と認められる範囲で、相手方に対し、秘密情報を開示する。<br><br><strong>（秘密情報の定義）</strong><br>第2条 本契約において秘密情報とは、書面、口頭その他方法を問わず、相手方に開示された、開示者の営業上、技術上その他業務上の一切の情報及び個人情報をいう。<br>2 前項の規定にかかわらず、個人情報以外で、次の各号のいずれかに該当するものは秘密情報に該当しない。<br>(1) 相手方から開示される以前に公知であったもの<br>(2) 相手方から開示された後に、自らの責めによらず、公知となったもの<br>(3) 相手方から開示される以前から自ら保有していたもの<br>(4) 正当な権限を有する第三者から秘密保持義務を負わずに取得したもの<br>(5) 相手方から開示された秘密情報によることなく、独自に開発したもの<br><br><strong>（目的外使用の禁止）</strong><br>第3条 甲及び乙は、相手方から提供された秘密情報を第1条で規定する目的以外に使用してはならない。<br><br><strong>（秘密保持義務）</strong><br>第4条 甲及び乙は、相手方から開示された秘密情報を厳重に保管及び管理するものとする。<br>2 甲及び乙は、事前に相手方から書面による承諾を得た場合を除き、秘密情報を第三者に開示又は漏洩しない。ただし、裁判所からの命令、その他法令に基づき開示が義務付けられる場合はこの限りでない。<br>3 甲及び乙は、前項ただし書に基づき、秘密情報を第三者に開示する場合は、事前に相手方に通知するものとする。<br><br><strong>（複製）</strong><br>第5条 甲及び乙は、事前に相手方から書面による承諾を得た場合を除き、秘密情報を複製しない。<br><br><strong>（開示の範囲）</strong><br>第6条 甲及び乙は、相手方から開示された秘密情報を、自己の役員又は従業員に開示する場合には、秘密情報を知る必要がある者に限り、その必要な範囲内でのみ開示するものとする。なお、この場合甲及び乙は、当該役員又は従業員に対して本契約による自己と同等の義務を遵守させるものとし、かつ、当該役員又は従業員の行為について全責任を負う。<br><br><strong>（秘密情報の帰属）</strong><br>第7条 甲又は乙から相手方へ開示された全ての秘密情報は、各開示者に帰属するものとし、相手方に対する秘密情報の開示により、特許権、商標権、著作権その他のいかなる知的財産権も譲渡されるものではなく、また、使用許諾その他いかなる権限も与えられるものではない。<br><br><strong>（秘密情報の返還）</strong><br>第8条 甲及び乙は、第10条1項で規定する期間が満了したとき又は相手方から要求があったときは、秘密情報（第5条に基づき複製された場合はその複製物を含む。）を相手方の指示に従い、返還又は破棄するものとする。<br><br><strong>（損害賠償義務）</strong><br>第9条 甲及び乙は、本契約に違反して、相手方に損害を与えた場合には、相手方に対し、損害（相手方の弁護士費用を含む。）の賠償をしなければならない。<br><br><strong>（期間等）</strong><br>第10条 本契約の有効期限は、契約締結の日から1年間とする。但し、期間満了の1ヶ月前までに甲または乙より異議申し立てのない場合は、本契約は同一条件にて更に1年間延長されるものとし、以後についても同様とする。<br>2 第3条ないし第9条、第11条及び第12条の規定は、契約終了後といえども存続するものとする。<br><br><strong>（禁止行為）</strong><br>第11条 乙は相手方との派遣期間中、甲から相手方への直接連絡を指示された場合を除き、直接連絡を行ってはならない。なお、甲への事前申し出なく、甲を介さず直接相手方と連絡を取り合った結果、トラブル等が発生した場合においては、甲は一切の責任を負わないものとする。<br><br><strong>（準拠法）</strong><br>第12条 本契約は、日本国法に準拠するものとする。<br><br><strong>（合意管轄）</strong><br>第13条 本契約に関し、甲乙間に紛争が生じた場合は、大阪地方裁判所を第一審の専属的合意管轄裁判所とする。<br><br><strong>（協議）</strong><br>第14条 本契約に定めのない事項又は本契約に関して疑義が生じた場合は、甲乙誠意を持って協議し、その解決に当たるものとする。<br><br>以上のとおり契約が成立したので、その成立を証するため本契約書を2通作成し、甲乙記名捺印の上、各1通ずつ保有する。<br><br>甲　株式会社アレスコ<br>　　代表取締役　全 允子`;
-      
       if(id==='edu') return `<strong>①個人情報保護方針</strong><br>弊社ホームページ、および本社に掲載しています。<br><br><strong>②PMSの重要性及び利点</strong><br>直接お客様から個人情報を預かる企業ではお客様が安心して個人情報を預けていただき、信頼されます。<br>お取引先企業から個人情報を預かる企業では委託、提供先企業としての選定基準をクリアできます。<br>入札、見積りで排除されにくくなります。<br>コンプライアンス経営企業としてイメージが向上します。<br>どの企業にも共通したメリットは、社員の個人情報に対する意識が高まります。<br>リスクマネジメントが強化され、情報漏え等のリスクが低減します。<br>名刺やパンフレット、ホームページ上でPマークが使用できます。<br><br><strong>③PMSのための役割及び責任</strong><br><div class="table-responsive"><table><thead><tr><th>主な活動</th><th>役割</th></tr></thead><tbody><tr><td>トップマネジメント<br>福山 允子</td><td>Pマークに関するリーダーシップの発揮、方針の確立、責任・役割・権限の割り当てと社内伝達、Pマークのパフォーマンスの報告を受ける、マネジメントレビューの実施</td></tr><tr><td>個人情報保護管理者<br>田中 圭美</td><td>Pマークの運用における、マニュアル監査、コミュニケーション、是正処置、教育、内部監査を監視</td></tr><tr><td>個人情報保護監査責任者<br>青戸 梨恵</td><td>内部監査の計画〜実施・報告</td></tr><tr><td>システム管理者<br>田中 圭美</td><td>自社のPCの初期設定やシステム面の管理</td></tr><tr><td>事務取扱担当者<br>田中 圭美</td><td>当社規程に従い、Pマークを維持するための特定個人情報の管理</td></tr><tr><td>窓口責任者<br>田中 圭美</td><td>開示請求や苦情等の問合せ対応全般</td></tr></tbody></table></div><br><strong>④PMSに違反した際に予想される結果</strong><br>社会的な信用の失墜<br>・顧客や取引先の信用を失う<br>経済的な損失<br>・再発防止策への投資<br>・本人への補償<br>・業務の停止<br>事業継続へのダメージ<br>・経営状況の悪化<br>従業員が違反した場合<br>・減給、罰金、解雇<br><br><div style="background:#fff1f0; border:2px solid var(--error); padding:15px; border-radius:10px; margin-top:15px;"><div style="background:var(--error); color:white; padding:8px; text-align:center; border-radius:4px; font-weight:bold; margin-bottom:12px;">過去５年間メール誤送信の割合が最も多い</div><strong style="color:var(--error);">危ないと思ったら報告する事</strong><br>・違う人のメールアドレスを選択していないか？<br><br><strong style="color:var(--error);">規則を守る事</strong><br>・不用意にお客様の話はしないようにしましょう。</div>`;
       return "";
     }
-
     document.addEventListener('DOMContentLoaded', () => {
       const kariPhoneInput = document.getElementById('kariPhone');
       if (kariPhoneInput) {
@@ -1673,7 +1567,7 @@ Template Name: Staff Portal App
         }
       });
     });
-
+    
     window.nextKariStep = function(step) {
       try {
         document.querySelectorAll('#viewKari .error-message').forEach(el => el.style.display = 'none');
@@ -2219,7 +2113,6 @@ Template Name: Staff Portal App
         const cb = document.getElementById(id);
         if(cb) { cb.checked = false; cb.disabled = true; if(cb.parentElement) cb.parentElement.classList.remove('active-box'); }
       });
-
       const testArea = document.getElementById('honEduTestArea');
       if(testArea) testArea.innerHTML = '';
       pendingKariData = null;
@@ -2244,7 +2137,6 @@ Template Name: Staff Portal App
       document.getElementById('toggleLandlineBtn').style.display = 'none';
       document.getElementById('kariLandline').focus();
     }
-
     window.addEventListener("focus", () => {
       if (currentUser && document.getElementById('viewMyPage').classList.contains('active')) {
         console.log("Tab được focus lại, kiểm tra cập nhật...");
@@ -2265,19 +2157,16 @@ Template Name: Staff Portal App
       }).getUserStatusById(currentUser.id);
     }
 
-    // ==========================================
-    // LOGIC CHẤM CÔNG (ĐIỂM DANH)
-    // ==========================================
     let clockInterval;
-    let locationCoordsObj = {}; // Lưu tọa độ lấy từ backend
-    let cachedPosition = null; // Thêm biến này để lưu GPS ngầm
-
+    let locationCoordsObj = {};
+    let cachedPosition = null;
+    
     function routeUser() {
       if (currentUser && currentUser.progress && currentUser.progress.includes("完了")) {
-        renderMyPage(); // <--- GỌI THÊM DÒNG NÀY ĐỂ VẼ SẴN DANH SÁCH GIẤY TỜ
+        renderMyPage();
         renderAttendanceView(); 
       } else {
-        renderMyPage(); // Giao diện nộp giấy tờ (Dành cho người mới)
+        renderMyPage();
       }
     }
     
@@ -2293,7 +2182,6 @@ Template Name: Staff Portal App
         const hh = String(now.getHours()).padStart(2, '0');
         const mm = String(now.getMinutes()).padStart(2, '0');
         const ss = String(now.getSeconds()).padStart(2, '0');
-        
         document.getElementById('attDateDisplay').innerText = `${y}/${m}/${d} (${day})`;
         document.getElementById('attClockDisplay').innerText = `${hh}:${mm}:${ss}`;
       }, 1000);
@@ -2304,25 +2192,19 @@ Template Name: Staff Portal App
       document.getElementById('attUserName').innerText = currentUser.name.replace(/\//g, ' ') + " 様";
       startClock();
       getCurrentPosition().then(pos => { cachedPosition = pos; }).catch(e => { console.log("Lấy GPS ngầm thất bại:", e); });
-      
       const locSelect = document.getElementById('attLocationSelect');
       const feeGroup = document.getElementById('attFeeGroup');
       const btnIn = document.getElementById('btnCheckIn');
       const btnOut = document.getElementById('btnCheckOut');
       const statusBox = document.getElementById('attStatusBox');
-
-      // Setup trạng thái
       if (currentUser.attendanceInfo && currentUser.attendanceInfo.status && currentUser.attendanceInfo.status.checkedIn) {
         let status = currentUser.attendanceInfo.status;
         statusBox.innerHTML = `<strong>${status.location}</strong>に<br><strong>${status.checkInTime}</strong> に出勤しました。`;
         statusBox.style.display = 'block';
-        
         feeGroup.style.display = 'block';
         document.getElementById('attCommuteFee').value = currentUser.attendanceInfo.lastCommuteFee || '';
-        
         locSelect.innerHTML = `<option value="${status.location}" selected>${status.location}</option>`;
         locSelect.disabled = true;
-        
         btnIn.disabled = true;
         btnOut.disabled = false;
         btnOut.classList.replace('btn-outline', 'btn-primary'); // Highlight nút out
@@ -2331,15 +2213,12 @@ Template Name: Staff Portal App
         statusBox.style.display = 'none';
         feeGroup.style.display = 'none';
         document.getElementById('attCommuteFee').value = '';
-        
         locSelect.disabled = true;
         locSelect.innerHTML = '<option value="">読み込み中...</option>';
         btnIn.disabled = false;
         btnOut.disabled = true;
         btnIn.classList.replace('btn-outline', 'btn-primary');
         btnOut.classList.replace('btn-primary', 'btn-outline');
-
-        // Tải danh sách địa điểm
         google.script.run.withSuccessHandler(locations => {
           locationCoordsObj = {};
           if (locations && locations.length > 0) {
@@ -2356,32 +2235,20 @@ Template Name: Staff Portal App
       }
     }
 
-    // HỆ THỐNG THÔNG BÁO TẠI CHỖ (INLINE ALERT) - CHUYÊN TRỊ LỖI IFRAME
     function showCustomAlert(msg, isError = false) {
-      // 1. Tìm xem người dùng đang mở màn hình nào (view đang active)
       const activeView = document.querySelector('.view.active');
-      if (!activeView) return alert(msg); // Dự phòng
-
-      // 2. Tìm hộp thông báo trong màn hình đó, nếu chưa có thì đẻ ra 1 cái mới
+      if (!activeView) return alert(msg);
       let alertBox = activeView.querySelector('.dynamic-alert-box');
       if (!alertBox) {
         alertBox = document.createElement('div');
         alertBox.className = 'dynamic-alert-box';
-        // Chèn vào vị trí thứ 2 từ trên xuống của màn hình đó (Thường là dưới Tiêu đề hoặc Đồng hồ)
         activeView.insertBefore(alertBox, activeView.children[1]);
       }
-
-      // 3. Đổi màu Xanh (Thành công) hoặc Đỏ (Lỗi)
       const bgColor = isError ? 'var(--md-error-container)' : 'var(--md-success-container)';
       const textColor = isError ? 'var(--md-error)' : 'var(--md-on-success-container)';
       const icon = isError ? '⚠️ ' : '✅ ';
-      
       alertBox.style.cssText = `background: ${bgColor}; color: ${textColor}; padding: 15px; border-radius: 12px; margin: 16px 0; text-align: center; font-weight: bold; font-size: 15px; animation: fadeIn 0.3s ease; display: block;`;
-      
-      // Xử lý xuống dòng cho đẹp
       alertBox.innerHTML = icon + msg.replace(/\n/g, '<br>');
-
-      // 4. Tự động dọn dẹp (biến mất) sau 5 giây để trả lại không gian
       setTimeout(() => { 
         alertBox.style.display = 'none'; 
       }, 5000);
@@ -2390,7 +2257,6 @@ Template Name: Staff Portal App
     function handleCheckInOut(type) {
       const locationName = document.getElementById('attLocationSelect').value;
       const commuteFeeInput = document.getElementById('attCommuteFee').value;
-      
       if (!locationName) {
         showCustomAlert("勤務地を選択してください。", true);
         return;
@@ -2407,29 +2273,20 @@ Template Name: Staff Portal App
           return;
         }
       }
-
       setLoading(true, "記録を送信中…", "");
-      
-      // Hàm Promise để lấy GPS (nếu chưa có sẵn thì mới phải lấy)
       const getPosTask = cachedPosition ? Promise.resolve(cachedPosition) : getCurrentPosition();
-
       getPosTask
         .then(position => {
           const userLat = position.coords.latitude;
           const userLng = position.coords.longitude;
           const target = locationCoordsObj[locationName] || (currentUser.attendanceInfo && currentUser.attendanceInfo.status ? locationCoordsObj[currentUser.attendanceInfo.status.location] : null); 
-          
-          if (!target && type === '出勤') throw new Error(`「${locationName}」の座標情報が設定されていません。`);
-          
+          if (!target && type === '出勤') throw new Error(`「${locationName}」の座標情報が設定されていません。`); 
           if (target && target.lat && target.lng) {
             const maxDist = (target.radius && !isNaN(target.radius)) ? Number(target.radius) : 1000; 
             const distance = calculateDistance(userLat, userLng, target.lat, target.lng);
             if (distance > maxDist) throw new Error(`現在地が「${locationName}」から離れすぎています。`);
           }
-
-          // Reset lại cache để lần bấm sau nó lấy vị trí mới
           cachedPosition = null; 
-
           return new Promise((resolve, reject) => {
             google.script.run.withSuccessHandler(res => {
               if (res.success) resolve(res); else reject(new Error(res.message));
@@ -2452,7 +2309,6 @@ Template Name: Staff Portal App
         });
     }
 
-    // TỐI ƯU GPS: Thời gian chờ 15 giây (tránh lỗi Code 3), dùng lại tọa độ cũ trong vòng 10 giây (tránh quét lại GPS tốn thời gian)
     function getCurrentPosition() { 
       return new Promise((resolve, reject) => { 
         if (!navigator.geolocation) return reject(new Error("この端末では位置情報が取得できません。")); 
@@ -2468,9 +2324,6 @@ Template Name: Staff Portal App
       const R = 6371e3; const p1 = lat1 * Math.PI/180; const p2 = lat2 * Math.PI/180; const dp = (lat2-lat1) * Math.PI/180; const dl = (lon2-lon1) * Math.PI/180; const a = Math.sin(dp/2) * Math.sin(dp/2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl/2) * Math.sin(dl/2); const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); return R * c; 
     }
 
-    // ==========================================
-    // LOGIC LỊCH SỬ CHẤM CÔNG
-    // ==========================================
     function showHistoryView() {
       showView('viewHistory');
       const now = new Date();
@@ -2483,37 +2336,28 @@ Template Name: Staff Portal App
     function loadFilteredHistory() {
       const container = document.getElementById('historyListContainer');
       container.innerHTML = '<p style="text-align:center;">読み込み中...</p>';
-      
       const monthValue = document.getElementById('historyMonthFilter').value;
       if (!monthValue) return container.innerHTML = '';
       const [year, month] = monthValue.split('-');
-
       google.script.run.withSuccessHandler(data => {
         let html = '';
         let totalMinutes = 0;
         let totalFee = 0;
-
         if (data && data.length > 0) {
           const days = ['日','月','火','水','木','金','土'];
           data.forEach(item => {
             const dateObj = new Date(item.dateFull);
             const dayStr = `${dateObj.getDate()}日 (${days[dateObj.getDay()]})`;
-            
-            // Góc trên cùng bên phải chỉ hiển thị Trạng thái (Status Badge)
             const statusBadge = item.isApproved 
               ? `<span style="background:var(--md-surface-variant); color:var(--md-on-surface-variant); padding:4px 10px; border-radius:6px; font-size:13px; font-weight:bold;">承認済</span>`
               : `<span style="background:var(--md-error-container); color:var(--md-error); padding:4px 10px; border-radius:6px; font-size:13px; font-weight:bold;">未承認</span>`;
-            
             const timeParts = item.totalDuration.split(':');
             if (timeParts.length === 2) {
               totalMinutes += (parseInt(timeParts[0],10)*60) + parseInt(timeParts[1],10);
             }
             totalFee += Number(item.fee) || 0;
-
-            // Góc dưới cùng bên phải: Chứa nút Sửa VÀ nút Phê duyệt
             const editBtn = item.isApproved ? '' : `<button style="background:none; border:2px solid var(--md-primary); color:var(--md-primary); border-radius:8px; padding:8px 24px; font-size:14px; font-weight:bold; cursor:pointer;" onclick="openManualModal('${item.dateFull}', '${item.location}', '${item.checkIn}', '${item.checkOut}', '${item.fee}', '${item.rowIndex}')">修正</button>`;
             const shoninBtn = item.isApproved ? '' : `<button style="background:var(--md-secondary); border:none; color:#fff; border-radius:8px; padding:8px 24px; font-size:14px; font-weight:bold; cursor:pointer;" onclick="openShoninModal('single', '${item.dateFull}', '')">承認する</button>`;
-
             html += `
               <div class="task-card" style="flex-direction:column; align-items:stretch; gap:12px; padding:20px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--md-outline-variant); padding-bottom:12px;">
@@ -2525,22 +2369,18 @@ Template Name: Staff Portal App
                   <span>出: ${item.checkIn || '--:--'} ~ 退: ${item.checkOut || '--:--'}</span>
                   <span style="color:var(--md-secondary); font-weight:700; font-size:16px;">¥${item.fee}</span>
                 </div>
-                <!-- Vùng chứa nút bấm ở dưới cùng -->
                 <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
                   ${editBtn}
                   ${shoninBtn}
                 </div>
               </div>
             `;
-            
-            // Logic lưu trữ để Duyệt hàng loạt (Bulk)
             if (!item.isApproved && item.checkIn && item.checkOut) {
               if (!window.pendingLocations) window.pendingLocations = {};
               if (!window.pendingLocations[item.location]) window.pendingLocations[item.location] = 0;
               window.pendingLocations[item.location]++;
             }
           });
-          
           document.getElementById('summaryTotalTime').innerText = Math.floor(totalMinutes/60) + ":" + String(totalMinutes%60).padStart(2, '0');
           document.getElementById('summaryTotalFee').innerText = totalFee.toLocaleString() + '円';
           document.getElementById('historySummary').style.display = 'flex';
@@ -2548,8 +2388,6 @@ Template Name: Staff Portal App
           html = '<p style="text-align:center;">データがありません。</p>';
           document.getElementById('historySummary').style.display = 'none';
         }
-
-        // Render nút Duyệt hàng loạt (Bulk Approval)
         let bulkHtml = '';
         if (window.pendingLocations) {
           Object.keys(window.pendingLocations).forEach(loc => {
@@ -2557,7 +2395,6 @@ Template Name: Staff Portal App
           });
           window.pendingLocations = {}; // Xóa bộ nhớ sau khi in xong
         }
-
         container.innerHTML = html;
       }).getEmployeeAttendanceHistory(currentUser.id, parseInt(year, 10), parseInt(month, 10));
     }
@@ -2569,11 +2406,9 @@ Template Name: Staff Portal App
       document.getElementById('manualOut').value = outTime;
       document.getElementById('manualFee').value = fee;
       document.getElementById('manualRowIndex').value = rowIndex;
-      
       const locSelect = document.getElementById('manualLocation');
       locSelect.innerHTML = '<option value="" disabled selected>読み込み中...</option>';
       showView('viewManual'); window.scrollTo(0,0);
-
       google.script.run.withSuccessHandler(locations => {
         let options = '<option value="" disabled selected>選択してください</option>';
         if (locations && locations.length > 0) {
@@ -2597,12 +2432,10 @@ Template Name: Staff Portal App
         fee: document.getElementById('manualFee').value,
         rowIndex: document.getElementById('manualRowIndex').value
       };
-      
       if (!data.date || !data.location || !data.checkIn) {
         showCustomAlert("日付、勤務地、出勤時間は必須です。", true);
         return;
       }
-
       setLoading(true, "保存中...");
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
@@ -2616,21 +2449,18 @@ Template Name: Staff Portal App
         }
       }).saveManualAttendanceRecord(data);
     }
-
-    // Mở Pop-up Shonin
+    
     function openShoninModal(mode, dateStr, locName) {
       document.getElementById('shoninMode').value = mode;
       document.getElementById('shoninTargetDate').value = dateStr;
       document.getElementById('shoninTargetLoc').value = locName;
       document.getElementById('shoninApproverName').value = '';
       document.getElementById('shoninPassword').value = '';
-
       const desc = (mode === 'bulk') ? `【一括承認】<br>拠点: ${locName}<br>対象月: ${document.getElementById('historyMonthFilter').value}` : `【個別承認】<br>日付: ${dateStr}`;
       document.getElementById('shoninModalDesc').innerHTML = desc;
       showView('viewShonin'); window.scrollTo(0,0);
     }
 
-    // Gửi Phê duyệt lên Backend
     function submitShonin() {
       const mode = document.getElementById('shoninMode').value;
       const dateStr = document.getElementById('shoninTargetDate').value;
@@ -2638,12 +2468,10 @@ Template Name: Staff Portal App
       const name = document.getElementById('shoninApproverName').value.trim();
       const pass = document.getElementById('shoninPassword').value.trim();
       const monthStr = document.getElementById('historyMonthFilter').value;
-
       if (!name || !pass) {
         showCustomAlert('承認者名とパスワードは必須です。', true); // Sửa alert thành đỏ
         return;
       }
-
       setLoading(true, "承認処理中...");
       let serverTask;
       if (mode === 'bulk') {
@@ -2651,7 +2479,6 @@ Template Name: Staff Portal App
       } else {
         serverTask = new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(rej).approveAttendanceRecord(currentUser.id, dateStr, name, pass));
       }
-
       serverTask.then(res => {
         setLoading(false);
         if (res.success) {
@@ -2668,9 +2495,6 @@ Template Name: Staff Portal App
       });
     }
 
-    // ==========================================
-    // LOGIC SHIFT (CA LÀM VIỆC)
-    // ==========================================
     let shiftYear = new Date().getFullYear();
     let shiftMonth = new Date().getMonth() + 2; 
     let shiftData = { templates: [], kibo: new Set(), kakutei: new Set(), shiftsAvailableByDay: {}, deadline: null, contactNotes: '' };
@@ -2678,12 +2502,10 @@ Template Name: Staff Portal App
     let stagedDeletions = new Set();
 
     function showShiftView() {
-      // Đặt mặc định là tháng tiếp theo
       const nextM = new Date();
       nextM.setMonth(nextM.getMonth() + 1);
       shiftYear = nextM.getFullYear();
       shiftMonth = nextM.getMonth() + 1;
-
       showView('viewShift');
       stagedAdditions.clear();
       stagedDeletions.clear();
@@ -2707,7 +2529,6 @@ Template Name: Staff Portal App
       document.getElementById('shiftMonthDisplay').innerText = `${shiftYear}年 ${shiftMonth}月`;
       const container = document.getElementById('shiftListContainer');
       container.innerHTML = '<p style="text-align:center;">読み込み中...</p>';
-      
       setLoading(true, "シフト取得中...");
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
@@ -2755,18 +2576,15 @@ Template Name: Staff Portal App
         if (!acc[t.locationId]) acc[t.locationId] = { name: t.locationName, shifts: [] };
         acc[t.locationId].shifts.push(t); return acc;
       }, {});
-
       let html = '';
       const days = new Date(shiftYear, shiftMonth, 0).getDate();
       const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
-      
       for (let d = 1; d <= days; d++) {
         const date = new Date(shiftYear, shiftMonth - 1, d);
         const dateStr = `${shiftYear}-${String(shiftMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
         const dayOfWeek = dayNames[date.getDay()];
         const availIds = new Set(shiftData.shiftsAvailableByDay[dateStr] || []);
         if (availIds.size === 0) continue;
-
         let dayHtml = Object.entries(tempByLoc).map(([locId, locData]) => {
           const validShifts = locData.shifts.filter(t => availIds.has(t.id));
           if (validShifts.length === 0) return '';
@@ -2783,7 +2601,6 @@ Template Name: Staff Portal App
           }).join('');
           return `<div style="margin-bottom:12px;"><div class="location-header">${locData.name}</div><div class="shift-items-wrapper">${shiftHtml}</div></div>`;
         }).join('');
-
         if (dayHtml) html += `<div class="shift-list-day"><div class="day-header">${shiftMonth}/${d} (${dayOfWeek})</div>${dayHtml}</div>`;
       }
       container.innerHTML = html || '<p style="text-align:center;">募集中のシフトはありません。</p>';
@@ -2812,7 +2629,6 @@ Template Name: Staff Portal App
         const dateStr = key.split('|')[1];
         const dayOfWeek = new Date(dateStr + 'T00:00:00').getDay();
         const wasKibo = shiftData.kibo.has(key);
-
         if (mode === 'weekdays' && dayOfWeek >= 1 && dayOfWeek <= 5) {
           stagedDeletions.delete(key); if (!wasKibo) stagedAdditions.add(key);
         } else if (mode === 'weekends' && (dayOfWeek === 0 || dayOfWeek === 6)) {
@@ -2835,14 +2651,12 @@ Template Name: Staff Portal App
       const finalKeys = new Set(shiftData.kibo);
       stagedDeletions.forEach(k => finalKeys.delete(k));
       stagedAdditions.forEach(k => finalKeys.add(k));
-
       const tMap = shiftData.templates.reduce((m, t) => { m[`${t.locationId}|${t.id}`] = t; return m; }, {});
       const shiftsToDisplay = Array.from(finalKeys).map(k => {
         const [lId, d, tId] = k.split('|');
         const t = tMap[`${lId}|${tId}`];
         return t ? { ...t, date: d, status: 'staging' } : null;
       }).filter(Boolean);
-
       const byDate = shiftsToDisplay.reduce((acc, s) => { (acc[s.date] = acc[s.date] || []).push(s); return acc; }, {});
       const fDay = new Date(shiftYear, shiftMonth - 1, 1).getDay();
       const mDays = new Date(shiftYear, shiftMonth, 0).getDate();
@@ -2865,24 +2679,19 @@ Template Name: Staff Portal App
       });
       const reqDel = Array.from(stagedDeletions).map(k => { const [l, d, t] = k.split('|'); return { locationId: l, date: d, templateId: t }; });
       const notes = document.getElementById('contactNotes').value;
-
       setLoading(true, "提出中...");
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
         if (res.success) { 
-          showCustomAlert(res.message); // 1. Hiện thông báo màu xanh
-          
-          // 2. Quay lại trang Shift và tải lại dữ liệu mới nhất
+          showCustomAlert(res.message);
           showView('viewShift');
           window.scrollTo(0,0);
           loadAndRenderAllShifts(); 
-          
         } else { 
           showCustomAlert(res.message, true); 
         }
       }).submitShiftRequestsWithNotes(currentUser.id, currentUser.name.replace(/\//g, " "), reqAdd, reqDel, notes, shiftYear, shiftMonth);
     }
-
     function showKakuteiView() {
       const now = new Date(); shiftYear = now.getFullYear(); shiftMonth = now.getMonth() + 1;
       showView('viewKakutei'); loadAndRenderKakuteiList();
@@ -2892,12 +2701,10 @@ Template Name: Staff Portal App
       document.getElementById('kakuteiMonthDisplay').innerText = `${shiftYear}年 ${shiftMonth}月`;
       const container = document.getElementById('kakuteiListContainer');
       container.innerHTML = '<p style="text-align:center;">読み込み中...</p>';
-      
       setLoading(true, "取得中...");
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
         if (!res.success) return container.innerHTML = `<p style="text-align:center; color:red;">${res.message}</p>`;
-        
         const tMap = res.templates.reduce((m, t) => { m[`${t.locationId}|${t.id}`] = t; return m; }, {});
         const byDate = {};
         res.kakutei.forEach(k => {
@@ -2905,10 +2712,8 @@ Template Name: Staff Portal App
           const t = tMap[`${lId}|${tId}`];
           if (t) (byDate[d] = byDate[d] || []).push({ ...t, remarks: rm });
         });
-
         const sortedDays = Object.keys(byDate).sort();
         if (sortedDays.length === 0) return container.innerHTML = '<p style="text-align:center;">確定シフトはありません。</p>';
-
         const days = ['日', '月', '火', '水', '木', '金', '土'];
         let html = sortedDays.map(dStr => {
           const dObj = new Date(dStr + 'T00:00:00');
@@ -2922,7 +2727,6 @@ Template Name: Staff Portal App
         container.innerHTML = html;
       }).getAggregatedShiftCalendarData(currentUser.id, shiftYear, shiftMonth);
     }
-
   </script>
 </body>
 </html>
