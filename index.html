@@ -395,24 +395,33 @@
   <div class="app-shell">
     <header><h1>株式会社アレスコ</h1></header>
     <div class="content">
-      <div id="viewStart" class="view active">
-        <div style="text-align:center; padding: 30px 0 10px;">
+
+      <!-- ========================================== -->
+      <!-- GIAO DIỆN 1 CỬA VẠN NĂNG (THAY THẾ CHO CẢ 3 MÀN HÌNH CŨ) -->
+      <!-- ========================================== -->
+      <div id="viewAuth" class="view active">
+        <div style="text-align:center; padding: 30px 0 20px;">
           <img src="https://alesco-v.co.jp/wp/wp-content/uploads/ALESCO-LOGO.png" style="width:150px; margin-bottom:20px;">
-          <h2>スタッフ専用ポータル</h2>
+          <h2 style="font-size: 20px; color: var(--md-on-surface);">スタッフ専用ポータル</h2>
+          <p style="font-size: 13px; color: var(--md-on-surface-variant); margin-bottom: 20px;">
+            携帯番号と生年月日を入力してください。<br>（初めての方もこちらから）
+          </p>
         </div>
-        <div style="margin-bottom: 25px; padding-top: 15px; border-top: 1px dashed #ddd;">
-          <p style="font-size: 13px; color: #5f6368; margin-bottom: 8px; font-weight: bold; text-align: center;">【STEP 1】 初めての方はこちら</p>
-          <button class="btn btn-primary" onclick="resetKariForm(); showView('viewKari')">プロフィール登録</button>
+        
+        <div id="authError" class="error-message" style="background:#fff1f0; padding:12px; border-radius:10px; border:1px solid #ffa39e; margin-bottom:20px; font-size:13px;"></div>
+        
+        <div class="form-group">
+          <label>電話番号</label>
+          <input type="tel" id="authPhone" placeholder="携帯または固定電話 (ハイフン不要可)">
         </div>
-        <div style="margin-bottom: 25px;">
-          <p style="font-size: 13px; color: #5f6368; margin-bottom: 8px; font-weight: bold; text-align: center;">【STEP 2】 採用が決まった方はこちら</p>
-          <button class="btn btn-tonal" onclick="showView('viewHonLogin')">入社手続き</button>
+        <div class="form-group">
+          <label>生年月日</label>
+          <input type="date" id="authDob">
         </div>
-        <div>
-          <p style="font-size: 13px; color: #5f6368; margin-bottom: 8px; font-weight: bold; text-align: center;">すでに就業中・登録済みの方</p>
-          <button class="btn btn-gray" onclick="showView('viewLogin')">マイページにログイン</button>
-        </div>
+        
+        <button class="btn btn-primary" style="height: 56px; font-size: 16px; margin-top: 10px;" onclick="handleSmartLogin()">次へ</button>
       </div>
+      
       <div id="viewKari" class="view">
         <div id="kariStep1">
           <h3>1. 個人情報の取扱いについて</h3>
@@ -443,7 +452,7 @@
           <p class="error-message" id="kariCheckError">「同意します」にチェックを入れてください。</p>
           <div class="btn-group">
             <button class="btn btn-primary" onclick="nextKariStep(2)">次へ</button>
-            <button class="btn btn-gray" onclick="showView('viewStart')">戻る</button>
+            <button class="btn btn-gray" onclick="showView('viewAuth')">戻る</button>
           </div>
         </div>
         <div id="kariStep2" style="display:none;">
@@ -574,7 +583,7 @@
             <p style="font-size: 13px; color: #333; margin-bottom: 10px; font-weight: bold;">■ すでに採用が決まっている方</p>
             <p style="font-size: 12px; color: #5f6368; margin: 0;">引き続き、トップページに戻り<br><b>「STEP 2：入社手続き」</b>へお進みください。</p>
           </div>
-          <button class="btn btn-primary" onclick="showView('viewStart')">トップページへ戻る</button>
+          <button class="btn btn-primary" onclick="showView('viewAuth')">トップページへ戻る</button>
         </div>
       </div>
       <div id="viewHonSuccess" class="view">
@@ -588,32 +597,10 @@
             ご提出をお願いいたします。
           </p>
           <button class="btn btn-primary" style="margin-bottom: 12px;" onclick="showView('viewLogin')">マイページへログインする</button>
-          <button class="btn btn-gray" onclick="showView('viewStart')">トップページへ戻る</button>
+          <button class="btn btn-gray" onclick="showView('viewAuth')">トップページへ戻る</button>
         </div>
       </div>
-      <div id="viewHonLogin" class="view">
-        <h3>入社手続き</h3>
-        <div id="honLoginErrorBox" style="display:none; background:#fff8e1; border:1px solid #ffe082; padding:15px; border-radius:12px; margin-bottom:20px;">
-          <p style="color:#b07a00; font-size:13px; font-weight:700; margin:0 0 10px 0;">⚠️ プロフィール登録が確認できません</p>
-          <p style="font-size:12px; color:#5f6368; line-height:1.5; margin:0 0 15px 0;">
-            入社手続きを始める前に、まずは「STEP 1：プロフィール登録」を完了させる必要があります。
-          </p>
-          <button class="btn btn-primary" style="height:44px; font-size:14px; margin:0;" onclick="resetKariForm(); showView('viewKari')">STEP 1へ進む</button>
-        </div>
-        <p style="font-size:13px; color:#5f6368; margin-bottom:20px;">
-          採用担当より案内を受けた方は、STEP 1で登録した電話番号と生年月日を入力してください。
-        </p>
-        <div class="form-group">
-          <label>電話番号</label>
-          <input type="tel" id="honLoginPhone" placeholder="携帯電話または固定電話">
-        </div>
-        <div class="form-group">
-          <label>生年月日</label>
-          <input type="date" id="honLoginDob">
-        </div>
-        <button class="btn btn-primary" onclick="handleHonLogin()">次へ進む</button>
-        <button class="btn btn-gray" onclick="showView('viewStart')">戻る</button>
-      </div>
+
       <div id="viewHonRegister" class="view">
         <div style="background:var(--bg); border:1px solid var(--border); border-left:4px solid var(--primary); padding:15px; border-radius:8px; margin-bottom:25px;">
           <p style="font-size:12px; color:#666; margin:0 0 5px 0;">以下のご本人様でお間違いないでしょうか？</p>
@@ -709,17 +696,7 @@
           </div>
         </div>
       </div>
-      <div id="viewLogin" class="view">
-        <h3>ログイン</h3>
-        <p class="error-message" id="loginError" style="background:#fff1f0; padding:12px; border-radius:10px; border:1px solid #ffa39e; margin-bottom:20px; font-size:13px;"></p>
-        <div class="form-group">
-          <label>電話番号</label>
-          <input type="tel" id="loginPhone" placeholder="携帯電話または固定電話">
-        </div>
-        <div class="form-group"><label>生年月日</label><input type="date" id="loginDob"></div>
-        <button class="btn btn-primary" onclick="handleLogin()">ログイン</button>
-        <button class="btn btn-gray" onclick="showView('viewStart')">戻る</button>
-      </div>
+
       <div id="viewMyPage" class="view">
       <div class="mypage-header">
         <h2 id="mpUserName" style="margin:0; font-size: 22px;">--- 様</h2>
@@ -736,7 +713,7 @@
         <div id="taskList"></div>
         <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
           <button class="btn btn-gray" onclick="routeUser()">戻る</button>
-          <button class="btn btn-gray" onclick="currentUser = null; resetHonForm(); resetKariForm(); showView('viewStart');">ログアウト</button>
+          <button class="btn btn-gray" onclick="currentUser = null; resetHonForm(); resetKariForm(); showView('viewAuth');">ログアウト</button>
         </div>
       </div>
       <div id="viewRegSuccess" class="view">
@@ -857,7 +834,7 @@
         </div>
         <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
           <button class="btn btn-gray" onclick="showView('viewMyPage')">登録情報・書類</button>
-          <button class="btn btn-gray" onclick="currentUser = null; resetHonForm(); resetKariForm(); showView('viewStart');">ログアウト</button>
+          <button class="btn btn-gray" onclick="currentUser = null; resetHonForm(); resetKariForm(); showView('viewAuth');">ログアウト</button>
         </div>
       </div>
       <div id="viewShift" class="view">
@@ -941,7 +918,7 @@
     const google = { script: { run: new GASRunner().getProxy() } };
     let currentUser = null;
     window.showView = function(id) {
-      if (id === 'viewStart') {
+      if (id === 'viewAuth') {
         resetKariForm();
         if (typeof resetHonForm === 'function') resetHonForm();
       }
@@ -951,7 +928,7 @@
       window.scrollTo(0,0);
       const header = document.querySelector('header');
       if(header) {
-        header.style.display = (id === 'viewStart') ? 'none' : 'block';
+        header.style.display = (id === 'viewAuth') ? 'none' : 'block';
       }
     };
 
@@ -971,31 +948,70 @@
         });
     }
 
-    function handleLogin() {
-      const phoneInput = document.getElementById('loginPhone');
-      const dobInput = document.getElementById('loginDob');
-      const errorEl = document.getElementById('loginError');
+    function handleSmartLogin() {
+      const phoneInput = document.getElementById('authPhone');
+      const dobInput = document.getElementById('authDob');
+      const errorEl = document.getElementById('authError');
+      
       phoneInput.classList.remove('input-error');
       dobInput.classList.remove('input-error');
       errorEl.style.display = 'none';
+      
       if(!phoneInput.value.trim() || !dobInput.value) {
         if(!phoneInput.value.trim()) phoneInput.classList.add('input-error');
         if(!dobInput.value) dobInput.classList.add('input-error');
         return;
       }
+      
       setLoading(true);
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
-        if(res.success) { 
-          currentUser = res.user; 
-          routeUser(); 
-        } else {
+        if (!res.success) {
+          // Lỗi (Vd: Nhân viên đã nghỉ việc)
           errorEl.innerText = "⚠️ " + res.message;
           errorEl.style.display = 'block';
           phoneInput.classList.add('input-error');
           dobInput.classList.add('input-error');
+          return;
         }
-      }).loginUser(phoneInput.value, dobInput.value);
+
+        // TỰ ĐỘNG ĐIỀU HƯỚNG DỰA VÀO KẾT QUẢ TỪ BACKEND
+        if (res.route === "step1") {
+          // Người mới: Chuyển sang form CV, điền sẵn SĐT và Ngày sinh cho họ
+          resetKariForm();
+          document.getElementById('kariPhone').value = phoneInput.value;
+          document.getElementById('kariDob').value = dobInput.value;
+          showView('viewKari');
+          showCustomAlert("初めての登録ですね。\nプロフィールを入力してください。");
+
+        } else if (res.route === "step2") {
+          // Được duyệt đỗ: Chuyển sang form Ký hợp đồng
+          pendingKariData = res.kariData;
+          pendingKariRowIndex = res.kariRowIndex;
+          document.getElementById('honConfirmName').innerText = pendingKariData.nameKanji.replace(/\//g, ' ') + " 様";
+          showView('viewHonRegister');
+          nextHonStep(1); 
+          showCustomAlert("入社手続き（STEP 2）へ進みます。");
+
+        } else if (res.route === "mypage") {
+          // Thiếu giấy tờ: Khóa ở My Page
+          currentUser = res.user;
+          renderMyPage();
+          showCustomAlert("未提出の書類があります。\n提出を完了させてください。");
+          prefetchData(); // Tải ngầm data chấm công để sẵn đó
+
+        } else if (res.route === "attendance") {
+          // Xong 100%: Chuyển thẳng vào Đồng hồ Chấm công
+          currentUser = res.user;
+          renderMyPage(); // Render chìm ở dưới để có data
+          renderAttendanceView();
+          showCustomAlert("ログインしました。");
+        }
+      }).withFailureHandler(err => {
+        setLoading(false);
+        errorEl.innerText = "⚠️ 通信エラーが発生しました。";
+        errorEl.style.display = 'block';
+      }).smartLogin(phoneInput.value, dobInput.value);
     }
 
     function renderMyPage() {
@@ -1948,34 +1964,21 @@
     let pendingKariData = null;
     let pendingKariRowIndex = -1;
 
-    function handleHonLogin() {
-      const phoneInput = document.getElementById('honLoginPhone');
-      const dobInput = document.getElementById('honLoginDob');
-      const errorBox = document.getElementById('honLoginErrorBox');
-      phoneInput.classList.remove('input-error');
-      dobInput.classList.remove('input-error');
-      errorBox.style.display = 'none';
-      if(!phoneInput.value || !dobInput.value) {
-        if(!phoneInput.value) phoneInput.classList.add('input-error');
-        if(!dobInput.value) dobInput.classList.add('input-error');
-        return;
+    function prefetchData() {
+      if (currentUser && currentUser.allowedLocIds) {
+        google.script.run.withSuccessHandler(locations => {
+          locationCoordsObj = {};
+          const locSelect = document.getElementById('attLocationSelect');
+          if (locations && locations.length > 0) {
+            locSelect.innerHTML = '<option value="" disabled selected>勤務地を選択してください</option>';
+            locations.forEach(loc => {
+              locSelect.innerHTML += `<option value="${loc.name}">${loc.name}</option>`;
+              locationCoordsObj[loc.name] = { lat: loc.lat, lng: loc.lng, radius: loc.radius };
+            });
+            locSelect.disabled = false;
+          }
+        }).getLocationsData(currentUser.allowedLocIds);
       }
-      setLoading(true);
-      google.script.run.withSuccessHandler(res => {
-        setLoading(false);
-        if(res.success) {
-          pendingKariData = res.kariData;
-          pendingKariRowIndex = res.kariRowIndex;
-          document.getElementById('honConfirmName').innerText = pendingKariData.nameKanji.replace(/\//g, ' ') + " 様";
-          showView('viewHonRegister');
-          nextHonStep(1); 
-        } else {
-          errorBox.style.display = 'block';
-          phoneInput.classList.add('input-error');
-          dobInput.classList.add('input-error');
-          window.scrollTo(0, 0);
-        }
-      }).findKariUser(phoneInput.value, dobInput.value);
     }
 
     function nextHonStep(step) {
@@ -2284,56 +2287,82 @@
     function handleCheckInOut(type) {
       const locationName = document.getElementById('attLocationSelect').value;
       const commuteFeeInput = document.getElementById('attCommuteFee').value;
+      
       if (!locationName) {
-        showCustomAlert("勤務地を選択してください。", true);
-        return;
+        showCustomAlert("勤務地を選択してください。", true); return;
       }
+      
       let commuteFee = 0;
       if (type === '退勤') {
-        if (!commuteFeeInput) {
-          showCustomAlert("退勤する前に往復交通費を入力してください。", true);
-          return;
-        }
+        if (!commuteFeeInput) { showCustomAlert("退勤する前に往復交通費を入力してください。", true); return; }
         commuteFee = parseInt(commuteFeeInput, 10);
-        if (isNaN(commuteFee) || commuteFee < 0) {
-          showCustomAlert("交通費は有効な半角数字で入力してください。", true);
-          return;
-        }
+        if (isNaN(commuteFee) || commuteFee < 0) { showCustomAlert("交通費は有効な半角数字で入力してください。", true); return; }
       }
-      setLoading(true, "記録を送信中…", "");
+
+      // --- KHÚC NÀY LÀ MAGIC: CHUYỂN GIAO DIỆN NGAY LẬP TỨC TRONG 0.1 GIÂY ---
+      // Lấy giờ hiện tại trên điện thoại
+      const now = new Date();
+      const timeStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
+      
+      const btnIn = document.getElementById('btnCheckIn');
+      const btnOut = document.getElementById('btnCheckOut');
+      const statusBox = document.getElementById('attStatusBox');
+      const feeGroup = document.getElementById('attFeeGroup');
+
+      // Tự động nhả thông báo Xanh Lá
+      if(type === '出勤') showCustomAlert("出勤時間を記録しました。");
+      else showCustomAlert("退勤時間を記録しました。\nお疲れ様でした！");
+
+      // Cập nhật giao diện lập tức (Không cần Spinner che màn hình nữa)
+      if (type === '出勤') {
+         statusBox.innerHTML = `<strong>${locationName}</strong>に<br><strong>${timeStr}</strong> に出勤しました。`;
+         statusBox.style.display = 'block';
+         feeGroup.style.display = 'block';
+         document.getElementById('attLocationSelect').disabled = true;
+         btnIn.disabled = true; btnIn.classList.replace('btn-primary', 'btn-outline');
+         btnOut.disabled = false; btnOut.classList.replace('btn-outline', 'btn-primary');
+         btnOut.innerText = "処理中..."; // Báo hiệu ngầm là đang xử lý
+      } else {
+         statusBox.style.display = 'none';
+         feeGroup.style.display = 'none';
+         document.getElementById('attLocationSelect').disabled = true;
+         btnIn.disabled = false; btnIn.classList.replace('btn-outline', 'btn-primary');
+         btnOut.disabled = true; btnOut.classList.replace('btn-primary', 'btn-outline');
+         btnIn.innerText = "処理中...";
+      }
+
+      // --- ĐẨY LỆNH GỌI API & GPS XUỐNG CHẠY NGẦM ---
       const getPosTask = cachedPosition ? Promise.resolve(cachedPosition) : getCurrentPosition();
-      getPosTask
-        .then(position => {
+      getPosTask.then(position => {
           const userLat = position.coords.latitude;
           const userLng = position.coords.longitude;
-          const target = locationCoordsObj[locationName] || (currentUser.attendanceInfo && currentUser.attendanceInfo.status ? locationCoordsObj[currentUser.attendanceInfo.status.location] : null); 
-          if (!target && type === '出勤') throw new Error(`「${locationName}」の座標情報が設定されていません。`); 
-          if (target && target.lat && target.lng) {
-            const maxDist = (target.radius && !isNaN(target.radius)) ? Number(target.radius) : 1000; 
-            const distance = calculateDistance(userLat, userLng, target.lat, target.lng);
-            if (distance > maxDist) throw new Error(`現在地が「${locationName}」から離れすぎています。`);
-          }
           cachedPosition = null; 
-          return new Promise((resolve, reject) => {
-            google.script.run.withSuccessHandler(res => {
-              if (res.success) resolve(res); else reject(new Error(res.message));
-            }).withFailureHandler(err => reject(err))
-              .submitAttendanceToOldApp(currentUser.id, currentUser.name, type, locationName, userLat, userLng, commuteFee);
-          });
-        })
-        .then(res => {
-          showCustomAlert(res.message);
-          if (!currentUser.attendanceInfo) currentUser.attendanceInfo = {};
-          currentUser.attendanceInfo.status = res.newStatus;
-          if (type === '退勤') currentUser.attendanceInfo.lastCommuteFee = commuteFeeInput;
-          renderAttendanceView();
-        })
-        .catch(err => {
-          showCustomAlert(err.message, true);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+
+          google.script.run.withSuccessHandler(res => {
+             // Reset lại chữ trên nút
+             btnIn.innerText = "出勤"; btnOut.innerText = "退勤";
+             if(res.success) {
+                // Cập nhật ngầm dữ liệu chuẩn từ Server
+                if (!currentUser.attendanceInfo) currentUser.attendanceInfo = {};
+                currentUser.attendanceInfo.status = res.newStatus;
+                if (type === '退勤') currentUser.attendanceInfo.lastCommuteFee = commuteFeeInput;
+             } else {
+                rollbackUI(res.message); // Nếu có biến thì lùi lại
+             }
+          }).withFailureHandler(err => {
+             btnIn.innerText = "出勤"; btnOut.innerText = "退勤";
+             rollbackUI("通信エラー: " + err.message);
+          }).submitAttendanceToOldApp(currentUser.id, currentUser.name, type, locationName, userLat, userLng, commuteFee);
+      }).catch(err => {
+          btnIn.innerText = "出勤"; btnOut.innerText = "退勤";
+          rollbackUI(err.message);
+      });
+
+      // Hàm lùi lại giao diện nếu API chạy ngầm bị lỗi
+      function rollbackUI(errMsg) {
+          showCustomAlert(errMsg, true); // Hiện Toast Đỏ báo lỗi
+          renderAttendanceView(); // Vẽ lại giao diện từ trạng thái cũ trước khi bấm
+      }
     }
 
     function getCurrentPosition() { 
