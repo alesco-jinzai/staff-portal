@@ -1295,15 +1295,18 @@
       const error1 = document.getElementById('error_f1');
       const box2 = document.getElementById('box_f2');
       const error2 = document.getElementById('error_f2');
+      
       if(box1) box1.classList.remove('input-error');
       if(error1) error1.style.display = 'none';
       if(box2) box2.classList.remove('input-error');
       if(error2) error2.style.display = 'none';
+      
       if (!inputs[0] || !inputs[0].files[0]) {
         if(box1) box1.classList.add('input-error');
         if(error1) error1.style.display = 'inline';
         return;
       }
+      
       const isMandatoryF2 = (id === 'id') || (id === 'mynumber' && extraInfo === 'マイナンバーカード');
       if (isMandatoryF2) {
         if (!inputs[1] || !inputs[1].files[0]) {
@@ -1318,30 +1321,35 @@
           return;
         }
       }
+      
       let docTypeLabel = extraInfo;
       if (!docTypeLabel) {
         if (id === 'bank') docTypeLabel = "口座情報";
         if (id === 'id') docTypeLabel = (currentUser.nationality === "外国籍") ? "在留カード" : "身分証明書";
       }
+      
       setLoading(true);
       const files = { f1: { data: await processImg(inputs[0].files[0]), label: "f1" } };
       if (inputs[1] && inputs[1].files[0]) {
         files.f2 = { data: await processImg(inputs[1].files[0]), label: "f2" };
       }
+      
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
         let isSuccess = false;
         let newValue = "";
+        
         if (res && res.success) {
-            isSuccess = true;
-            newValue = res.newVal;
+          isSuccess = true;
+          newValue = res.newVal;
         } else if (typeof res === 'string') {
-            isSuccess = true;
-            newValue = res;
+          isSuccess = true;
+          newValue = res;
         } else if (res && !res.error && !res.message) {
-            isSuccess = true;
-            newValue = "提出済"; 
+          isSuccess = true;
+          newValue = "提出済"; 
         }
+        
         if (isSuccess) {
           if (id === 'id') {
             currentUser.statusID = newValue;
@@ -1350,16 +1358,31 @@
           } else if (id === 'mynumber') {
             currentUser.statusMyNumber = newValue;
           }
+          
           if (res && res.autoIdSkipped) {
             currentUser.statusID = "提出不要";
           }
-          renderMyPage();
-          showView('viewMyPage');
+          
+          // Cập nhật Tiến độ
+          if (res && res.progress) {
+            currentUser.progress = res.progress; 
+          }
+          
+          routeUser(); // Ống trượt vạn năng kích hoạt!
+          
+          // Hiện thông báo
+          if (currentUser.progress && currentUser.progress.includes("完了")) {
+            showCustomAlert("全ての手続きが完了しました！\n出勤画面へ移動します。");
+          } else {
+            showCustomAlert("提出が完了しました。");
+          }
+          
         } else {
           let errMsg = "不明なエラー (Lỗi không xác định)";
           if (res && res.message) errMsg = res.message;
           else if (res && res.error) errMsg = res.error;
           else errMsg = JSON.stringify(res);
+          
           setLoading(true, "⚠️ エラー: " + errMsg, "もう一度お試しください");
           setTimeout(() => setLoading(false), 3000);
         }
@@ -1475,7 +1498,8 @@
         google.script.run.withSuccessHandler(res => {
           setLoading(false);
           currentUser.statusMyNumber = res.newVal;
-          renderMyPage();
+          if (res.progress) currentUser.progress = res.progress;
+          routeUser();
           google.script.run.generateMyNumberPdfBackground(currentUser.id); 
         }).updateStaffData(currentUser.id, 'mynumber', signInput.value);
       } else {
