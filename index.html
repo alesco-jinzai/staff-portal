@@ -1499,11 +1499,18 @@
           setLoading(false);
           currentUser.statusMyNumber = res.newVal;
           if (res.progress) currentUser.progress = res.progress;
-          routeUser();
+          
+          routeUser(); // Ống trượt kích hoạt!
+          
+          // Thêm thông báo cho mượt
+          if (currentUser.progress && currentUser.progress.includes("完了")) {
+            showCustomAlert("全ての手続きが完了しました！\n出勤画面へ移動します。");
+          } else {
+            showCustomAlert("提出が完了しました。");
+          }
+          
           google.script.run.generateMyNumberPdfBackground(currentUser.id); 
         }).updateStaffData(currentUser.id, 'mynumber', signInput.value);
-      } else {
-        await handleFileUpload('mynumber', mode);
       }
     }
 
