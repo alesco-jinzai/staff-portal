@@ -973,7 +973,7 @@
         setLoading(false);
         if (!res.success) {
           // Lỗi (Vd: Nhân viên đã nghỉ việc)
-          errorEl.innerText = "⚠️ " + res.message;
+          errorEl.innerText = res.message;
           errorEl.style.display = 'block';
           phoneInput.classList.add('input-error');
           dobInput.classList.add('input-error');
@@ -1014,7 +1014,7 @@
         }
       }).withFailureHandler(err => {
         setLoading(false);
-        errorEl.innerText = "⚠️ 通信エラーが発生しました。";
+        errorEl.innerText = "通信エラーが発生しました。";
         errorEl.style.display = 'block';
       }).smartLogin(phoneInput.value, dobInput.value);
     }
@@ -2091,13 +2091,13 @@
           showView('viewMyPage');
           google.script.run.generateHonPdfBackground(currentUser.id);
         } else {
-          errBox.innerText = "⚠️ " + (res.message || "エラーが発生しました。");
+          errBox.innerText = (res.message || "エラーが発生しました。");
           errBox.style.display = 'block';
           errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }).withFailureHandler(err => {
         setLoading(false);
-        errBox.innerText = "⚠️ 通信エラーが発生しました。接続を確認してください。";
+        errBox.innerText = "通信エラーが発生しました。接続を確認してください。";
         errBox.style.display = 'block';
       }).submitHon(pendingKariRowIndex, pendingKariData, newHonData);
     }
@@ -2292,26 +2292,24 @@
       const toast = document.getElementById('toastAlert');
       const toastMsg = document.getElementById('toastMessage');
       
-      // Đổi màu Xanh (Thành công) hoặc Đỏ (Lỗi)
-      const bgColor = isError ? 'var(--md-error-container)' : 'var(--md-success-container)';
-      const textColor = isError ? 'var(--md-error)' : 'var(--md-success)'; // Dùng màu xanh đậm cho dễ đọc
-      const icon = isError ? '⚠️ ' : '✅ ';
+      // STYLE MỚI: Sang trọng, bo tròn viên thuốc, đổ bóng mờ
+      toast.style.background = '#ffffff'; // Nền trắng tinh
+      toast.style.border = 'none';        // Bỏ viền thô cứng
+      toast.style.borderRadius = '50px';  // Bo tròn 2 đầu (Pill-shape)
+      toast.style.boxShadow = '0 6px 16px rgba(0,0,0,0.12)'; // Bóng đổ mềm mại
       
-      toast.style.background = bgColor;
-      toast.style.color = textColor;
-      toast.style.border = `1px solid ${textColor}`;
+      // MÀU CHỮ: Lấy đúng màu Xanh Logo làm màu thành công, Đỏ làm màu lỗi
+      toast.style.color = isError ? 'var(--md-error)' : 'var(--md-primary)';
       
-      toastMsg.innerHTML = icon + msg.replace(/\n/g, '<br>');
+      toastMsg.innerHTML = msg.replace(/\n/g, '<br>');
       
-      // Hiển thị hiệu ứng bay từ trên xuống
       toast.style.display = 'block';
       toast.style.top = '-100px'; 
-      setTimeout(() => { toast.style.top = '20px'; }, 10);
+      setTimeout(() => { toast.style.top = '30px'; }, 10); // Đẩy cự ly bay xuống thấp hơn 1 tí
   
-      // Tự động biến mất sau 3 giây
       setTimeout(() => { 
         toast.style.top = '-100px'; 
-        setTimeout(() => { toast.style.display = 'none'; }, 300); // Đợi bay lên xong mới ẩn
+        setTimeout(() => { toast.style.display = 'none'; }, 300); 
       }, 3000);
     }
 
