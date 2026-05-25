@@ -1364,7 +1364,9 @@
           }
           
           // Cập nhật Tiến độ
-          if (res && res.progress) {
+          if (res && res.user) {
+            currentUser = res.user; 
+          } else if (res && res.progress) {
             currentUser.progress = res.progress; 
           }
           
@@ -1498,7 +1500,11 @@
         google.script.run.withSuccessHandler(res => {
           setLoading(false);
           currentUser.statusMyNumber = res.newVal;
-          if (res.progress) currentUser.progress = res.progress;
+          if (res.user) {
+            currentUser = res.user;
+          } else if (res.progress) {
+            currentUser.progress = res.progress;
+          }
           
           routeUser(); // Ống trượt kích hoạt!
           
