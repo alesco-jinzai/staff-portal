@@ -576,12 +576,16 @@
       <div id="viewKariSuccess" class="view">
         <div style="text-align:center; padding: 40px 0;">
           <div style="font-size: 60px; color: var(--md-success); margin-bottom: 20px;">✓</div>
-          <h2 style="color: var(--md-success); font-size: 22px;">STEP 1 が完了しました</h2>
+          
+          <!-- Đã xóa chữ STEP 1 -->
+          <h2 style="color: var(--md-success); font-size: 22px;">プロフィールの登録が完了しました</h2>
           
           <div style="background: var(--md-surface-container); border: 1px solid var(--md-outline-variant); border-radius: 12px; padding: 20px; margin: 24px 0; text-align: left;">
             <p style="font-size: 14px; color: var(--md-primary); margin-bottom: 8px; font-weight: bold;">■ すでに採用が決まっている方</p>
-            <p style="font-size: 13px; color: var(--md-on-surface-variant); margin: 0 0 16px 0;">下のボタンから「STEP 2：入社手続き」へお進みください。</p>
-            <button class="btn btn-primary" onclick="goToStep2FromSuccess()">STEP 2 へ進む</button>
+            
+            <!-- Đã xóa chữ STEP 2 -->
+            <p style="font-size: 13px; color: var(--md-on-surface-variant); margin: 0 0 16px 0;">下のボタンから入社手続きへお進みください。</p>
+            <button class="btn btn-primary" onclick="goToStep2FromSuccess()">入社手続きへ進む</button>
             
             <hr style="border: 0; border-top: 1px dashed var(--md-outline-variant); margin: 20px 0;">
             
@@ -996,7 +1000,7 @@
           document.getElementById('honConfirmName').innerText = pendingKariData.nameKanji.replace(/\//g, ' ') + " 様";
           showView('viewHonRegister');
           nextHonStep(1); 
-          showCustomAlert("入社手続き（STEP 2）へ進みます。");
+          showCustomAlert("入社手続きへ進みます。");
 
         } else if (res.route === "mypage") {
           // Thiếu giấy tờ: Khóa ở My Page
@@ -2299,7 +2303,7 @@
       toast.style.boxShadow = '0 6px 16px rgba(0,0,0,0.12)'; // Bóng đổ mềm mại
       
       // MÀU CHỮ: Lấy đúng màu Xanh Logo làm màu thành công, Đỏ làm màu lỗi
-      toast.style.color = isError ? 'var(--md-error)' : 'var(--md-primary)';
+      toast.style.color = isError ? 'var(--md-error)' : '#107c41';
       
       toastMsg.innerHTML = msg.replace(/\n/g, '<br>');
       
