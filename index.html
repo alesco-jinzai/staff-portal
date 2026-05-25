@@ -575,15 +575,20 @@
       </div>
       <div id="viewKariSuccess" class="view">
         <div style="text-align:center; padding: 40px 0;">
-          <div style="font-size: 60px; color: var(--success); margin-bottom: 20px;">✓</div>
-          <h2 style="color: var(--success); font-size: 22px;">STEP 1 が完了しました</h2>
-          <div style="background: #f8f9fa; border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin: 20px 0; text-align: left;">
-            <p style="font-size: 13px; color: #333; margin-bottom: 10px; font-weight: bold;">■ これから選考に進む方</p>
-            <p style="font-size: 12px; color: #5f6368; margin: 0 0 15px 0;">担当者より面接等に関するご案内をお電話またはメールにてご連絡します。</p>
-            <p style="font-size: 13px; color: #333; margin-bottom: 10px; font-weight: bold;">■ すでに採用が決まっている方</p>
-            <p style="font-size: 12px; color: #5f6368; margin: 0;">引き続き、トップページに戻り<br><b>「STEP 2：入社手続き」</b>へお進みください。</p>
+          <div style="font-size: 60px; color: var(--md-success); margin-bottom: 20px;">✓</div>
+          <h2 style="color: var(--md-success); font-size: 22px;">STEP 1 が完了しました</h2>
+          
+          <div style="background: var(--md-surface-container); border: 1px solid var(--md-outline-variant); border-radius: 12px; padding: 20px; margin: 24px 0; text-align: left;">
+            <p style="font-size: 14px; color: var(--md-primary); margin-bottom: 8px; font-weight: bold;">■ すでに採用が決まっている方</p>
+            <p style="font-size: 13px; color: var(--md-on-surface-variant); margin: 0 0 16px 0;">下のボタンから「STEP 2：入社手続き」へお進みください。</p>
+            <button class="btn btn-primary" onclick="goToStep2FromSuccess()">STEP 2 へ進む</button>
+            
+            <hr style="border: 0; border-top: 1px dashed var(--md-outline-variant); margin: 20px 0;">
+            
+            <p style="font-size: 14px; color: var(--md-primary); margin-bottom: 8px; font-weight: bold;">■ これから選考・面接に進む方</p>
+            <p style="font-size: 13px; color: var(--md-on-surface-variant); margin: 0 0 16px 0;">担当者よりご案内をお電話またはメールにてご連絡します。</p>
+            <button class="btn btn-gray" onclick="showView('viewAuth')">トップページへ戻る</button>
           </div>
-          <button class="btn btn-primary" onclick="showView('viewAuth')">トップページへ戻る</button>
         </div>
       </div>
       <div id="viewHonSuccess" class="view">
@@ -1888,6 +1893,16 @@
       }
     }
 
+    function goToStep2FromSuccess() {
+      if (!pendingKariData) {
+         showView('viewAuth'); // Đề phòng lỗi rớt mạng thì văng ra ngoài
+         return;
+      }
+      document.getElementById('honConfirmName').innerText = pendingKariData.nameKanji.replace(/\//g, ' ') + " 様";
+      showView('viewHonRegister');
+      nextHonStep(1); 
+    }
+    
     async function handleKariRegister() {
       try {
         let finalNationality;
@@ -1897,12 +1912,13 @@
         } else {
           finalNationality = nationalityChoice;
         }
+        
         const formData = {
           nameKanji: document.getElementById('kariLastName').value.trim() + "/" + document.getElementById('kariFirstName').value.trim(),
           nameKana: document.getElementById('kariLastKana').value.trim() + "/" + document.getElementById('kariFirstKana').value.trim(),
           dob: document.getElementById('kariDob').value,
           gender: document.getElementById('kariGender').value,
-          nationality: finalNationality, // SỬ DỤNG BIẾN ĐÃ XỬ LÝ LOGIC
+          nationality: finalNationality,
           phone: document.getElementById('kariPhone').value,
           landline: document.getElementById('kariLandline').value.trim(),
           email: document.getElementById('kariEmail').value,
@@ -1911,7 +1927,9 @@
           address2: document.getElementById('kariAddr2').value,
           address3: document.getElementById('kariAddr3').value
         };
+        
         setLoading(true, "データを送信中...", "少々お待ちください");
+        
         google.script.run.withSuccessHandler(async (res) => {
           if (res.success) {
             const allInputs = document.querySelectorAll('#kariUploadZone input[type="file"]');
@@ -1939,12 +1957,25 @@
                   .saveSingleKariFile(res.folderName, {data: base64Data, isImage: isImage}, formData.nameKanji, (i + 1));
               });
             }
+            
             setLoading(true, "最終処理を行っています...", "まもなく完了します");
-            google.script.run.withSuccessHandler(() => {
+            
+            // ==============================================================
+            // ĐIỂM SỬA CHỮA: Nhận 'result' từ Backend và lưu ngầm vào biến
+            // ==============================================================
+            google.script.run.withSuccessHandler((result) => {
               setLoading(false);
               resetKariForm();
-              showView('viewKariSuccess');
+              
+              // Cất "Vé thông hành" vào túi để lát trượt thẳng sang STEP 2
+              if (result && result.success) {
+                pendingKariData = result.kariData;
+                pendingKariRowIndex = result.kariRowIndex;
+              }
+              
+              showView('viewKariSuccess'); // Mở màn hình thành công
             }).finalCheckKari(res.rowIndex);
+            
           }
         }).createKariRecord(formData);
       } catch (e) {
