@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>株式会社アレスコ - スタッフ専用ポータル</title>
+  <title>株式会社アレスコ</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -2243,11 +2243,20 @@
     let cachedPosition = null;
     
     function routeUser() {
-      if (currentUser && currentUser.progress && currentUser.progress.includes("完了")) {
-        renderMyPage();
-        renderAttendanceView(); 
-      } else {
-        renderMyPage();
+      if (!currentUser) {
+        showView('viewAuth');
+        return;
+      }
+      
+      // KIỂM TRA: Nếu đã hoàn thành 100% -> Vào Chấm công
+      if (currentUser.progress && currentUser.progress.indexOf("完了") > -1) {
+        renderAttendanceView(); // Vẽ dữ liệu chấm công
+        showView('viewAttendance'); // Mở màn hình chấm công
+      } 
+      // NẾU CHƯA XONG -> Nhốt ở My Page bắt nộp tiếp
+      else {
+        renderMyPage(); 
+        showView('viewMyPage');
       }
     }
     
