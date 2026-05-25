@@ -1438,11 +1438,21 @@
       }
       if (hasError) return;
       setLoading(true);
+      
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
         if(type === 'agreement') currentUser.statusAgreement = res.newVal;
         if(type === 'nda') currentUser.statusNDA = res.newVal;
-        renderMyPage();
+        
+        // KIỂM TRA KỸ KHÔNG ĐỂ BỊ NULL
+        if (res.user) {
+          currentUser = res.user;
+        } else if (res.progress) {
+          currentUser.progress = res.progress;
+        }
+        
+        routeUser(); // Ống trượt kích hoạt!
+        
       }).updateStaffData(currentUser.id, type, signInput.value);
     }
 
@@ -1473,10 +1483,20 @@
       }
       const resultString = results.join(', ');
       setLoading(true);
+      
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
         currentUser.statusEdu = res.newVal;
-        renderMyPage();
+        
+        // KIỂM TRA KỸ KHÔNG ĐỂ BỊ NULL
+        if (res.user) {
+          currentUser = res.user;
+        } else if (res.progress) {
+          currentUser.progress = res.progress;
+        }
+        
+        routeUser(); // Ống trượt kích hoạt!
+        
       }).updateStaffData(currentUser.id, 'pmark', resultString);
     }
 
@@ -2231,6 +2251,7 @@
       document.getElementById('toggleLandlineBtn').style.display = 'none';
       document.getElementById('kariLandline').focus();
     }
+    
     window.addEventListener("focus", () => {
       if (currentUser && document.getElementById('viewMyPage').classList.contains('active')) {
         console.log("Tab được focus lại, kiểm tra cập nhật...");
@@ -2241,11 +2262,12 @@
     function checkAndUpdateStatus() {
       if (!currentUser || !currentUser.id) return;
       google.script.run.withSuccessHandler(res => {
-        if (res.success) {
+        // PHẢI CHẮC CHẮN RES.USER TỒN TẠI MỚI CHẠY ĐỂ TRÁNH LỖI NULL
+        if (res.success && res.user) {
           if (currentUser.statusFuyo !== res.user.statusFuyo) {
             console.log("Phát hiện trạng thái Tờ khai thuế đã thay đổi! Cập nhật giao diện.");
             currentUser = res.user;
-            renderMyPage();
+            routeUser(); // Gọi ống trượt để lỡ xong 100% thì nó bế sang Chấm công luôn!
           }
         }
       }).getUserStatusById(currentUser.id);
