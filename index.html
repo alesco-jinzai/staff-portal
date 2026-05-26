@@ -1335,56 +1335,43 @@
       }
       
       google.script.run.withSuccessHandler(res => {
-        setLoading(false);
         let isSuccess = false;
         let newValue = "";
         
-        if (res && res.success) {
-          isSuccess = true;
-          newValue = res.newVal;
-        } else if (typeof res === 'string') {
-          isSuccess = true;
-          newValue = res;
-        } else if (res && !res.error && !res.message) {
-          isSuccess = true;
-          newValue = "提出済"; 
-        }
+        if (res && res.success) { isSuccess = true; newValue = res.newVal; } 
+        else if (typeof res === 'string') { isSuccess = true; newValue = res; } 
+        else if (res && !res.error && !res.message) { isSuccess = true; newValue = "提出済"; }
         
         if (isSuccess) {
-          if (id === 'id') {
-            currentUser.statusID = newValue;
-          } else if (id === 'bank') {
-            currentUser.statusBank = newValue;
-          } else if (id === 'mynumber') {
-            currentUser.statusMyNumber = newValue;
-          }
-          
-          if (res && res.autoIdSkipped) {
-            currentUser.statusID = "提出不要";
-          }
-          
-          // Cập nhật Tiến độ
-          if (res && res.user) {
-            currentUser = res.user; 
-          } else if (res && res.progress) {
-            currentUser.progress = res.progress; 
-          }
-          
-          routeUser(); // Ống trượt vạn năng kích hoạt!
-          
-          // Hiện thông báo
-          if (currentUser.progress && currentUser.progress.includes("完了")) {
-            showCustomAlert("全ての手続きが完了しました！\n出勤画面へ移動します。");
+          if (id === 'id') currentUser.statusID = newValue;
+          else if (id === 'bank') currentUser.statusBank = newValue;
+          else if (id === 'mynumber') currentUser.statusMyNumber = newValue;
+          if (res && res.autoIdSkipped) currentUser.statusID = "提出不要";
+
+          // MAGIC Ở ĐÂY: NẾU ĐÃ XONG 100%, TỰ ĐỘNG LẤY LẠI FULL DATA
+          if (res.progress && res.progress.indexOf("完了") > -1) {
+            setLoading(true, "出勤画面を準備しています...", "少々お待ちください");
+            google.script.run.withSuccessHandler(statusRes => {
+               setLoading(false);
+               if (statusRes.success) {
+                 currentUser = statusRes.user; // Nạp full máu (GPS, Lịch sử...)
+                 showCustomAlert("全ての手続きが完了しました！\n出勤画面へ移動します。");
+                 routeUser();
+               }
+            }).getUserStatusById(currentUser.id);
           } else {
+            // Chưa xong thì chỉ load lại My Page
+            setLoading(false);
+            if (res.progress) currentUser.progress = res.progress;
             showCustomAlert("提出が完了しました。");
+            routeUser();
           }
           
         } else {
-          let errMsg = "不明なエラー (Lỗi không xác định)";
+          setLoading(false);
+          let errMsg = "不明なエラー";
           if (res && res.message) errMsg = res.message;
           else if (res && res.error) errMsg = res.error;
-          else errMsg = JSON.stringify(res);
-          
           setLoading(true, "⚠️ エラー: " + errMsg, "もう一度お試しください");
           setTimeout(() => setLoading(false), 3000);
         }
@@ -1393,7 +1380,7 @@
           showCustomAlert("通信エラー: " + err, true);
       }).uploadFiles(currentUser.id, files, id, docTypeLabel);
     }
-
+    
     function openFuyoForm() {
       const baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdbGr6tn2GQ6a7Fyg8v6IxN1Uies_Q35EWoehULIgrXGifkXA/viewform";
       const entry_Kanji = "entry.971256660";
@@ -1440,19 +1427,26 @@
       setLoading(true);
       
       google.script.run.withSuccessHandler(res => {
-        setLoading(false);
         if(type === 'agreement') currentUser.statusAgreement = res.newVal;
         if(type === 'nda') currentUser.statusNDA = res.newVal;
-        
-        // KIỂM TRA KỸ KHÔNG ĐỂ BỊ NULL
-        if (res.user) {
-          currentUser = res.user;
-        } else if (res.progress) {
-          currentUser.progress = res.progress;
+
+        // MAGIC Ở ĐÂY: NẾU ĐÃ XONG 100%, TỰ ĐỘNG LẤY LẠI FULL DATA
+        if (res.progress && res.progress.indexOf("完了") > -1) {
+          setLoading(true, "出勤画面を準備しています...", "少々お待ちください");
+          google.script.run.withSuccessHandler(statusRes => {
+             setLoading(false);
+             if (statusRes.success) {
+               currentUser = statusRes.user;
+               showCustomAlert("全ての手続きが完了しました！\n出勤画面へ移動します。");
+               routeUser();
+             }
+          }).getUserStatusById(currentUser.id);
+        } else {
+          setLoading(false);
+          if (res.progress) currentUser.progress = res.progress;
+          showCustomAlert("提出が完了しました。");
+          routeUser();
         }
-        
-        routeUser(); // Ống trượt kích hoạt!
-        
       }).updateStaffData(currentUser.id, type, signInput.value);
     }
 
@@ -1485,18 +1479,25 @@
       setLoading(true);
       
       google.script.run.withSuccessHandler(res => {
-        setLoading(false);
         currentUser.statusEdu = res.newVal;
-        
-        // KIỂM TRA KỸ KHÔNG ĐỂ BỊ NULL
-        if (res.user) {
-          currentUser = res.user;
-        } else if (res.progress) {
-          currentUser.progress = res.progress;
+
+        // MAGIC Ở ĐÂY: NẾU ĐÃ XONG 100%, TỰ ĐỘNG LẤY LẠI FULL DATA
+        if (res.progress && res.progress.indexOf("完了") > -1) {
+          setLoading(true, "出勤画面を準備しています...", "少々お待ちください");
+          google.script.run.withSuccessHandler(statusRes => {
+             setLoading(false);
+             if (statusRes.success) {
+               currentUser = statusRes.user;
+               showCustomAlert("全ての手続きが完了しました！\n出勤画面へ移動します。");
+               routeUser();
+             }
+          }).getUserStatusById(currentUser.id);
+        } else {
+          setLoading(false);
+          if (res.progress) currentUser.progress = res.progress;
+          showCustomAlert("提出が完了しました。");
+          routeUser();
         }
-        
-        routeUser(); // Ống trượt kích hoạt!
-        
       }).updateStaffData(currentUser.id, 'pmark', resultString);
     }
 
@@ -1518,25 +1519,30 @@
         }
         setLoading(true);
         google.script.run.withSuccessHandler(res => {
-          setLoading(false);
           currentUser.statusMyNumber = res.newVal;
-          if (res.user) {
-            currentUser = res.user;
-          } else if (res.progress) {
-            currentUser.progress = res.progress;
-          }
-          
-          routeUser(); // Ống trượt kích hoạt!
-          
-          // Thêm thông báo cho mượt
-          if (currentUser.progress && currentUser.progress.includes("完了")) {
-            showCustomAlert("全ての手続きが完了しました！\n出勤画面へ移動します。");
+
+          // MAGIC Ở ĐÂY: NẾU ĐÃ XONG 100%, TỰ ĐỘNG LẤY LẠI FULL DATA
+          if (res.progress && res.progress.indexOf("完了") > -1) {
+            setLoading(true, "出勤画面を準備しています...", "少々お待ちください");
+            google.script.run.withSuccessHandler(statusRes => {
+               setLoading(false);
+               if (statusRes.success) {
+                 currentUser = statusRes.user;
+                 showCustomAlert("全ての手続きが完了しました！\n出勤画面へ移動します。");
+                 routeUser();
+                 google.script.run.generateMyNumberPdfBackground(currentUser.id); 
+               }
+            }).getUserStatusById(currentUser.id);
           } else {
+            setLoading(false);
+            if (res.progress) currentUser.progress = res.progress;
             showCustomAlert("提出が完了しました。");
+            routeUser();
+            google.script.run.generateMyNumberPdfBackground(currentUser.id); 
           }
-          
-          google.script.run.generateMyNumberPdfBackground(currentUser.id); 
         }).updateStaffData(currentUser.id, 'mynumber', signInput.value);
+      } else {
+        await handleFileUpload('mynumber', mode);
       }
     }
 
