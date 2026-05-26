@@ -1641,31 +1641,40 @@
       if(id==='edu') return `<strong>①個人情報保護方針</strong><br>弊社ホームページ、および本社に掲載しています。<br><br><strong>②PMSの重要性及び利点</strong><br>直接お客様から個人情報を預かる企業ではお客様が安心して個人情報を預けていただき、信頼されます。<br>お取引先企業から個人情報を預かる企業では委託、提供先企業としての選定基準をクリアできます。<br>入札、見積りで排除されにくくなります。<br>コンプライアンス経営企業としてイメージが向上します。<br>どの企業にも共通したメリットは、社員の個人情報に対する意識が高まります。<br>リスクマネジメントが強化され、情報漏え等のリスクが低減します。<br>名刺やパンフレット、ホームページ上でPマークが使用できます。<br><br><strong>③PMSのための役割及び責任</strong><br><div class="table-responsive"><table><thead><tr><th>主な活動</th><th>役割</th></tr></thead><tbody><tr><td>トップマネジメント<br>福山 允子</td><td>Pマークに関するリーダーシップの発揮、方針の確立、責任・役割・権限の割り当てと社内伝達、Pマークのパフォーマンスの報告を受ける、マネジメントレビューの実施</td></tr><tr><td>個人情報保護管理者<br>田中 圭美</td><td>Pマークの運用における、マニュアル監査、コミュニケーション、是正処置、教育、内部監査を監視</td></tr><tr><td>個人情報保護監査責任者<br>青戸 梨恵</td><td>内部監査の計画〜実施・報告</td></tr><tr><td>システム管理者<br>田中 圭美</td><td>自社のPCの初期設定やシステム面の管理</td></tr><tr><td>事務取扱担当者<br>田中 圭美</td><td>当社規程に従い、Pマークを維持するための特定個人情報の管理</td></tr><tr><td>窓口責任者<br>田中 圭美</td><td>開示請求や苦情等の問合せ対応全般</td></tr></tbody></table></div><br><strong>④PMSに違反した際に予想される結果</strong><br>社会的な信用の失墜<br>・顧客や取引先の信用を失う<br>経済的な損失<br>・再発防止策への投資<br>・本人への補償<br>・業務の停止<br>事業継続へのダメージ<br>・経営状況の悪化<br>従業員が違反した場合<br>・減給、罰金、解雇<br><br><div style="background:#fff1f0; border:2px solid var(--error); padding:15px; border-radius:10px; margin-top:15px;"><div style="background:var(--error); color:white; padding:8px; text-align:center; border-radius:4px; font-weight:bold; margin-bottom:12px;">過去５年間メール誤送信の割合が最も多い</div><strong style="color:var(--error);">危ないと思ったら報告する事</strong><br>・違う人のメールアドレスを選択していないか？<br><br><strong style="color:var(--error);">規則を守る事</strong><br>・不用意にお客様の話はしないようにしましょう。</div>`;
       return "";
     }
+    
     document.addEventListener('DOMContentLoaded', () => {
-      const kariPhoneInput = document.getElementById('kariPhone');
-      if (kariPhoneInput) {
-        kariPhoneInput.addEventListener('input', function (e) {
-          var x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,4})(\d{0,4})/);
-          e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
-        });
-      }
-      const simplePhoneInputs = ['loginPhone', 'honLoginPhone', 'kariLandline'];
-      simplePhoneInputs.forEach(id => {
+      // 1. TỰ ĐỘNG THÊM GẠCH NGANG CHO SỐ ĐIỆN THOẠI
+      // (Áp dụng cho ô Đăng nhập, SĐT di động lúc đăng ký, và SĐT bàn lúc đăng ký)
+      const phoneInputs = ['authPhone', 'kariPhone', 'kariLandline'];
+      
+      phoneInputs.forEach(id => {
         const input = document.getElementById(id);
         if (input) {
           input.addEventListener('input', function (e) {
-            // Chỉ cho phép nhập số và dấu gạch ngang, xóa mọi ký tự khác.
-            e.target.value = e.target.value.replace(/[^0-9-]/g, '');
+            // Chỉ giữ lại số
+            var cleaned = e.target.value.replace(/\D/g, '');
+            // Format theo chuẩn 3-4-4 (VD: 090-1234-5678)
+            var match = cleaned.match(/(\d{0,3})(\d{0,4})(\d{0,4})/);
+            if (match) {
+              e.target.value = !match[2] ? match[1] : match[1] + '-' + match[2] + (match[3] ? '-' + match[3] : '');
+            }
           });
         }
       });
+
+      // 2. TỰ ĐỘNG THÊM GẠCH NGANG CHO MÃ BƯU ĐIỆN (ZIPCODE)
       const zipInputs = ['kariZip'];
       zipInputs.forEach(id => {
         const input = document.getElementById(id);
         if (input) {
           input.addEventListener('input', function (e) {
-            var x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,4})/);
-            e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2];
+            // Chỉ giữ lại số
+            var cleaned = e.target.value.replace(/\D/g, '');
+            // Format theo chuẩn 3-4 (VD: 123-4567)
+            var match = cleaned.match(/(\d{0,3})(\d{0,4})/);
+            if (match) {
+              e.target.value = !match[2] ? match[1] : match[1] + '-' + match[2];
+            }
           });
         }
       });
