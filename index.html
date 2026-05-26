@@ -1006,7 +1006,7 @@
         return;
       }
 
-      setLoading(true);
+      setLoading(true, "ログインしています...");
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
         if (!res.success) {
@@ -1018,7 +1018,9 @@
           return;
         }
 
-        // TỰ ĐỘNG ĐIỀU HƯỚNG DỰA VÀO KẾT QUẢ TỪ BACKEND
+        // =======================================================
+        // TỰ ĐỘNG ĐIỀU HƯỚNG DỰA VÀO "TƯ LỆNH FRONTEND"
+        // =======================================================
         if (res.route === "step1") {
           // Người mới: Chuyển sang form CV, điền sẵn SĐT và Ngày sinh cho họ
           resetKariForm();
@@ -1036,19 +1038,41 @@
           nextHonStep(1); 
           showCustomAlert("入社手続きへ進みます。");
 
-        } else if (res.route === "mypage") {
-          // Thiếu giấy tờ: Khóa ở My Page
+        } else if (res.route === "mypage" || res.route === "attendance") {
           currentUser = res.user;
-          renderMyPage();
-          showCustomAlert("未提出の書類があります。\n提出を完了させてください。");
-          prefetchData(); // Tải ngầm data chấm công để sẵn đó
+          
+          // FRONTEND TỰ ĐẾM NGÓN TAY XEM ĐÃ XONG CHƯA
+          const stMy = currentUser.statusMyNumber || "";
+          const stId = currentUser.statusID || "";
+          const stBk = currentUser.statusBank || "";
+          const stFy = currentUser.statusFuyo || "";
+          const stEdu = currentUser.statusEdu || "";
+          const stAgr = currentUser.statusAgreement || "";
+          const stNda = currentUser.statusNDA || "";
 
-        } else if (res.route === "attendance") {
-          // Xong 100%: Chuyển thẳng vào Đồng hồ Chấm công
-          currentUser = res.user;
-          renderMyPage(); // Render chìm ở dưới để có data
-          renderAttendanceView();
-          showCustomAlert("ログインしました。");
+          // Kiểm tra logic 100% hoàn thành
+          const isDocsDone = (stMy.includes("済") || stMy.includes("拒否")) && 
+                             (stId.includes("済") || stId.includes("不要")) && 
+                             stBk.includes("済") && 
+                             (stFy.includes("済") || stFy.includes("不要") || currentUser.employmentType !== 'メイン');
+          
+          const isHonDone = stEdu.includes("完了") && 
+                            stAgr.includes("同意済") && 
+                            stNda.includes("同意済");
+
+          if (isDocsDone && isHonDone) {
+            // NẾU XONG HẾT -> BẾ VÀO CHẤM CÔNG LUÔN
+            currentUser.progress = "完了"; // Ép cho chuẩn
+            renderAttendanceView();
+            showView('viewAttendance');
+            showCustomAlert("ログインしました。");
+          } else {
+            // NẾU CÒN THIẾU -> NHỐT Ở MY PAGE
+            renderMyPage();
+            showView('viewMyPage');
+            showCustomAlert("未提出の書類があります。\n提出を完了させてください。");
+            prefetchData(); // Tải ngầm data chấm công để sẵn đó chờ nộp xong là đi
+          }
         }
       }).withFailureHandler(err => {
         setLoading(false);
@@ -1362,7 +1386,7 @@
         if (id === 'id') docTypeLabel = (currentUser.nationality === "外国籍") ? "在留カード" : "身分証明書";
       }
 
-      setLoading(true);
+      setLoading(true, "アップロードしています...", "画面を閉じずにお待ちください");
       const files = { f1: { data: await processImg(inputs[0].files[0]), label: "f1" } };
       if (inputs[1] && inputs[1].files[0]) {
         files.f2 = { data: await processImg(inputs[1].files[0]), label: "f2" };
@@ -1370,54 +1394,17 @@
 
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
-        let isSuccess = false;
-        let newValue = "";
-
         if (res && res.success) {
-          isSuccess = true;
-          newValue = res.newVal;
-        } else if (typeof res === 'string') {
-          isSuccess = true;
-          newValue = res;
-        } else if (res && !res.error && !res.message) {
-          isSuccess = true;
-          newValue = "提出済"; 
-        }
+          // Frontend tự cập nhật trạng thái ngay lập tức
+          if (id === 'id') currentUser.statusID = res.newVal;
+          else if (id === 'bank') currentUser.statusBank = res.newVal;
+          else if (id === 'mynumber') currentUser.statusMyNumber = res.newVal;
+          if (res.autoIdSkipped) currentUser.statusID = "提出不要";
 
-        if (isSuccess) {
-          if (id === 'id') {
-            currentUser.statusID = newValue;
-          } else if (id === 'bank') {
-            currentUser.statusBank = newValue;
-          } else if (id === 'mynumber') {
-            currentUser.statusMyNumber = newValue;
-          }
-
-          if (res && res.autoIdSkipped) {
-            currentUser.statusID = "提出不要";
-          }
-
-          // Cập nhật Tiến độ mới nhất
-          if (res.progress) currentUser.progress = res.progress; 
-          
-          // Render lại My Page ngay lập tức để dòng vừa nộp biến thành màu Xanh (完了)
-          renderMyPage(); 
-          
-          // NẾU HOÀN THÀNH 100% -> Bật Pop-up lên
-          if (currentUser.progress && currentUser.progress.includes("完了")) {
-            document.getElementById('completeModal').style.display = 'flex';
-          } else {
-            showCustomAlert("提出が完了しました。");
-          }
-
+          // Gọi Frontend Tư Lệnh tự kiểm tra
+          checkFrontendProgressAndRoute();
         } else {
-          let errMsg = "不明なエラー (Lỗi không xác định)";
-          if (res && res.message) errMsg = res.message;
-          else if (res && res.error) errMsg = res.error;
-          else errMsg = JSON.stringify(res);
-
-          setLoading(true, "⚠️ エラー: " + errMsg, "もう一度お試しください");
-          setTimeout(() => setLoading(false), 3000);
+          showCustomAlert("⚠️ エラー: " + (res.message || "不明なエラー"), true);
         }
       }).withFailureHandler(err => {
           setLoading(false);
@@ -1458,85 +1445,49 @@
       document.getElementById('taskSignError').style.display = 'none';
       document.getElementById('taskCheckError').style.display = 'none';
       let hasError = false;
-      if (!checkInput.checked) {
-        document.getElementById('taskCheckError').style.display = 'block';
-        hasError = true;
-      }
-      if (!signInput.value.trim()) {
-        signInput.classList.add('input-error');
-        document.getElementById('taskSignError').style.display = 'inline'; 
-        hasError = true;
-      }
+      if (!checkInput.checked) { document.getElementById('taskCheckError').style.display = 'block'; hasError = true; }
+      if (!signInput.value.trim()) { signInput.classList.add('input-error'); document.getElementById('taskSignError').style.display = 'inline'; hasError = true; }
       if (hasError) return;
-      setLoading(true);
       
+      setLoading(true, "送信中...");
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
-        if(type === 'agreement') currentUser.statusAgreement = res.newVal;
-        if(type === 'nda') currentUser.statusNDA = res.newVal;
-        
-        // Cập nhật Tiến độ mới nhất
-        if (res.progress) currentUser.progress = res.progress;
-        
-        // Render lại My Page
-        renderMyPage(); 
-
-        // NẾU HOÀN THÀNH 100% -> Bật Pop-up lên
-        if (currentUser.progress && currentUser.progress.includes("完了")) {
-          document.getElementById('completeModal').style.display = 'flex';
-        } else {
-          showCustomAlert("提出が完了しました。");
+        if(res.success) {
+          if(type === 'agreement') currentUser.statusAgreement = res.newVal;
+          if(type === 'nda') currentUser.statusNDA = res.newVal;
+          checkFrontendProgressAndRoute(); // Gọi Frontend Tư Lệnh
         }
-        
-      }).updateStaffData(currentUser.id, type, signInput.value);
+      }).withFailureHandler(err => { setLoading(false); showCustomAlert("通信エラー", true); })
+      .updateStaffData(currentUser.id, type, signInput.value);
     }
 
     function submitEdu() {
       const checkInput = document.getElementById('taskCheck');
       const errorMsg = document.getElementById('eduCheckError');
       errorMsg.style.display = 'none';
-      if(!checkInput.checked) {
-        errorMsg.style.display = 'block';
-        return;
-      }
+      if(!checkInput.checked) { errorMsg.style.display = 'block'; return; }
+      
       let results = [];
       let firstMissingQ = null;
       for (let i = 0; i < 10; i++) {
         const qBox = document.querySelectorAll('.test-q-box')[i];
         const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
         qBox.classList.remove('error'); 
-        if (!selectedOption) {
-          qBox.classList.add('error'); 
-          if (!firstMissingQ) firstMissingQ = qBox;
-        } else {
-          results.push(`Q${i+1}:${selectedOption.value}`);
-        }
+        if (!selectedOption) { qBox.classList.add('error'); if (!firstMissingQ) firstMissingQ = qBox; } 
+        else { results.push(`Q${i+1}:${selectedOption.value}`); }
       }
-      if (firstMissingQ) {
-        firstMissingQ.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return;
-      }
-      const resultString = results.join(', ');
-      setLoading(true);
+      if (firstMissingQ) { firstMissingQ.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
       
+      const resultString = results.join(', ');
+      setLoading(true, "送信中...");
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
-        currentUser.statusEdu = res.newVal;
-        
-        // Cập nhật Tiến độ mới nhất
-        if (res.progress) currentUser.progress = res.progress;
-        
-        // Render lại My Page
-        renderMyPage(); 
-
-        // NẾU HOÀN THÀNH 100% -> Bật Pop-up lên
-        if (currentUser.progress && currentUser.progress.includes("完了")) {
-          document.getElementById('completeModal').style.display = 'flex';
-        } else {
-          showCustomAlert("提出が完了しました。");
+        if(res.success) {
+          currentUser.statusEdu = res.newVal;
+          checkFrontendProgressAndRoute(); // Gọi Frontend Tư Lệnh
         }
-        
-      }).updateStaffData(currentUser.id, 'pmark', resultString);
+      }).withFailureHandler(err => { setLoading(false); showCustomAlert("通信エラー", true); })
+      .updateStaffData(currentUser.id, 'pmark', resultString);
     }
 
     async function submitMyNumber() {
@@ -1555,31 +1506,22 @@
           errorMsg.style.display = 'inline';      
           return; 
         }
-        setLoading(true);
+        setLoading(true, "送信中...");
         google.script.run.withSuccessHandler(res => {
           setLoading(false);
-          currentUser.statusMyNumber = res.newVal;
-          
-          // Cập nhật Tiến độ mới nhất
-          if (res.progress) currentUser.progress = res.progress;
-          
-          // Render lại My Page
-          renderMyPage(); 
-
-          // NẾU HOÀN THÀNH 100% -> Bật Pop-up lên
-          if (currentUser.progress && currentUser.progress.includes("完了")) {
-            document.getElementById('completeModal').style.display = 'flex';
-          } else {
-            showCustomAlert("提出が完了しました。");
+          if(res.success) {
+            currentUser.statusMyNumber = res.newVal;
+            checkFrontendProgressAndRoute(); // Gọi Frontend Tư Lệnh
+            google.script.run.generateMyNumberPdfBackground(currentUser.id); 
           }
-
-          google.script.run.generateMyNumberPdfBackground(currentUser.id); 
+        }).withFailureHandler(err => {
+          setLoading(false); showCustomAlert("通信エラー", true);
         }).updateStaffData(currentUser.id, 'mynumber', signInput.value);
       } else {
         await handleFileUpload('mynumber', mode);
       }
     }
-
+    
     async function processImg(file, addWatermark = true) {
       return new Promise(res => {
         const r = new FileReader(); r.readAsDataURL(file);
@@ -2327,21 +2269,29 @@
     let locationCoordsObj = {};
     let cachedPosition = null;
 
-    function routeUser() {
-      if (!currentUser) {
-        showView('viewAuth');
-        return;
-      }
+    function checkFrontendProgressAndRoute() {
+      // Tự Frontend đọc Data hiện tại (không thèm hỏi Backend)
+      const stMyNumber = currentUser.statusMyNumber || "";
+      const stID = currentUser.statusID || "";
+      const stBank = currentUser.statusBank || "";
+      const stFuyo = currentUser.statusFuyo || "";
+      
+      const isMyNumberDone = stMyNumber.includes("提出済") || stMyNumber.includes("提供拒否");
+      const isIdDone = stID.includes("提出済") || stID.includes("提出不要");
+      const isBankDone = stBank.includes("提出済");
+      const isFuyoDone = stFuyo.includes("提出済") || stFuyo.includes("提出不要") || (currentUser.employmentType !== 'メイン');
+      const isEduDone = (currentUser.statusEdu || "").includes("完了");
+      const isAgreeDone = (currentUser.statusAgreement || "").includes("同意済");
+      const isNdaDone = (currentUser.statusNDA || "").includes("同意済");
 
-      // KIỂM TRA: Nếu đã hoàn thành 100% -> Vào Chấm công
-      if (currentUser.progress && currentUser.progress.indexOf("完了") > -1) {
-        renderAttendanceView(); // Vẽ dữ liệu chấm công
-        showView('viewAttendance'); // Mở màn hình chấm công
-      } 
-      // NẾU CHƯA XONG -> Nhốt ở My Page bắt nộp tiếp
-      else {
-        renderMyPage(); 
-        showView('viewMyPage');
+      // NẾU GOM ĐỦ 100% -> KÍCH HOẠT CHUYỂN TRANG
+      if (isMyNumberDone && isIdDone && isBankDone && isFuyoDone && isEduDone && isAgreeDone && isNdaDone) {
+        currentUser.progress = "完了"; // Tự đánh dấu hoàn thành
+        document.getElementById('completeModal').style.display = 'flex'; // Bật Pop-up chúc mừng
+      } else {
+        // NẾU CHƯA ĐỦ -> Vẽ lại My Page, báo thành công
+        renderMyPage();
+        showCustomAlert("提出が完了しました。");
       }
     }
 
