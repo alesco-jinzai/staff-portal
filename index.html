@@ -998,11 +998,22 @@
           return;
         }
 
-        // TỰ ĐỘNG ĐIỀU HƯỚNG DỰA VÀO KẾT QUẢ TỪ BACKEND
         if (res.route === "step1") {
           // Người mới: Chuyển sang form CV, điền sẵn SĐT và Ngày sinh cho họ
           resetKariForm();
-          document.getElementById('kariPhone').value = phoneInput.value;
+          
+          // 👉 THÊM LOGIC NHẬN DIỆN THÔNG MINH Ở ĐÂY
+          let cleanPhoneForDetect = phoneInput.value.replace(/\D/g, "");
+          if (cleanPhoneForDetect.startsWith("090") || cleanPhoneForDetect.startsWith("080") || cleanPhoneForDetect.startsWith("070")) {
+            // Nếu là đầu số di động -> Bỏ vào ô Di động
+            document.getElementById('kariPhone').value = phoneInput.value;
+          } else {
+            // Nếu là đầu số khác (Máy bàn) -> Bỏ vào ô Máy bàn và tự động mở khung máy bàn ra
+            document.getElementById('kariLandline').value = phoneInput.value;
+            showLandlineField(); 
+          }
+          // ==========================================
+
           document.getElementById('kariDob').value = dobInput.value;
           showView('viewKari');
           showCustomAlert("初めての登録ですね。\nプロフィールを入力してください。", "info");
@@ -1704,34 +1715,30 @@
     }
     
     document.addEventListener('DOMContentLoaded', () => {
-      // 1. TỰ ĐỘNG THÊM GẠCH NGANG CHO SỐ ĐIỆN THOẠI
-      // (Áp dụng cho ô Đăng nhập, SĐT di động lúc đăng ký, và SĐT bàn lúc đăng ký)
+      // 1. ÉP CHẶT INPUT SỐ ĐIỆN THOẠI (Chỉ cho gõ số, tối đa 11 số)
       const phoneInputs = ['authPhone', 'kariPhone', 'kariLandline'];
       
       phoneInputs.forEach(id => {
         const input = document.getElementById(id);
         if (input) {
+          // Ép thuộc tính maxlength để không cho gõ lố
+          input.setAttribute('maxlength', '11');
+          
           input.addEventListener('input', function (e) {
-            // Chỉ giữ lại số
-            var cleaned = e.target.value.replace(/\D/g, '');
-            // Format theo chuẩn 3-4-4 (VD: 090-1234-5678)
-            var match = cleaned.match(/(\d{0,3})(\d{0,4})(\d{0,4})/);
-            if (match) {
-              e.target.value = !match[2] ? match[1] : match[1] + '-' + match[2] + (match[3] ? '-' + match[3] : '');
-            }
+            // Xóa ngay lập tức mọi ký tự không phải số (kể cả dấu -)
+            e.target.value = e.target.value.replace(/\D/g, '');
           });
         }
       });
 
-      // 2. TỰ ĐỘNG THÊM GẠCH NGANG CHO MÃ BƯU ĐIỆN (ZIPCODE)
+      // 2. TỰ ĐỘNG THÊM GẠCH NGANG CHO MÃ BƯU ĐIỆN (ZIPCODE 3-4)
       const zipInputs = ['kariZip'];
       zipInputs.forEach(id => {
         const input = document.getElementById(id);
         if (input) {
+          input.setAttribute('maxlength', '8'); // 7 số + 1 dấu gạch
           input.addEventListener('input', function (e) {
-            // Chỉ giữ lại số
             var cleaned = e.target.value.replace(/\D/g, '');
-            // Format theo chuẩn 3-4 (VD: 123-4567)
             var match = cleaned.match(/(\d{0,3})(\d{0,4})/);
             if (match) {
               e.target.value = !match[2] ? match[1] : match[1] + '-' + match[2];
@@ -1841,10 +1848,25 @@
               if (errorText.id === 'kariPhoneError') errorText.innerText = "（いずれか一方は入力必須です）"; 
             }
           });
-          const phoneVal = el.phone.value.trim(); const landlineVal = el.landline.value.trim();
+          const phoneVal = el.phone.value.replace(/\D/g, ""); 
+          const landlineVal = el.landline.value.replace(/\D/g, "");
+          
           if (!phoneVal && !landlineVal) {
             el.phone.classList.add('input-error'); el.landline.classList.add('input-error');
+            err.phone.innerText = "（いずれか必須）";
             err.phone.style.display = 'inline'; hasErr = true;
+          } else {
+            // Check nếu có nhập mà độ dài nhỏ hơn 10 số -> Báo lỗi
+            if (phoneVal && phoneVal.length < 10) {
+              el.phone.classList.add('input-error');
+              err.phone.innerText = "（有効な番号を入力してください）";
+              err.phone.style.display = 'inline'; hasErr = true;
+            }
+            if (landlineVal && landlineVal.length < 10) {
+              el.landline.classList.add('input-error');
+              err.phone.innerText = "（有効な番号を入力してください）";
+              err.phone.style.display = 'inline'; hasErr = true;
+            }
           }
           if (!el.zip.value.trim() || el.zip.value.length < 8) { el.zip.classList.add('input-error'); err.zip.style.display = 'inline'; hasErr = true; }
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
