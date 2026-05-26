@@ -1335,56 +1335,81 @@ files.f2 = { data: await processImg(inputs[1].files[0]), label: "f2" };
 }
 
 google.script.run.withSuccessHandler(res => {
-setLoading(false);
+        setLoading(false);
 let isSuccess = false;
 let newValue = "";
 
-if (res && res.success) {
-isSuccess = true;
-newValue = res.newVal;
-} else if (typeof res === 'string') {
-isSuccess = true;
-newValue = res;
-} else if (res && !res.error && !res.message) {
-isSuccess = true;
-newValue = "提出済"; 
-}
+        if (res && res.success) {
+          isSuccess = true;
+          newValue = res.newVal;
+        } else if (typeof res === 'string') {
+          isSuccess = true;
+          newValue = res;
+        } else if (res && !res.error && !res.message) {
+          isSuccess = true;
+          newValue = "提出済"; 
+        }
+        if (res && res.success) { isSuccess = true; newValue = res.newVal; } 
+        else if (typeof res === 'string') { isSuccess = true; newValue = res; } 
+        else if (res && !res.error && !res.message) { isSuccess = true; newValue = "提出済"; }
 
 if (isSuccess) {
-if (id === 'id') {
-currentUser.statusID = newValue;
-} else if (id === 'bank') {
-currentUser.statusBank = newValue;
-} else if (id === 'mynumber') {
-currentUser.statusMyNumber = newValue;
-}
+          if (id === 'id') {
+            currentUser.statusID = newValue;
+          } else if (id === 'bank') {
+            currentUser.statusBank = newValue;
+          } else if (id === 'mynumber') {
+            currentUser.statusMyNumber = newValue;
+          }
+          
+          if (res && res.autoIdSkipped) {
+            currentUser.statusID = "提出不要";
+          }
+          
+          // Cập nhật Tiến độ
+          if (res && res.user) {
+            currentUser = res.user; 
+          } else if (res && res.progress) {
+            currentUser.progress = res.progress; 
+          }
+          
+          routeUser(); // Ống trượt vạn năng kích hoạt!
+          
+          // Hiện thông báo
+          if (currentUser.progress && currentUser.progress.includes("完了")) {
+            showCustomAlert("全ての手続きが完了しました！\n出勤画面へ移動します。");
+          if (id === 'id') currentUser.statusID = newValue;
+          else if (id === 'bank') currentUser.statusBank = newValue;
+          else if (id === 'mynumber') currentUser.statusMyNumber = newValue;
+          if (res && res.autoIdSkipped) currentUser.statusID = "提出不要";
 
-if (res && res.autoIdSkipped) {
-currentUser.statusID = "提出不要";
-}
-
-// Cập nhật Tiến độ
-if (res && res.user) {
-currentUser = res.user; 
-} else if (res && res.progress) {
-currentUser.progress = res.progress; 
-}
-
-routeUser(); // Ống trượt vạn năng kích hoạt!
-
-// Hiện thông báo
-if (currentUser.progress && currentUser.progress.includes("完了")) {
-showCustomAlert("全ての手続きが完了しました！\n出勤画面へ移動します。");
+          // MAGIC Ở ĐÂY: NẾU ĐÃ XONG 100%, TỰ ĐỘNG LẤY LẠI FULL DATA
+          if (res.progress && res.progress.indexOf("完了") > -1) {
+            setLoading(true, "出勤画面を準備しています...", "少々お待ちください");
+            google.script.run.withSuccessHandler(statusRes => {
+               setLoading(false);
+               if (statusRes.success) {
+                 currentUser = statusRes.user; // Nạp full máu (GPS, Lịch sử...)
+                 showCustomAlert("全ての手続きが完了しました！\n出勤画面へ移動します。");
+                 routeUser();
+               }
+            }).getUserStatusById(currentUser.id);
 } else {
+            // Chưa xong thì chỉ load lại My Page
+            setLoading(false);
+            if (res.progress) currentUser.progress = res.progress;
 showCustomAlert("提出が完了しました。");
+            routeUser();
 }
 
 } else {
-let errMsg = "不明なエラー (Lỗi không xác định)";
+          let errMsg = "不明なエラー (Lỗi không xác định)";
+          setLoading(false);
+          let errMsg = "不明なエラー";
 if (res && res.message) errMsg = res.message;
 else if (res && res.error) errMsg = res.error;
-else errMsg = JSON.stringify(res);
-
+          else errMsg = JSON.stringify(res);
+          
 setLoading(true, "⚠️ エラー: " + errMsg, "もう一度お試しください");
 setTimeout(() => setLoading(false), 3000);
 }
@@ -1394,6 +1419,7 @@ showCustomAlert("通信エラー: " + err, true);
 }).uploadFiles(currentUser.id, files, id, docTypeLabel);
 }
 
+    
 function openFuyoForm() {
 const baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdbGr6tn2GQ6a7Fyg8v6IxN1Uies_Q35EWoehULIgrXGifkXA/viewform";
 const entry_Kanji = "entry.971256660";
@@ -1438,19 +1464,35 @@ hasError = true;
 }
 if (hasError) return;
 setLoading(true);
-      
+
 google.script.run.withSuccessHandler(res => {
-setLoading(false);
+        setLoading(false);
 if(type === 'agreement') currentUser.statusAgreement = res.newVal;
 if(type === 'nda') currentUser.statusNDA = res.newVal;
-        renderMyPage();
         
         // KIỂM TRA KỸ KHÔNG ĐỂ BỊ NULL
         if (res.user) {
           currentUser = res.user;
         } else if (res.progress) {
           currentUser.progress = res.progress;
-        }
+
+        // MAGIC Ở ĐÂY: NẾU ĐÃ XONG 100%, TỰ ĐỘNG LẤY LẠI FULL DATA
+        if (res.progress && res.progress.indexOf("完了") > -1) {
+          setLoading(true, "出勤画面を準備しています...", "少々お待ちください");
+          google.script.run.withSuccessHandler(statusRes => {
+             setLoading(false);
+             if (statusRes.success) {
+               currentUser = statusRes.user;
+               showCustomAlert("全ての手続きが完了しました！\n出勤画面へ移動します。");
+               routeUser();
+             }
+          }).getUserStatusById(currentUser.id);
+        } else {
+          setLoading(false);
+          if (res.progress) currentUser.progress = res.progress;
+          showCustomAlert("提出が完了しました。");
+          routeUser();
+}
         
         routeUser(); // Ống trượt kích hoạt!
         
@@ -1484,18 +1526,34 @@ return;
 }
 const resultString = results.join(', ');
 setLoading(true);
-      
+
 google.script.run.withSuccessHandler(res => {
-setLoading(false);
+        setLoading(false);
 currentUser.statusEdu = res.newVal;
-        renderMyPage();
         
         // KIỂM TRA KỸ KHÔNG ĐỂ BỊ NULL
         if (res.user) {
           currentUser = res.user;
         } else if (res.progress) {
           currentUser.progress = res.progress;
-        }
+
+        // MAGIC Ở ĐÂY: NẾU ĐÃ XONG 100%, TỰ ĐỘNG LẤY LẠI FULL DATA
+        if (res.progress && res.progress.indexOf("完了") > -1) {
+          setLoading(true, "出勤画面を準備しています...", "少々お待ちください");
+          google.script.run.withSuccessHandler(statusRes => {
+             setLoading(false);
+             if (statusRes.success) {
+               currentUser = statusRes.user;
+               showCustomAlert("全ての手続きが完了しました！\n出勤画面へ移動します。");
+               routeUser();
+             }
+          }).getUserStatusById(currentUser.id);
+        } else {
+          setLoading(false);
+          if (res.progress) currentUser.progress = res.progress;
+          showCustomAlert("提出が完了しました。");
+          routeUser();
+}
         
         routeUser(); // Ống trượt kích hoạt!
         
@@ -1520,25 +1578,44 @@ return;
 }
 setLoading(true);
 google.script.run.withSuccessHandler(res => {
-setLoading(false);
+          setLoading(false);
 currentUser.statusMyNumber = res.newVal;
-if (res.user) {
-currentUser = res.user;
-} else if (res.progress) {
-currentUser.progress = res.progress;
-}
+          if (res.user) {
+            currentUser = res.user;
+          } else if (res.progress) {
+            currentUser.progress = res.progress;
+          }
+          
+          routeUser(); // Ống trượt kích hoạt!
+          
+          // Thêm thông báo cho mượt
+          if (currentUser.progress && currentUser.progress.includes("完了")) {
+            showCustomAlert("全ての手続きが完了しました！\n出勤画面へ移動します。");
 
-routeUser(); // Ống trượt kích hoạt!
-
-// Thêm thông báo cho mượt
-if (currentUser.progress && currentUser.progress.includes("完了")) {
-showCustomAlert("全ての手続きが完了しました！\n出勤画面へ移動します。");
+          // MAGIC Ở ĐÂY: NẾU ĐÃ XONG 100%, TỰ ĐỘNG LẤY LẠI FULL DATA
+          if (res.progress && res.progress.indexOf("完了") > -1) {
+            setLoading(true, "出勤画面を準備しています...", "少々お待ちください");
+            google.script.run.withSuccessHandler(statusRes => {
+               setLoading(false);
+               if (statusRes.success) {
+                 currentUser = statusRes.user;
+                 showCustomAlert("全ての手続きが完了しました！\n出勤画面へ移動します。");
+                 routeUser();
+                 google.script.run.generateMyNumberPdfBackground(currentUser.id); 
+               }
+            }).getUserStatusById(currentUser.id);
 } else {
+            setLoading(false);
+            if (res.progress) currentUser.progress = res.progress;
 showCustomAlert("提出が完了しました。");
+            routeUser();
+            google.script.run.generateMyNumberPdfBackground(currentUser.id); 
 }
-
-google.script.run.generateMyNumberPdfBackground(currentUser.id); 
+          
+          google.script.run.generateMyNumberPdfBackground(currentUser.id); 
 }).updateStaffData(currentUser.id, 'mynumber', signInput.value);
+      } else {
+        await handleFileUpload('mynumber', mode);
 }
 }
 
@@ -2253,7 +2330,7 @@ document.getElementById('landlineArea').style.display = 'block';
 document.getElementById('toggleLandlineBtn').style.display = 'none';
 document.getElementById('kariLandline').focus();
 }
-    
+
 window.addEventListener("focus", () => {
 if (currentUser && document.getElementById('viewMyPage').classList.contains('active')) {
 console.log("Tab được focus lại, kiểm tra cập nhật...");
@@ -2264,14 +2341,12 @@ checkAndUpdateStatus();
 function checkAndUpdateStatus() {
 if (!currentUser || !currentUser.id) return;
 google.script.run.withSuccessHandler(res => {
-        if (res.success) {
-        // PHẢI CHẮC CHẮN RES.USER TỒN TẠI MỚI CHẠY ĐỂ TRÁNH LỖI NULL
-        if (res.success && res.user) {
+// PHẢI CHẮC CHẮN RES.USER TỒN TẠI MỚI CHẠY ĐỂ TRÁNH LỖI NULL
+if (res.success && res.user) {
 if (currentUser.statusFuyo !== res.user.statusFuyo) {
 console.log("Phát hiện trạng thái Tờ khai thuế đã thay đổi! Cập nhật giao diện.");
 currentUser = res.user;
-            renderMyPage();
-            routeUser(); // Gọi ống trượt để lỡ xong 100% thì nó bế sang Chấm công luôn!
+routeUser(); // Gọi ống trượt để lỡ xong 100% thì nó bế sang Chấm công luôn!
 }
 }
 }).getUserStatusById(currentUser.id);
