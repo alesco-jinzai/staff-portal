@@ -2264,14 +2264,13 @@
     function checkAndUpdateStatus() {
       if (!currentUser || !currentUser.id) return;
       google.script.run.withSuccessHandler(res => {
-        if (res.success) {
         // PHẢI CHẮC CHẮN RES.USER TỒN TẠI MỚI CHẠY ĐỂ TRÁNH LỖI NULL
         if (res.success && res.user) {
           if (currentUser.statusFuyo !== res.user.statusFuyo) {
             console.log("Phát hiện trạng thái Tờ khai thuế đã thay đổi! Cập nhật giao diện.");
             currentUser = res.user;
             renderMyPage();
-            routeUser(); // Gọi ống trượt để lỡ xong 100% thì nó bế sang Chấm công luôn!
+            routeUser(); 
           }
         }
       }).getUserStatusById(currentUser.id);
