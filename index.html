@@ -734,7 +734,7 @@
         </div>
         <div id="taskList"></div>
         <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
-          <button class="btn btn-gray" onclick="routeUser()">戻る</button>
+          <button id="mpBtnBack" class="btn btn-gray" onclick="routeUser()">戻る</button>
           <button class="btn btn-gray" onclick="currentUser = null; resetHonForm(); resetKariForm(); showView('viewAuth');">ログアウト</button>
         </div>
       </div>
@@ -1040,6 +1040,16 @@
       showView('viewMyPage');
       document.getElementById('mpUserName').innerText = currentUser.name.replace(/\//g, ' ') + " 様";
       document.getElementById('mpUserType').innerText = currentUser.employmentType;
+    
+      // 👉 THÊM ĐOẠN NÀY: Tự động ẩn/hiện nút Quay lại
+      const isFullyOnboarded = currentUser.progress && currentUser.progress.indexOf("完了") > -1;
+      const btnBack = document.getElementById('mpBtnBack');
+      if (btnBack) {
+          // Nếu chưa nộp đủ 100% -> Ẩn nút Quay lại. Chỉ hiện nút Logout.
+          // Nếu đã xong 100% -> Hiện nút Quay lại để họ có thể quay về màn hình Chấm Công.
+          btnBack.style.display = isFullyOnboarded ? 'flex' : 'none';
+      }
+    
       let fuyoStatus = currentUser.statusFuyo || "";
       let isMainEmployee = (currentUser.employmentType === 'メイン');
       let needsFuyo = (isMainEmployee && fuyoStatus.indexOf('提出済') === -1);
