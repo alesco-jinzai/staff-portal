@@ -750,7 +750,7 @@
           <button class="btn btn-primary" style="margin-top:30px;" onclick="showView('viewLogin')">ログイン画面へ</button>
         </div>
       </div>
-      <div id="viewTaskDetail" class="view"><h3 id="taskDetailTitle" style="color:var(--primary); border-bottom:2px solid var(--primary); padding-bottom:10px;">---</h3><div id="taskDetailContent"></div><div id="taskDetailActions" style="margin-top:20px;"></div><button class="btn btn-gray" onclick="showView('viewMyPage')" style="margin-top:20px;">戻る</button></div>
+      <div id="viewTaskDetail" class="view"><h3 id="taskDetailTitle" style="color:var(--primary); border-bottom:2px solid var(--primary); padding-bottom:10px;">---</h3><div id="taskDetailContent"></div><div id="taskDetailActions" style="margin-top:20px;"></div><button class="btn btn-gray" onclick="renderMyPage()" style="margin-top:20px;">戻る</button></div>
       <div id="viewHistory" class="view">
         <h3 style="text-align: center;">勤怠履歴</h3>
         <div class="form-group" style="display:flex; gap:10px;">
@@ -855,7 +855,7 @@
           <button class="btn btn-tonal" style="flex:1; margin:0; height:54px; font-weight:bold;" onclick="showHistoryView()">勤怠履歴</button>
         </div>
         <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
-          <button class="btn btn-gray" onclick="showView('viewMyPage')">登録情報・書類</button>
+          <button class="btn btn-gray" onclick="renderMyPage()">登録情報・書類</button>
           <button class="btn btn-gray" onclick="currentUser = null; resetHonForm(); resetKariForm(); showView('viewAuth');">ログアウト</button>
         </div>
       </div>
@@ -1004,7 +1004,7 @@
           document.getElementById('kariPhone').value = phoneInput.value;
           document.getElementById('kariDob').value = dobInput.value;
           showView('viewKari');
-          showCustomAlert("初めての登録ですね。\nプロフィールを入力してください。");
+          showCustomAlert("初めての登録ですね。\nプロフィールを入力してください。", "info");
 
         } else if (res.route === "step2") {
           // Được duyệt đỗ: Chuyển sang form Ký hợp đồng
@@ -1013,13 +1013,13 @@
           document.getElementById('honConfirmName').innerText = pendingKariData.nameKanji.replace(/\//g, ' ') + " 様";
           showView('viewHonRegister');
           nextHonStep(1); 
-          showCustomAlert("入社手続きへ進みます。");
+          showCustomAlert("入社手続きへ進みます。", "info");
 
         } else if (res.route === "mypage") {
           // Thiếu giấy tờ: Khóa ở My Page
           currentUser = res.user;
           renderMyPage();
-          showCustomAlert("未提出の書類があります。\n提出を完了させてください。");
+          showCustomAlert("未提出の書類があります。\n提出を完了させてください。", true);
           prefetchData(); // Tải ngầm data chấm công để sẵn đó
 
         } else if (res.route === "attendance") {
@@ -1865,7 +1865,7 @@
           }).withFailureHandler(function() {
               nextBtn.disabled = false;
               nextBtn.innerText = originalBtnText;
-              alert("通信エラーが発生しました。");
+              showCustomAlert("通信エラーが発生しました。", true);
           }).checkPhoneExists(phoneToCheck);
           return; 
         }
@@ -2422,30 +2422,36 @@
       }
     }
 
-    let toastTimer; // Khai báo biến Timer cục bộ trên đầu hàm
-    function showCustomAlert(msg, isError = false) {
+    let toastTimer;
+    function showCustomAlert(msg, type = 'success') {
       const toast = document.getElementById('toastAlert');
       const toastMsg = document.getElementById('toastMessage');
     
       toast.style.background = '#ffffff'; 
       toast.style.borderRadius = '50px';
       toast.style.boxShadow = '0 6px 16px rgba(0,0,0,0.12)';
-      toast.style.color = isError ? 'var(--md-error)' : '#107c41';
+    
+      // Hỗ trợ 3 màu theo trạng thái (Truyền true vẫn hiểu là Lỗi cho tương thích code cũ)
+      if (type === true || type === 'error') {
+        toast.style.color = 'var(--md-error)'; // Đỏ (Lỗi)
+      } else if (type === 'info') {
+        toast.style.color = 'var(--md-primary)'; // Xanh dương (Hướng dẫn / Trung lập)
+      } else {
+        toast.style.color = '#107c41'; // Xanh lá (Thành công)
+      }
     
       toastMsg.innerHTML = msg.replace(/\n/g, '<br>');
       toast.style.display = 'block';
     
-      // Triệt tiêu Timer của thông báo cũ nếu có
       if(toastTimer) clearTimeout(toastTimer);
     
-      // Restart Animation
       toast.style.top = '-100px'; 
       setTimeout(() => { toast.style.top = '30px'; }, 10); 
     
       toastTimer = setTimeout(() => { 
         toast.style.top = '-100px'; 
         setTimeout(() => { toast.style.display = 'none'; }, 300); 
-      }, 3500); // Kéo dài ra 3.5s cho dễ đọc
+      }, 3500); 
     }
 
     function handleCheckInOut(type) {
