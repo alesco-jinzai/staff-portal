@@ -2626,9 +2626,6 @@
         if (isNaN(commuteFee) || commuteFee < 0) { showCustomAlert("交通費は有効な半角数字で入力してください。", true); return; }
       }
 
-      // ===============================================
-      // 👉 KHÓA NÚT VÀ HIỆN CHỮ CHỜ LẤY VỊ TRÍ
-      // ===============================================
       const btnIn = document.getElementById('btnCheckIn');
       const btnOut = document.getElementById('btnCheckOut');
       const statusBox = document.getElementById('attStatusBox');
@@ -2646,15 +2643,11 @@
         btnOut.innerText = "位置情報を取得中..."; 
       }
 
-      // ===============================================
-      // 👉 TƯỜNG LỬA GPS (BẮT TỌA ĐỘ VÀ KIỂM TRA KHOẢNG CÁCH)
-      // ===============================================
       getCurrentPosition().then(position => {
           const userLat = position.coords.latitude;
           const userLng = position.coords.longitude;
-          
           const targetLoc = locationCoordsObj[locationName];
-
+          
           if (targetLoc && targetLoc.lat && targetLoc.lng) {
             const distance = calculateDistance(userLat, userLng, targetLoc.lat, targetLoc.lng);
             const allowedRadius = targetLoc.radius ? parseFloat(targetLoc.radius) : 300; 
@@ -2664,17 +2657,12 @@
                btnIn.innerText = originInText; 
                btnOut.disabled = (type === '出勤');
                btnOut.innerText = originOutText;
-
                let distanceStr = Math.round(distance);
                showCustomAlert(`⚠️ エラー：勤務地から離れすぎています！\n現在地から約 ${distanceStr}m 離れています。\n指定の場所（許容 ${allowedRadius}m）に移動してから打刻してください。`, true);
-               showCustomAlert(`⚠️ エラー：勤務地から離れすぎています！\n現在地から約 ${distanceStr}m 離れています。\n指定 of 場所（許容 ${allowedRadius}m）に移動してから打刻してください。`, true);
                return; 
             }
           }
 
-          // ===============================================
-          // VƯỢT QUA KIỂM TRA -> CẬP NHẬT UI SIÊU TỐC VÀ GHI XUỐNG SHEET
-          // ===============================================
           const now = new Date();
           const timeStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
 
@@ -2685,9 +2673,8 @@
              statusBox.style.background = 'var(--status-ok-bg)';
              statusBox.style.color = 'var(--status-ok-txt)';
              feeGroup.style.display = 'block';
-             locSelect.disabled = true; // Đi làm thì khóa địa điểm
              locSelect.disabled = true; 
-
+             
              btnIn.disabled = true; 
              btnIn.classList.replace('btn-primary', 'btn-outline');
              btnIn.innerText = originInText;
@@ -2699,11 +2686,9 @@
              showCustomAlert("退勤時間を記録しました。\nお疲れ様でした！");
              statusBox.style.display = 'none';
              feeGroup.style.display = 'none';
-
-             // 👉 FIX Ở ĐÂY: Mở khóa và reset ô chọn địa điểm khi tan ca
+             
              locSelect.disabled = false; 
              locSelect.innerHTML = '<option value="" disabled selected>勤務地を選択してください</option>';
-             // Gọi lại hàm lấy danh sách địa điểm để nạp lại menu (cho chắc chắn)
              if (currentUser && currentUser.allowedLocIds) {
                 google.script.run.withSuccessHandler(locations => {
                    let options = '<option value="" disabled selected>勤務地を選択してください</option>';
@@ -2721,16 +2706,8 @@
              btnOut.innerText = originOutText;
           }
 
-          // ===============================================
-          // 👉 BẪY LỖI SIÊU CẤP ĐƯỢC THIẾT LẬP Ở ĐÂY
-          // ===============================================
+          // Gọi Backend chạy ngầm
           google.script.run.withSuccessHandler(res => {
-             if(res.success) {
-                if (!currentUser.attendanceInfo) currentUser.attendanceInfo = {};
-                currentUser.attendanceInfo.status = res.newStatus;
-                if (type === '退勤') currentUser.attendanceInfo.lastCommuteFee = commuteFeeInput;
-             } else {
-                rollbackUI(res.message); 
              try {
                 if(res.success) {
                    if (!currentUser.attendanceInfo) currentUser.attendanceInfo = {};
@@ -2740,13 +2717,10 @@
                    rollbackUI(res.message); 
                 }
              } catch (successErr) {
-                // Nếu lỗi xảy ra ngay trong hàm thành công (do sếp chưa sửa các chỗ khác)
                 alert("【THÀNH CÔNG NHƯNG LỖI FRONTEND】\nMessage: " + successErr.message + "\nStack: " + successErr.stack);
              }
           }).withFailureHandler(err => {
-             rollbackUI("通信エラー: " + err.message);
              try {
-                // Nếu lỗi từ Server gửi về hoặc lỗi đứt mạng
                 alert("【THẤT BẠI HOẶC LỖI TỪ SERVER】\nString: " + String(err) + "\nMessage: " + err.message + "\nStack: " + err.stack);
                 rollbackUI("通信エラー: " + (err.message || err));
              } catch (failErr) {
