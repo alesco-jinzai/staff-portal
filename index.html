@@ -982,6 +982,11 @@
     let currentUser = null;
     window.showView = function(id) {
       if (id === 'viewAuth') {
+        // THÊM 3 DÒNG NÀY ĐỂ XÓA TRẮNG Ô ĐĂNG NHẬP
+        if (document.getElementById('authPhone')) document.getElementById('authPhone').value = '';
+        if (document.getElementById('authDob')) document.getElementById('authDob').value = '';
+        if (document.getElementById('authError')) document.getElementById('authError').style.display = 'none';
+    
         resetKariForm();
         if (typeof resetHonForm === 'function') resetHonForm();
       }
