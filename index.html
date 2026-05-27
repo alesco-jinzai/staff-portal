@@ -980,11 +980,29 @@
       dobInput.classList.remove('input-error');
       errorEl.style.display = 'none';
 
-      if(!phoneInput.value.trim() || !dobInput.value) {
-        if(!phoneInput.value.trim()) phoneInput.classList.add('input-error');
-        if(!dobInput.value) dobInput.classList.add('input-error');
-        return;
+      // ===============================================
+      // 👉 LUẬT THÉP KIỂM TRA SĐT NGAY CỬA LOGIN
+      // ===============================================
+      const phoneVal = phoneInput.value.replace(/\D/g, ""); // Chỉ lấy số
+      
+      // Hàm kiểm tra: Có dữ liệu + dài 10~11 số + bắt đầu bằng 0
+      const isValidPhone = (val) => val.length >= 10 && val.length <= 11 && val.startsWith("0");
+
+      if (!phoneVal || !dobInput.value || !isValidPhone(phoneVal)) {
+        if (!phoneVal) {
+          phoneInput.classList.add('input-error');
+          errorEl.innerText = "電話番号を入力してください。";
+        } else if (!isValidPhone(phoneVal)) {
+          phoneInput.classList.add('input-error');
+          errorEl.innerText = "電話番号は0から始まる10〜11桁の数字で入力してください。"; // Lỗi nhập bậy
+        } else if (!dobInput.value) {
+          dobInput.classList.add('input-error');
+          errorEl.innerText = "生年月日を入力してください。";
+        }
+        errorEl.style.display = 'block';
+        return; // LẬP TỨC KHÓA CỬA, KHÔNG GỌI BACKEND!
       }
+      // ===============================================
 
       setLoading(true);
       google.script.run.withSuccessHandler(res => {
