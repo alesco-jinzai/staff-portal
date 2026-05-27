@@ -2673,7 +2673,7 @@
              statusBox.style.background = 'var(--status-ok-bg)';
              statusBox.style.color = 'var(--status-ok-txt)';
              feeGroup.style.display = 'block';
-             locSelect.disabled = true; // Đi làm thì khóa địa điểm
+             locSelect.disabled = true; 
              
              btnIn.disabled = true; 
              btnIn.classList.replace('btn-primary', 'btn-outline');
@@ -2687,10 +2687,8 @@
              statusBox.style.display = 'none';
              feeGroup.style.display = 'none';
              
-             // 👉 FIX Ở ĐÂY: Mở khóa và reset ô chọn địa điểm khi tan ca
              locSelect.disabled = false; 
              locSelect.innerHTML = '<option value="" disabled selected>勤務地を選択してください</option>';
-             // Gọi lại hàm lấy danh sách địa điểm để nạp lại menu (cho chắc chắn)
              if (currentUser && currentUser.allowedLocIds) {
                 google.script.run.withSuccessHandler(locations => {
                    let options = '<option value="" disabled selected>勤務地を選択してください</option>';
@@ -2708,16 +2706,22 @@
              btnOut.innerText = originOutText;
           }
 
+          // Gọi Backend chạy ngầm (Có bẫy log chống lỗi)
           google.script.run.withSuccessHandler(res => {
-             if(res.success) {
+             // 👉 KÍNH HIỂN VI SOI PHẢN HỒI THỰC TẾ TỪ SERVER
+             alert("【SERVER PHẢN HỒI THỰC TẾ】\n" + JSON.stringify(res));
+
+             if(res && res.success) {
                 if (!currentUser.attendanceInfo) currentUser.attendanceInfo = {};
                 currentUser.attendanceInfo.status = res.newStatus;
                 if (type === '退勤') currentUser.attendanceInfo.lastCommuteFee = commuteFeeInput;
              } else {
-                rollbackUI(res.message); 
+                rollbackUI(res ? res.message : "APIエラー"); 
              }
           }).withFailureHandler(err => {
-             rollbackUI("通信エラー: " + err.message);
+             // 👉 BẪY LỖI SẬP MẠNG HOẶC SERVER CRASH ĐẬP THẲNG RA MÀN HÌNH
+             alert("【SERVER CRASH HOẶC LỖI ĐƯỜNG TRUYỀN】\n" + String(err));
+             rollbackUI("通信エラー: " + (err.message || err));
           }).submitAttendanceToOldApp(currentUser.id, currentUser.name, type, locationName, userLat, userLng, commuteFee);
 
       }).catch(err => {
