@@ -911,6 +911,14 @@
     </div>
   </div>
   <script>
+
+    // Bộ bẫy lỗi tự động - Sẽ hiện Alert báo chính xác dòng bị lỗi khi có biến cố
+    window.onerror = function(msg, url, line, col, error) {
+      var extra = !url ? '' : '\nURL: ' + url + '\nLine: ' + line + '\nCol: ' + col;
+      alert("Phát hiện lỗi Frontend:\n" + msg + extra + "\nStack: " + (error ? error.stack : ''));
+      return false;
+    };
+    
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxC71cAofv5QXr-pjKkmK8ehgNzo4M5wRMMjtG1enU-5w62j0slyK56XJtDvMimAlvE/exec";
 
     class GASRunner {
