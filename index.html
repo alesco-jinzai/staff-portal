@@ -2621,8 +2621,9 @@
       const statusBox = document.getElementById('attStatusBox');
       const feeGroup = document.getElementById('attFeeGroup');
 
-      const originInText = btnIn.innerText;
-      const originOutText = btnOut.innerText;
+      // Ghi nhớ chữ gốc để sau này khôi phục
+      const originInText = "出勤打刻"; 
+      const originOutText = "退勤打刻";
 
       if (type === '出勤') {
         btnIn.disabled = true; 
@@ -2649,7 +2650,7 @@
             const allowedRadius = targetLoc.radius ? parseFloat(targetLoc.radius) : 300; 
 
             if (distance > allowedRadius) {
-               // Gian lận phát hiện! Chặn lại ngay lập tức
+               // Gian lận phát hiện! Chặn lại ngay lập tức và Khôi phục chữ trên nút
                btnIn.disabled = (type === '退勤'); 
                btnIn.innerText = originInText; 
                btnOut.disabled = (type === '出勤');
@@ -2670,7 +2671,7 @@
           if(type === '出勤') showCustomAlert("出勤時間を記録しました。");
           else showCustomAlert("退勤時間を記録しました。\nお疲れ様でした！");
 
-          // Thay đổi giao diện 0.1s Optimistic UI
+          // 👉 FIX LỖI Ở ĐÂY: KHÔI PHỤC LẠI CHỮ TRÊN CẢ 2 NÚT BẤM
           if (type === '出勤') {
              statusBox.innerHTML = `<strong>${locationName}</strong>に<br><strong>${timeStr}</strong> に出勤しました。`;
              statusBox.style.display = 'block';
@@ -2678,16 +2679,28 @@
              statusBox.style.color = 'var(--status-ok-txt)';
              feeGroup.style.display = 'block';
              document.getElementById('attLocationSelect').disabled = true;
+             
+             // Khóa nút IN, Mở nút OUT
+             btnIn.disabled = true; 
              btnIn.classList.replace('btn-primary', 'btn-outline');
-             btnOut.disabled = false; btnOut.classList.replace('btn-outline', 'btn-primary');
-             btnOut.innerText = originOutText; 
+             btnIn.innerText = originInText; // Trả lại chữ 出勤
+
+             btnOut.disabled = false; 
+             btnOut.classList.replace('btn-outline', 'btn-primary');
+             btnOut.innerText = originOutText; // Trả lại chữ 退勤
           } else {
              statusBox.style.display = 'none';
              feeGroup.style.display = 'none';
              document.getElementById('attLocationSelect').disabled = true;
-             btnIn.disabled = false; btnIn.classList.replace('btn-outline', 'btn-primary');
+             
+             // Mở nút IN, Khóa nút OUT
+             btnIn.disabled = false; 
+             btnIn.classList.replace('btn-outline', 'btn-primary');
+             btnIn.innerText = originInText; // Trả lại chữ 出勤
+
+             btnOut.disabled = true;
              btnOut.classList.replace('btn-primary', 'btn-outline');
-             btnIn.innerText = originInText;
+             btnOut.innerText = originOutText; // Trả lại chữ 退勤
           }
 
           // Gọi Backend chạy ngầm
