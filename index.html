@@ -734,6 +734,15 @@
             申告書を入力する
           </button>
         </div>
+
+        <div id="mypageGuideline" style="display:none; background:#e8f0fe; color:#1a5cbf; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #b3d7ff; font-size:12px; line-height:1.6; text-align:left;">
+          <p style="margin:0 0 6px 0; font-size:13px; font-weight:bold;">💡 提出済み書類の変更・追加提出について</p>
+          すべての手続きは完了していますが、提出済みの書類を更新・追加提出したい場合は、対象の項目をタップすることでいつでも再アップロードが可能です。
+        </div>
+
+        <div id="taskList"></div>
+        <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
+        
         <div id="taskList"></div>
         <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
           <button id="mpBtnBack" class="btn btn-gray" onclick="routeUser()">戻る</button>
@@ -1134,6 +1143,12 @@
           // Nếu chưa nộp đủ 100% -> Ẩn nút Quay lại. Chỉ hiện nút Logout.
           // Nếu đã xong 100% -> Hiện nút Quay lại để họ có thể quay về màn hình Chấm Công.
           btnBack.style.display = isFullyOnboarded ? 'flex' : 'none';
+      }
+
+      // 👉 THÊM ĐOẠN ĐIỀU KHIỂN HƯỚNG DẪN NÀY
+      const guidelineEl = document.getElementById('mypageGuideline');
+      if (guidelineEl) {
+          guidelineEl.style.display = isFullyOnboarded ? 'block' : 'none';
       }
 
       let fuyoStatus = currentUser.statusFuyo || "";
