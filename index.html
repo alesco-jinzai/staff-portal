@@ -400,7 +400,7 @@
     </div>
   </div>
   <style> @keyframes popIn { from { opacity: 0; transform: scale(0.8) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } } </style>
-  
+
   <div id="loading">
       <div class="spinner"></div>
       <p id="loadingStatus" style="font-weight:700; color:var(--primary); margin-bottom:5px;">処理中...</p>
@@ -918,7 +918,7 @@
       alert("Phát hiện lỗi Frontend:\n" + msg + extra + "\nStack: " + (error ? error.stack : ''));
       return false;
     };
-    
+
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxC71cAofv5QXr-pjKkmK8ehgNzo4M5wRMMjtG1enU-5w62j0slyK56XJtDvMimAlvE/exec";
 
     class GASRunner {
@@ -967,7 +967,7 @@
       if (!nameStr) return "---"; // Nếu tên rỗng thì hiện gạch ngang, không báo lỗi
       return String(nameStr).replace(/\//g, ' ');
     }
-    
+
     function searchAddress() {
       const zip = document.getElementById('regZip').value.replace(/[^0-9]/g, "");
       if(zip.length !== 7) return alert("郵便番号は7桁で入力してください。"); 
@@ -997,7 +997,7 @@
       // 👉 LUẬT THÉP KIỂM TRA SĐT NGAY CỬA LOGIN
       // ===============================================
       const phoneVal = phoneInput.value.replace(/\D/g, ""); // Chỉ lấy số
-      
+
       // Hàm kiểm tra: Có dữ liệu + dài 10~11 số + bắt đầu bằng 0
       const isValidPhone = (val) => val.length >= 10 && val.length <= 11 && val.startsWith("0");
 
@@ -1032,11 +1032,11 @@
         // 👉 ĐÃ THÊM: Lưu thông tin đăng nhập thành công vào bộ nhớ máy
         localStorage.setItem('alescoPhone', phoneVal);
         localStorage.setItem('alescoDob', dobInput.value);
-        
+
         if (res.route === "step1") {
           // Người mới: Chuyển sang form CV, điền sẵn SĐT và Ngày sinh cho họ
           resetKariForm();
-          
+
           // 👉 THÊM LOGIC NHẬN DIỆN THÔNG MINH Ở ĐÂY
           let cleanPhoneForDetect = phoneInput.value.replace(/\D/g, "");
           if (cleanPhoneForDetect.startsWith("090") || cleanPhoneForDetect.startsWith("080") || cleanPhoneForDetect.startsWith("070")) {
@@ -1087,7 +1087,7 @@
       showView('viewMyPage');
       document.getElementById('mpUserName').innerText = safeCleanName(currentUser.name) + " 様";
       document.getElementById('mpUserType').innerText = currentUser.employmentType;
-    
+
       // 👉 THÊM ĐOẠN NÀY: Tự động ẩn/hiện nút Quay lại
       const isFullyOnboarded = currentUser.progress && currentUser.progress.indexOf("完了") > -1;
       const btnBack = document.getElementById('mpBtnBack');
@@ -1096,7 +1096,7 @@
           // Nếu đã xong 100% -> Hiện nút Quay lại để họ có thể quay về màn hình Chấm Công.
           btnBack.style.display = isFullyOnboarded ? 'flex' : 'none';
       }
-    
+
       let fuyoStatus = currentUser.statusFuyo || "";
       let isMainEmployee = (currentUser.employmentType === 'メイン');
       let needsFuyo = (isMainEmployee && fuyoStatus.indexOf('提出済') === -1);
@@ -1365,13 +1365,13 @@
       const error1 = document.getElementById('error_f1');
       const box2 = document.getElementById('box_f2');
       const error2 = document.getElementById('error_f2');
-    
+
       // Reset CSS lỗi trước khi check
       if(box1) box1.classList.remove('input-error');
       if(error1) error1.style.display = 'none';
       if(box2) box2.classList.remove('input-error');
       if(error2) error2.style.display = 'none';
-    
+
       // Check file 1
       if (!inputs[0] || !inputs[0].files[0]) {
         if(box1) box1.classList.add('input-error');
@@ -1381,7 +1381,7 @@
         }
         return;
       }
-    
+
       // Bắt buộc mặt sau đối với ID (Tùy quốc tịch) và Thẻ MyNumber cứng
       const isMandatoryF2 = (id === 'id') || (id === 'mynumber' && extraInfo === 'マイナンバーカード');
       if (isMandatoryF2) {
@@ -1397,35 +1397,35 @@
           return;
         }
       }
-    
+
       let docTypeLabel = extraInfo;
       if (!docTypeLabel) {
         if (id === 'bank') docTypeLabel = "口座情報";
         if (id === 'id') docTypeLabel = (currentUser.nationality === "外国籍") ? "在留カード" : "身分証明書";
       }
-    
+
       setLoading(true, "アップロード中...", "画像を圧縮・送信しています");
-    
+
       try {
           const files = { f1: { data: await processImg(inputs[0].files[0]), label: "f1" } };
           if (inputs[1] && inputs[1].files[0]) {
             files.f2 = { data: await processImg(inputs[1].files[0]), label: "f2" };
           }
-    
+
           google.script.run.withSuccessHandler(res => {
             setLoading(false);
-    
+
             if (res && res.success) {
               // Cập nhật trạng thái hiển thị ngầm
               if (id === 'id') currentUser.statusID = res.newVal;
               if (id === 'bank') currentUser.statusBank = res.newVal;
               if (id === 'mynumber') currentUser.statusMyNumber = res.newVal;
               if (res.autoIdSkipped) currentUser.statusID = "提出不要 (マイナンバーカード提出済)";
-    
+
               // Đồng bộ lại cục User Data chuẩn nhất từ Backend trả về
               if (res.user) currentUser = res.user; 
               else if (res.progress) currentUser.progress = res.progress;
-    
+
               // 👉 FIX LỖI POPUP Ở ĐÂY: KHÔNG ROUTE ĐI NẾU ĐÃ 100%
               if (currentUser.progress && currentUser.progress.includes("完了")) {
                   document.getElementById('finalSuccessPopup').style.display = 'flex'; // Khóa màn hình
@@ -1441,7 +1441,7 @@
               setLoading(false);
               showCustomAlert("通信エラー: 接続を確認して再試行してください。", true);
           }).uploadFiles(currentUser.id, files, id, docTypeLabel);
-    
+
       } catch(error) {
           setLoading(false);
           showCustomAlert("ファイル処理エラー: " + error.message, true);
@@ -1479,14 +1479,14 @@
       const checkInput = document.getElementById('taskCheck');
       const taskSignError = document.getElementById('taskSignError');
       const taskCheckError = document.getElementById('taskCheckError');
-    
+
       // Reset Errors
       signInput.classList.remove('input-error');
       taskSignError.style.display = 'none';
       taskCheckError.style.display = 'none';
-      
+
       let hasError = false;
-    
+
       // Validate Checkbox
       if (!checkInput.checked) {
         taskCheckError.style.display = 'block';
@@ -1498,22 +1498,22 @@
         taskSignError.style.display = 'inline'; 
         hasError = true;
       }
-      
+
       if (hasError) return;
-      
+
       setLoading(true, "送信中...", "署名データを処理しています");
-      
+
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
-    
+
         if (res.success) {
             if(type === 'agreement') currentUser.statusAgreement = res.newVal;
             if(type === 'nda') currentUser.statusNDA = res.newVal;
-            
+
             // Cập nhật User an toàn
             if (res.user) currentUser = res.user;
             else if (res.progress) currentUser.progress = res.progress;
-            
+
             // 👉 FIX LỖI POPUP Ở ĐÂY
             if (currentUser.progress && currentUser.progress.includes("完了")) {
                 document.getElementById('finalSuccessPopup').style.display = 'flex';
@@ -1533,7 +1533,7 @@
     function submitEdu() {
       const checkInput = document.getElementById('taskCheck');
       const errorMsg = document.getElementById('eduCheckError');
-      
+
       errorMsg.style.display = 'none';
       if(!checkInput.checked) {
         errorMsg.style.display = 'block';
@@ -1541,17 +1541,17 @@
         document.getElementById('checkGroup').scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
-    
+
       let results = [];
       let firstMissingQ = null;
-    
+
       // Quét vòng lặp 10 câu hỏi để đảm bảo không bị sót câu nào
       for (let i = 0; i < 10; i++) {
         const qBox = document.querySelectorAll('#testArea .test-q-box')[i];
         const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
-        
+
         qBox.classList.remove('error'); // Clear CSS
-        
+
         if (!selectedOption) {
           qBox.classList.add('error'); // Tô đỏ ô nếu quên check
           if (!firstMissingQ) firstMissingQ = qBox;
@@ -1559,25 +1559,25 @@
           results.push(`Q${i+1}:${selectedOption.value}`);
         }
       }
-    
+
       if (firstMissingQ) {
         // Cuộn êm đến câu hỏi đầu tiên bị sót và chớp lỗi
         firstMissingQ.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
-    
+
       const resultString = results.join(', ');
       setLoading(true, "送信中...", "テスト結果を判定しています");
-      
+
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
-        
+
         if (res.success) {
             currentUser.statusEdu = res.newVal;
-            
+
             if (res.user) currentUser = res.user;
             else if (res.progress) currentUser.progress = res.progress;
-            
+
             // 👉 FIX LỖI POPUP Ở ĐÂY
             if (currentUser.progress && currentUser.progress.includes("完了")) {
                 document.getElementById('finalSuccessPopup').style.display = 'flex';
@@ -1595,40 +1595,40 @@
     }
     function submitMyNumber() {
       const mode = document.getElementById('mnChoice').value;
-      
+
       if(!mode) {
           document.getElementById('mnChoice').classList.add('input-error');
           return; 
       }
-    
+
       // Hàm này chuyên trị Form Chữ ký (Từ chối). Upload thì đã nằm ở hàm trên.
       if (mode === '提供を拒否する') {
         const signInput = document.getElementById('mnRefuseSign');
         const errorMsg = document.getElementById('mnSignError');
-        
+
         // Reset CSS
         signInput.classList.remove('input-error');
         errorMsg.style.display = 'none';
-    
+
         // Validate
         if (!signInput.value.trim()) {
           signInput.classList.add('input-error'); 
           errorMsg.style.display = 'inline';      
           return; 
         }
-    
+
         setLoading(true, "送信中...", "処理しています");
-    
+
         google.script.run.withSuccessHandler(res => {
           setLoading(false);
-          
+
           if (res.success) {
               currentUser.statusMyNumber = res.newVal;
-    
+
               // Cập nhật User từ Server
               if (res.user) currentUser = res.user; 
               else if (res.progress) currentUser.progress = res.progress;
-    
+
               // 👉 FIX LỖI POPUP Ở ĐÂY
               if (currentUser.progress && currentUser.progress.includes("完了")) {
                   document.getElementById('finalSuccessPopup').style.display = 'flex'; // Hiện khóa màn hình
@@ -1636,7 +1636,7 @@
                   showCustomAlert("提出が完了しました。");
                   routeUser();
               }
-    
+
               // Chạy Gen PDF Ngầm không đợi kết quả để tránh lag UI
               google.script.run.generateMyNumberPdfBackground(currentUser.id); 
           } else {
@@ -1748,17 +1748,17 @@
       if(id==='edu') return `<strong>①個人情報保護方針</strong><br>弊社ホームページ、および本社に掲載しています。<br><br><strong>②PMSの重要性及び利点</strong><br>直接お客様から個人情報を預かる企業ではお客様が安心して個人情報を預けていただき、信頼されます。<br>お取引先企業から個人情報を預かる企業では委託、提供先企業としての選定基準をクリアできます。<br>入札、見積りで排除されにくくなります。<br>コンプライアンス経営企業としてイメージが向上します。<br>どの企業にも共通したメリットは、社員の個人情報に対する意識が高まります。<br>リスクマネジメントが強化され、情報漏え等のリスクが低減します。<br>名刺やパンフレット、ホームページ上でPマークが使用できます。<br><br><strong>③PMSのための役割及び責任</strong><br><div class="table-responsive"><table><thead><tr><th>主な活動</th><th>役割</th></tr></thead><tbody><tr><td>トップマネジメント<br>福山 允子</td><td>Pマークに関するリーダーシップの発揮、方針の確立、責任・役割・権限の割り当てと社内伝達、Pマークのパフォーマンスの報告を受ける、マネジメントレビューの実施</td></tr><tr><td>個人情報保護管理者<br>田中 圭美</td><td>Pマークの運用における、マニュアル監査、コミュニケーション、是正処置、教育、内部監査を監視</td></tr><tr><td>個人情報保護監査責任者<br>青戸 梨恵</td><td>内部監査の計画〜実施・報告</td></tr><tr><td>システム管理者<br>田中 圭美</td><td>自社のPCの初期設定やシステム面の管理</td></tr><tr><td>事務取扱担当者<br>田中 圭美</td><td>当社規程に従い、Pマークを維持するための特定個人情報の管理</td></tr><tr><td>窓口責任者<br>田中 圭美</td><td>開示請求や苦情等の問合せ対応全般</td></tr></tbody></table></div><br><strong>④PMSに違反した際に予想される結果</strong><br>社会的な信用の失墜<br>・顧客や取引先の信用を失う<br>経済的な損失<br>・再発防止策への投資<br>・本人への補償<br>・業務の停止<br>事業継続へのダメージ<br>・経営状況の悪化<br>従業員が違反した場合<br>・減給、罰金、解雇<br><br><div style="background:#fff1f0; border:2px solid var(--error); padding:15px; border-radius:10px; margin-top:15px;"><div style="background:var(--error); color:white; padding:8px; text-align:center; border-radius:4px; font-weight:bold; margin-bottom:12px;">過去５年間メール誤送信の割合が最も多い</div><strong style="color:var(--error);">危ないと思ったら報告する事</strong><br>・違う人のメールアドレスを選択していないか？<br><br><strong style="color:var(--error);">規則を守る事</strong><br>・不用意にお客様の話はしないようにしましょう。</div>`;
       return "";
     }
-    
+
     document.addEventListener('DOMContentLoaded', () => {
       // 1. ÉP CHẶT INPUT SỐ ĐIỆN THOẠI (Chỉ cho gõ số, tối đa 11 số)
       const phoneInputs = ['authPhone', 'kariPhone', 'kariLandline'];
-      
+
       phoneInputs.forEach(id => {
         const input = document.getElementById(id);
         if (input) {
           // Ép thuộc tính maxlength để không cho gõ lố
           input.setAttribute('maxlength', '11');
-          
+
           input.addEventListener('input', function (e) {
             // Xóa ngay lập tức mọi ký tự không phải số (kể cả dấu -)
             e.target.value = e.target.value.replace(/\D/g, '');
@@ -1790,14 +1790,14 @@
         // Điền tạm vào form cho có dữ liệu (đề phòng auto-login thất bại)
         document.getElementById('authPhone').value = savedPhone;
         document.getElementById('authDob').value = savedDob;
-        
+
         // Hiện vòng xoay Loading ngay lập tức để người dùng không bấm lung tung
         setLoading(true, "自動ログイン中...", "アカウント状態を確認しています");
 
         // Gọi thẳng API SmartLogin
         google.script.run.withSuccessHandler(res => {
           setLoading(false);
-          
+
           if (!res.success) {
             // Nếu API từ chối (VD: Nhân viên vừa bị đuổi, hoặc đổi ngày sinh)
             localStorage.removeItem('alescoPhone');
@@ -1931,9 +1931,9 @@
             email: document.getElementById('kariEmailError'), addr1: document.getElementById('kariAddr1Error'),
             addr2: document.getElementById('kariAddr2Error')
           };
-          
+
           let hasErr = false;
-          
+
           Object.values(el).forEach(input => input && input.classList.remove('input-error'));
           Object.values(err).forEach(errorText => { 
             if (errorText) {
@@ -1944,7 +1944,7 @@
           // Lấy số thuần túy
           const phoneVal = el.phone.value.replace(/\D/g, ""); 
           const landlineVal = el.landline.value.replace(/\D/g, "");
-          
+
           // 👉 LUẬT THÉP: Phải dài 10-11 số VÀ bắt đầu bằng 0
           const isValidPhone = (val) => val.length >= 10 && val.length <= 11 && val.startsWith("0");
 
@@ -1978,7 +1978,7 @@
             err.zip.style.display = 'inline'; 
             hasErr = true; 
           }
-          
+
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           if (!el.email.value.trim() || !emailRegex.test(el.email.value)) { 
             el.email.classList.add('input-error'); 
@@ -1986,10 +1986,10 @@
             err.email.style.display = 'inline'; 
             hasErr = true; 
           }
-          
+
           if (!el.addr1.value.trim()) { el.addr1.classList.add('input-error'); err.addr1.style.display = 'inline'; hasErr = true; }
           if (!el.addr2.value.trim()) { el.addr2.classList.add('input-error'); err.addr2.style.display = 'inline'; hasErr = true; }
-          
+
           if (hasErr) return;
 
           // ==============================
@@ -2000,11 +2000,11 @@
           const originalBtnText = nextBtn.innerText;
           nextBtn.disabled = true;
           nextBtn.innerText = "確認中..."; 
-          
+
           google.script.run.withSuccessHandler(function(isExist) {
             nextBtn.disabled = false;
             nextBtn.innerText = originalBtnText;
-            
+
             if (isExist) {
               if (phoneVal) el.phone.classList.add('input-error');
               if (!phoneVal && landlineVal) el.landline.classList.add('input-error'); 
@@ -2023,7 +2023,7 @@
               nextBtn.innerText = originalBtnText;
               showCustomAlert("通信エラーが発生しました。", true);
           }).checkPhoneExists(phoneToCheck);
-          
+
           return; 
         }
         if (step === 5) {
@@ -2469,7 +2469,7 @@
       document.getElementById('toggleLandlineBtn').style.display = 'none';
       document.getElementById('kariLandline').focus();
     }
-    
+
     window.addEventListener("focus", () => {
       if (currentUser && document.getElementById('viewMyPage').classList.contains('active')) {
         console.log("Tab được focus lại, kiểm tra cập nhật...");
@@ -2583,28 +2583,28 @@
     function showCustomAlert(msg, type = 'success') {
       const toast = document.getElementById('toastAlert');
       const toastMsg = document.getElementById('toastMessage');
-    
+
       toast.style.background = '#ffffff'; 
       toast.style.borderRadius = '50px';
       toast.style.boxShadow = '0 6px 16px rgba(0,0,0,0.12)';
-    
+
+      // Hỗ trợ 3 màu theo trạng thái (Truyền true vẫn hiểu là Lỗi cho tương thích code cũ)
       if (type === true || type === 'error') {
-        toast.style.color = 'var(--md-error)'; 
+        toast.style.color = 'var(--md-error)'; // Đỏ (Lỗi)
       } else if (type === 'info') {
-        toast.style.color = 'var(--md-primary)'; 
+        toast.style.color = 'var(--md-primary)'; // Xanh dương (Hướng dẫn / Trung lập)
       } else {
-        toast.style.color = '#107c41'; 
+        toast.style.color = '#107c41'; // Xanh lá (Thành công)
       }
-    
-      // 👉 ĐÃ VÁ LỖI: Nếu msg bị rỗng thì tự động gán chuỗi mặc định, tránh bị sập replace
-      var safeMsg = msg ? String(msg) : "処理が完了しました。";
-      toastMsg.innerHTML = safeMsg.replace(/\n/g, '<br>');
-    
+
+      toastMsg.innerHTML = msg.replace(/\n/g, '<br>');
+      toast.style.display = 'block';
+
       if(toastTimer) clearTimeout(toastTimer);
-    
+
       toast.style.top = '-100px'; 
       setTimeout(() => { toast.style.top = '30px'; }, 10); 
-    
+
       toastTimer = setTimeout(() => { 
         toast.style.top = '-100px'; 
         setTimeout(() => { toast.style.display = 'none'; }, 300); 
@@ -2626,6 +2626,9 @@
         if (isNaN(commuteFee) || commuteFee < 0) { showCustomAlert("交通費は有効な半角数字で入力してください。", true); return; }
       }
 
+      // ===============================================
+      // 👉 KHÓA NÚT VÀ HIỆN CHỮ CHỜ LẤY VỊ TRÍ
+      // ===============================================
       const btnIn = document.getElementById('btnCheckIn');
       const btnOut = document.getElementById('btnCheckOut');
       const statusBox = document.getElementById('attStatusBox');
@@ -2643,11 +2646,15 @@
         btnOut.innerText = "位置情報を取得中..."; 
       }
 
+      // ===============================================
+      // 👉 TƯỜNG LỬA GPS (BẮT TỌA ĐỘ VÀ KIỂM TRA KHOẢNG CÁCH)
+      // ===============================================
       getCurrentPosition().then(position => {
           const userLat = position.coords.latitude;
           const userLng = position.coords.longitude;
-          const targetLoc = locationCoordsObj[locationName];
           
+          const targetLoc = locationCoordsObj[locationName];
+
           if (targetLoc && targetLoc.lat && targetLoc.lng) {
             const distance = calculateDistance(userLat, userLng, targetLoc.lat, targetLoc.lng);
             const allowedRadius = targetLoc.radius ? parseFloat(targetLoc.radius) : 300; 
@@ -2657,12 +2664,17 @@
                btnIn.innerText = originInText; 
                btnOut.disabled = (type === '出勤');
                btnOut.innerText = originOutText;
+
                let distanceStr = Math.round(distance);
                showCustomAlert(`⚠️ エラー：勤務地から離れすぎています！\n現在地から約 ${distanceStr}m 離れています。\n指定の場所（許容 ${allowedRadius}m）に移動してから打刻してください。`, true);
+               showCustomAlert(`⚠️ エラー：勤務地から離れすぎています！\n現在地から約 ${distanceStr}m 離れています。\n指定 of 場所（許容 ${allowedRadius}m）に移動してから打刻してください。`, true);
                return; 
             }
           }
 
+          // ===============================================
+          // VƯỢT QUA KIỂM TRA -> CẬP NHẬT UI SIÊU TỐC VÀ GHI XUỐNG SHEET
+          // ===============================================
           const now = new Date();
           const timeStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
 
@@ -2673,8 +2685,9 @@
              statusBox.style.background = 'var(--status-ok-bg)';
              statusBox.style.color = 'var(--status-ok-txt)';
              feeGroup.style.display = 'block';
+             locSelect.disabled = true; // Đi làm thì khóa địa điểm
              locSelect.disabled = true; 
-             
+
              btnIn.disabled = true; 
              btnIn.classList.replace('btn-primary', 'btn-outline');
              btnIn.innerText = originInText;
@@ -2686,9 +2699,11 @@
              showCustomAlert("退勤時間を記録しました。\nお疲れ様でした！");
              statusBox.style.display = 'none';
              feeGroup.style.display = 'none';
-             
+
+             // 👉 FIX Ở ĐÂY: Mở khóa và reset ô chọn địa điểm khi tan ca
              locSelect.disabled = false; 
              locSelect.innerHTML = '<option value="" disabled selected>勤務地を選択してください</option>';
+             // Gọi lại hàm lấy danh sách địa điểm để nạp lại menu (cho chắc chắn)
              if (currentUser && currentUser.allowedLocIds) {
                 google.script.run.withSuccessHandler(locations => {
                    let options = '<option value="" disabled selected>勤務地を選択してください</option>';
@@ -2706,22 +2721,37 @@
              btnOut.innerText = originOutText;
           }
 
-          // Gọi Backend chạy ngầm (Có bẫy log chống lỗi)
+          // ===============================================
+          // 👉 BẪY LỖI SIÊU CẤP ĐƯỢC THIẾT LẬP Ở ĐÂY
+          // ===============================================
           google.script.run.withSuccessHandler(res => {
-             // 👉 KÍNH HIỂN VI SOI PHẢN HỒI THỰC TẾ TỪ SERVER
-             alert("【SERVER PHẢN HỒI THỰC TẾ】\n" + JSON.stringify(res));
-
-             if(res && res.success) {
+             if(res.success) {
                 if (!currentUser.attendanceInfo) currentUser.attendanceInfo = {};
                 currentUser.attendanceInfo.status = res.newStatus;
                 if (type === '退勤') currentUser.attendanceInfo.lastCommuteFee = commuteFeeInput;
              } else {
-                rollbackUI(res ? res.message : "APIエラー"); 
+                rollbackUI(res.message); 
+             try {
+                if(res.success) {
+                   if (!currentUser.attendanceInfo) currentUser.attendanceInfo = {};
+                   currentUser.attendanceInfo.status = res.newStatus;
+                   if (type === '退勤') currentUser.attendanceInfo.lastCommuteFee = commuteFeeInput;
+                } else {
+                   rollbackUI(res.message); 
+                }
+             } catch (successErr) {
+                // Nếu lỗi xảy ra ngay trong hàm thành công (do sếp chưa sửa các chỗ khác)
+                alert("【THÀNH CÔNG NHƯNG LỖI FRONTEND】\nMessage: " + successErr.message + "\nStack: " + successErr.stack);
              }
           }).withFailureHandler(err => {
-             // 👉 BẪY LỖI SẬP MẠNG HOẶC SERVER CRASH ĐẬP THẲNG RA MÀN HÌNH
-             alert("【SERVER CRASH HOẶC LỖI ĐƯỜNG TRUYỀN】\n" + String(err));
-             rollbackUI("通信エラー: " + (err.message || err));
+             rollbackUI("通信エラー: " + err.message);
+             try {
+                // Nếu lỗi từ Server gửi về hoặc lỗi đứt mạng
+                alert("【THẤT BẠI HOẶC LỖI TỪ SERVER】\nString: " + String(err) + "\nMessage: " + err.message + "\nStack: " + err.stack);
+                rollbackUI("通信エラー: " + (err.message || err));
+             } catch (failErr) {
+                alert("【CRASH TRONG FAILURE HANDLER】\nMessage: " + failErr.message);
+             }
           }).submitAttendanceToOldApp(currentUser.id, currentUser.name, type, locationName, userLat, userLng, commuteFee);
 
       }).catch(err => {
@@ -3158,7 +3188,7 @@
     function finalizeAndMoveToAttendance() {
       document.getElementById('finalSuccessPopup').style.display = 'none';
       setLoading(true, "データを最終同期しています...");
-      
+
       // Gọi lại API ép Google quét sạch Sheet lần nữa (Giải quyết triệt để Cache lỏ của Google)
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
@@ -3173,7 +3203,7 @@
         }
       }).getUserStatusById(currentUser.id);
     }
-    
+
   </script>
 </body>
 </html>
