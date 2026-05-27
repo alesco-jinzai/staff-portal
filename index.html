@@ -466,7 +466,7 @@
           <p class="error-message" id="kariCheckError">「同意します」にチェックを入れてください。</p>
           <div class="btn-group">
             <button class="btn btn-primary" onclick="nextKariStep(2)">次へ</button>
-            <button class="btn btn-gray" onclick="showView('viewAuth')">戻る</button>
+            <button class="btn btn-gray" onclick="localStorage.removeItem('alescoPhone'); localStorage.removeItem('alescoDob'); showView('viewAuth')">戻る</button>
           </div>
         </div>
         <div id="kariStep2" style="display:none;">
@@ -643,7 +643,7 @@
           </div>
           <div class="btn-group">
             <button class="btn btn-primary" onclick="nextHonStep(2)">次へ</button>
-            <button class="btn btn-gray" onclick="showView('viewHonLogin')">戻る</button>
+            <button class="btn btn-gray" onclick="localStorage.removeItem('alescoPhone'); localStorage.removeItem('alescoDob'); resetHonForm(); showView('viewAuth')">戻る</button>
           </div>
         </div>
         <div id="honStep2" style="display:none;">
@@ -2246,7 +2246,7 @@
         }).createKariRecord(formData);
       } catch (e) {
         setLoading(false);
-        console.error(e);
+        showCustomAlert("予期しないエラーが発生しました: " + e.message, true);
       }
     }
 
