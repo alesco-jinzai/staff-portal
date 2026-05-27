@@ -1290,7 +1290,7 @@
       }
       else if (id === 'mynumber') {
         title.innerText = '4. マイナンバー提供';
-        const isForeigner = (currentUser.nationality === "外国籍");
+        const isForeigner = (currentUser.nationality !== '日本');
         let warningText = isForeigner ? "" : `<div style="font-size:12px; background:#e8f0fe; color:var(--primary-dark); padding:10px; border-radius:8px; margin-bottom:15px;">💡「マイナンバーカード（写真付き）」をご提出いただいた場合、「本人確認書類」の提出は不要となります。</div>`;
         content.innerHTML = historyHtml + warningText + `
           <div class="form-group">
