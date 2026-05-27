@@ -736,7 +736,7 @@
         <div id="taskList"></div>
         <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
           <button id="mpBtnBack" class="btn btn-gray" onclick="routeUser()">戻る</button>
-          <button class="btn btn-gray" onclick="currentUser = null; resetHonForm(); resetKariForm(); showView('viewAuth');">ログアウト</button>
+          <button class="btn btn-gray" onclick="localStorage.removeItem('alescoPhone'); localStorage.removeItem('alescoDob'); currentUser = null; resetHonForm(); resetKariForm(); showView('viewAuth');">ログアウト</button>
         </div>
       </div>
       <div id="viewRegSuccess" class="view">
@@ -857,7 +857,7 @@
         </div>
         <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
           <button class="btn btn-gray" onclick="renderMyPage()">登録情報・書類</button>
-          <button class="btn btn-gray" onclick="currentUser = null; resetHonForm(); resetKariForm(); showView('viewAuth');">ログアウト</button>
+          <button class="btn btn-gray" onclick="localStorage.removeItem('alescoPhone'); localStorage.removeItem('alescoDob'); currentUser = null; resetHonForm(); resetKariForm(); showView('viewAuth');">ログアウト</button>
         </div>
       </div>
       <div id="viewShift" class="view">
@@ -1016,6 +1016,10 @@
           return;
         }
 
+        // 👉 ĐÃ THÊM: Lưu thông tin đăng nhập thành công vào bộ nhớ máy
+        localStorage.setItem('alescoPhone', phoneVal);
+        localStorage.setItem('alescoDob', dobInput.value);
+        
         if (res.route === "step1") {
           // Người mới: Chuyển sang form CV, điền sẵn SĐT và Ngày sinh cho họ
           resetKariForm();
@@ -1764,6 +1768,62 @@
           });
         }
       });
+
+      // 👉 ĐÃ THÊM: TÍNH NĂNG AUTO-LOGIN KHI VỪA MỞ APP
+      const savedPhone = localStorage.getItem('alescoPhone');
+      const savedDob = localStorage.getItem('alescoDob');
+
+      if (savedPhone && savedDob) {
+        // Điền tạm vào form cho có dữ liệu (đề phòng auto-login thất bại)
+        document.getElementById('authPhone').value = savedPhone;
+        document.getElementById('authDob').value = savedDob;
+        
+        // Hiện vòng xoay Loading ngay lập tức để người dùng không bấm lung tung
+        setLoading(true, "自動ログイン中...", "アカウント状態を確認しています");
+
+        // Gọi thẳng API SmartLogin
+        google.script.run.withSuccessHandler(res => {
+          setLoading(false);
+          
+          if (!res.success) {
+            // Nếu API từ chối (VD: Nhân viên vừa bị đuổi, hoặc đổi ngày sinh)
+            localStorage.removeItem('alescoPhone');
+            localStorage.removeItem('alescoDob');
+            document.getElementById('authError').innerText = "セッションが切れました。再度ログインしてください。";
+            document.getElementById('authError').style.display = 'block';
+            return;
+          }
+
+          // NẾU THÀNH CÔNG: Chạy y hệt logic điều hướng của nút Đăng nhập!
+          if (res.route === "step1") {
+            resetKariForm();
+            document.getElementById('kariPhone').value = savedPhone;
+            document.getElementById('kariDob').value = savedDob;
+            showView('viewKari');
+            showCustomAlert("初めての登録ですね。\nプロフィールを入力してください。", "info");
+          } else if (res.route === "step2") {
+            pendingKariData = res.kariData;
+            pendingKariRowIndex = res.kariRowIndex;
+            document.getElementById('honConfirmName').innerText = pendingKariData.nameKanji.replace(/\//g, ' ') + " 様";
+            showView('viewHonRegister');
+            nextHonStep(1); 
+            showCustomAlert("入社手続きへ進みます。", "info");
+          } else if (res.route === "mypage") {
+            currentUser = res.user;
+            renderMyPage();
+            showCustomAlert("未提出の書類があります。\n提出を完了させてください。", true);
+            prefetchData(); 
+          } else if (res.route === "attendance") {
+            currentUser = res.user;
+            renderMyPage(); 
+            renderAttendanceView();
+            showCustomAlert("自動ログインしました。");
+          }
+        }).withFailureHandler(err => {
+          setLoading(false);
+          // Lỗi mạng thì im lặng ở lại màn hình Login
+        }).smartLogin(savedPhone, savedDob);
+      }
     });
 
     window.nextKariStep = function(step) {
@@ -1858,52 +1918,84 @@
             email: document.getElementById('kariEmailError'), addr1: document.getElementById('kariAddr1Error'),
             addr2: document.getElementById('kariAddr2Error')
           };
+          
           let hasErr = false;
+          
           Object.values(el).forEach(input => input && input.classList.remove('input-error'));
           Object.values(err).forEach(errorText => { 
             if (errorText) {
               errorText.style.display = 'none'; 
-              if (errorText.id === 'kariPhoneError') errorText.innerText = "（いずれか一方は入力必須です）"; 
             }
           });
+
+          // Lấy số thuần túy
           const phoneVal = el.phone.value.replace(/\D/g, ""); 
           const landlineVal = el.landline.value.replace(/\D/g, "");
           
+          // 👉 LUẬT THÉP: Phải dài 10-11 số VÀ bắt đầu bằng 0
+          const isValidPhone = (val) => val.length >= 10 && val.length <= 11 && val.startsWith("0");
+
           if (!phoneVal && !landlineVal) {
-            el.phone.classList.add('input-error'); el.landline.classList.add('input-error');
-            err.phone.innerText = "（いずれか必須）";
-            err.phone.style.display = 'inline'; hasErr = true;
+            el.phone.classList.add('input-error'); 
+            el.landline.classList.add('input-error');
+            err.phone.innerText = "※いずれか必須です";
+            err.phone.style.display = 'inline'; 
+            hasErr = true;
           } else {
-            // Check nếu có nhập mà độ dài nhỏ hơn 10 số -> Báo lỗi
-            if (phoneVal && phoneVal.length < 10) {
+            // Check lỗi Di động
+            if (phoneVal && !isValidPhone(phoneVal)) {
               el.phone.classList.add('input-error');
-              err.phone.innerText = "（有効な番号を入力してください）";
-              err.phone.style.display = 'inline'; hasErr = true;
+              err.phone.innerText = "※0から始まる10〜11桁で入力してください";
+              err.phone.style.display = 'inline'; 
+              hasErr = true;
             }
-            if (landlineVal && landlineVal.length < 10) {
+            // Check lỗi Máy bàn
+            if (landlineVal && !isValidPhone(landlineVal)) {
               el.landline.classList.add('input-error');
-              err.phone.innerText = "（有効な番号を入力してください）";
-              err.phone.style.display = 'inline'; hasErr = true;
+              err.phone.innerText = "※0から始まる10〜11桁で入力してください";
+              err.phone.style.display = 'inline'; 
+              hasErr = true;
             }
           }
-          if (!el.zip.value.trim() || el.zip.value.length < 8) { el.zip.classList.add('input-error'); err.zip.style.display = 'inline'; hasErr = true; }
+
+          // Check Zipcode (Chỉ đếm số, chuẩn 7 số)
+          if (!el.zip.value.trim() || el.zip.value.replace(/\D/g, "").length !== 7) { 
+            el.zip.classList.add('input-error'); 
+            err.zip.innerText = "※7桁で入力してください"; 
+            err.zip.style.display = 'inline'; 
+            hasErr = true; 
+          }
+          
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (!el.email.value.trim() || !emailRegex.test(el.email.value)) { el.email.classList.add('input-error'); err.email.style.display = 'inline'; hasErr = true; }
+          if (!el.email.value.trim() || !emailRegex.test(el.email.value)) { 
+            el.email.classList.add('input-error'); 
+            err.email.innerText = "※正しい形式で入力してください"; 
+            err.email.style.display = 'inline'; 
+            hasErr = true; 
+          }
+          
           if (!el.addr1.value.trim()) { el.addr1.classList.add('input-error'); err.addr1.style.display = 'inline'; hasErr = true; }
           if (!el.addr2.value.trim()) { el.addr2.classList.add('input-error'); err.addr2.style.display = 'inline'; hasErr = true; }
+          
           if (hasErr) return;
+
+          // ==============================
+          // XỬ LÝ GỌI API KHI DỮ LIỆU ĐÃ CHUẨN
+          // ==============================
           const phoneToCheck = phoneVal ? phoneVal : landlineVal;
           const nextBtn = document.querySelector('#kariStep3 .btn-primary');
           const originalBtnText = nextBtn.innerText;
           nextBtn.disabled = true;
           nextBtn.innerText = "確認中..."; 
+          
           google.script.run.withSuccessHandler(function(isExist) {
             nextBtn.disabled = false;
             nextBtn.innerText = originalBtnText;
+            
             if (isExist) {
               if (phoneVal) el.phone.classList.add('input-error');
               if (!phoneVal && landlineVal) el.landline.classList.add('input-error'); 
-              err.phone.innerText = "（この電話番号は既に登録されています）"; 
+              err.phone.innerText = "※この電話番号は既に登録されています"; 
               err.phone.style.display = 'inline';
               (phoneVal ? el.phone : el.landline).scrollIntoView({ behavior: 'smooth', block: 'center' });
             } else {
@@ -1918,6 +2010,7 @@
               nextBtn.innerText = originalBtnText;
               showCustomAlert("通信エラーが発生しました。", true);
           }).checkPhoneExists(phoneToCheck);
+          
           return; 
         }
         if (step === 5) {
