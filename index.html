@@ -922,14 +922,31 @@
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxC71cAofv5QXr-pjKkmK8ehgNzo4M5wRMMjtG1enU-5w62j0slyK56XJtDvMimAlvE/exec";
 
     class GASRunner {
-      constructor() { this.successCb = null; this.failureCb = null; }
-      withSuccessHandler(cb) { this.successCb = cb; return this.getProxy(); }
-      withFailureHandler(cb) { this.failureCb = cb; return this.getProxy(); }
+      // 1. Cho phép truyền callback vào ngay khi khởi tạo
+      constructor(successCb = null, failureCb = null) { 
+        this.successCb = successCb; 
+        this.failureCb = failureCb; 
+      }
+    
+      // 2. Mỗi lần chain (.withSuccessHandler), tạo ra một Object mới hoàn toàn
+      withSuccessHandler(cb) { 
+        return new GASRunner(cb, this.failureCb).getProxy(); 
+      }
+      
+      withFailureHandler(cb) { 
+        return new GASRunner(this.successCb, cb).getProxy(); 
+      }
+    
       getProxy() {
         return new Proxy(this, {
           get: (target, prop) => {
             if (prop === 'withSuccessHandler' || prop === 'withFailureHandler') return target[prop].bind(target);
+            
             return (...args) => {
+              // BẮT CỨNG callback hiện tại vào biến cục bộ (Chống bị ghi đè khi gọi nhiều API cùng lúc)
+              const sCb = target.successCb;
+              const fCb = target.failureCb;
+              
               fetch(GAS_WEB_APP_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
@@ -937,16 +954,31 @@
               })
               .then(response => response.json())
               .then(data => {
-                if (data.error) { if (target.failureCb) target.failureCb(data.error); else console.error(data.error); } 
-                else { if (target.successCb) target.successCb(data.result); }
+                if (data.error) { 
+                  if (fCb) fCb(data.error); 
+                  else console.error(data.error); 
+                } else { 
+                  if (sCb) sCb(data.result); 
+                }
               })
-              .catch(err => { if (target.failureCb) target.failureCb(err); else console.error(err); });
+              .catch(err => { 
+                if (fCb) fCb(err); 
+                else console.error(err); 
+              });
             };
           }
         });
       }
     }
-    const google = { script: { run: new GASRunner().getProxy() } };
+    
+    // 3. ĐIỂM QUAN TRỌNG NHẤT: Dùng Getters để mỗi lần gọi 'google.script.run' là đẻ ra 1 luồng mới
+    const google = { 
+      script: { 
+        get run() { 
+          return new GASRunner().getProxy(); 
+        } 
+      } 
+    };
     let currentUser = null;
     window.showView = function(id) {
       if (id === 'viewAuth') {
