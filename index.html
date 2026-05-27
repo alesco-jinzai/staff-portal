@@ -2597,7 +2597,7 @@
         toast.style.color = '#107c41'; // Xanh lá (Thành công)
       }
 
-      toastMsg.innerHTML = msg.replace(/\n/g, '<br>');
+      toastMsg.innerHTML = String(msg || "不明なエラーが発生しました").replace(/\n/g, '<br>');
       toast.style.display = 'block';
 
       if(toastTimer) clearTimeout(toastTimer);
@@ -2714,7 +2714,7 @@
                    currentUser.attendanceInfo.status = res.newStatus;
                    if (type === '退勤') currentUser.attendanceInfo.lastCommuteFee = commuteFeeInput;
                 } else {
-                   rollbackUI(res.message); 
+                   rollbackUI(res.message || res.error || "通信に失敗しました。もう一度お試しください。");
                 }
              } catch (successErr) {
                 alert("【THÀNH CÔNG NHƯNG LỖI FRONTEND】\nMessage: " + successErr.message + "\nStack: " + successErr.stack);
