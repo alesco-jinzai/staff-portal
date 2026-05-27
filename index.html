@@ -1140,6 +1140,18 @@
       let isMainEmployee = (currentUser.employmentType === 'メイン');
       let needsFuyo = (isMainEmployee && fuyoStatus.indexOf('提出済') === -1);
       document.getElementById('shinkokushoAlert').style.display = needsFuyo ? 'block' : 'none';
+      // 👉 ĐÃ THÊM: Hiện thông báo hướng dẫn nộp bổ sung nếu đã hoàn thành 100%
+      let extraNoticeHtml = '';
+      if (isFullyOnboarded) {
+         extraNoticeHtml = `
+            <div style="background:#F4F9FD; border:1px solid #D1E4FF; border-radius:12px; padding:12px 16px; margin-bottom:20px;">
+               <p style="margin:0; font-size:12px; color:#004577; line-height:1.5;">
+                 <strong>💡 各種書類の更新・追加提出について</strong><br>
+                 「完了」となっている項目でも、タップすると再度ファイルをアップロードできます。在留カードの更新や振込先の変更がある場合は、該当項目を選択して最新の書類をご提出ください。
+               </p>
+            </div>
+         `;
+      }
       const isForeigner = (currentUser.nationality !== '日本');
       const idTitle = isForeigner ? '在留カード' : '本人確認書類';
       let myNumDesc = "マイナンバーカード、通知カード、またはマイナンバー入り住民票を提出してください。";
@@ -1169,7 +1181,7 @@
           ...allPossibleTasks.filter(t => ['mynumber', 'id', 'bank', 'fuyo'].includes(t.id)),
           ...allPossibleTasks.filter(t => !['mynumber', 'id', 'bank', 'fuyo'].includes(t.id))
       ];
-      let html = '';
+      let html = extraNoticeHtml; // Nhét cái thông báo đó lên đầu tiên
       sortedTasks.forEach(t => {
         let statusText = t.status || "";
         let isSkipped = statusText.includes('提出不要');
