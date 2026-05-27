@@ -955,6 +955,11 @@
       }
     };
 
+    function safeCleanName(nameStr) {
+      if (!nameStr) return "---"; // Nếu tên rỗng thì hiện gạch ngang, không báo lỗi
+      return String(nameStr).replace(/\//g, ' ');
+    }
+    
     function searchAddress() {
       const zip = document.getElementById('regZip').value.replace(/[^0-9]/g, "");
       if(zip.length !== 7) return alert("郵便番号は7桁で入力してください。"); 
@@ -1044,7 +1049,7 @@
           // Được duyệt đỗ: Chuyển sang form Ký hợp đồng
           pendingKariData = res.kariData;
           pendingKariRowIndex = res.kariRowIndex;
-          document.getElementById('honConfirmName').innerText = pendingKariData.nameKanji.replace(/\//g, ' ') + " 様";
+          document.getElementById('honConfirmName').innerText = safeCleanName(pendingKariData.nameKanji) + " 様";
           showView('viewHonRegister');
           nextHonStep(1); 
           showCustomAlert("入社手続きへ進みます。", "info");
@@ -1072,7 +1077,7 @@
 
     function renderMyPage() {
       showView('viewMyPage');
-      document.getElementById('mpUserName').innerText = currentUser.name.replace(/\//g, ' ') + " 様";
+      document.getElementById('mpUserName').innerText = safeCleanName(currentUser.name) + " 様";
       document.getElementById('mpUserType').innerText = currentUser.employmentType;
     
       // 👉 THÊM ĐOẠN NÀY: Tự động ẩn/hiện nút Quay lại
@@ -2520,7 +2525,7 @@
 
     function renderAttendanceView() {
       showView('viewAttendance');
-      document.getElementById('attUserName').innerText = currentUser.name.replace(/\//g, ' ') + " 様";
+      document.getElementById('attUserName').innerText = safeCleanName(currentUser.name) + " 様";
       startClock();
       getCurrentPosition().then(pos => { cachedPosition = pos; }).catch(e => { console.log("Lấy GPS ngầm thất bại:", e); });
       const locSelect = document.getElementById('attLocationSelect');
@@ -3100,7 +3105,7 @@
         } else { 
           showCustomAlert(res.message, true); 
         }
-      }).submitShiftRequestsWithNotes(currentUser.id, currentUser.name.replace(/\//g, " "), reqAdd, reqDel, notes, shiftYear, shiftMonth);
+      }).submitShiftRequestsWithNotes(currentUser.id, safeCleanName(currentUser.name), reqAdd, reqDel, notes, shiftYear, shiftMonth);
     }
     function showKakuteiView() {
       const now = new Date(); shiftYear = now.getFullYear(); shiftMonth = now.getMonth() + 1;
