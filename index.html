@@ -910,6 +910,22 @@
         <div id="kakuteiListContainer" class="scroll-box" style="padding:12px; height: 60vh;"></div>
         <button class="btn btn-gray" style="margin-top:20px;" onclick="showView('viewShift')">シフト管理に戻る</button>
       </div>
+
+      <!-- ============================================== -->
+      <!-- POP-UP: CHỜ XÁC NHẬN GOOGLE FORM FUYO          -->
+      <!-- ============================================== -->
+      <div id="fuyoWaitModal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.95); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+        <div class="spinner" style="border-top-color: var(--md-secondary); width: 60px; height: 60px;"></div>
+        <h3 style="color: var(--md-secondary); margin-top: 20px;">申告書の提出をお待ちしています...</h3>
+        <p style="color: #666; font-size: 14px; text-align: center; line-height: 1.6; margin-bottom: 30px;">
+          別のタブで開いた入力フォームを完了させてください。<br>
+          完了後、この画面は<b>自動的に切り替わります</b>。
+        </p>
+        <button class="btn btn-outline" style="width: auto; padding: 0 30px;" onclick="cancelFuyoPolling()">
+          あとで提出する (キャンセル)
+        </button>
+      </div>
+      
     </div>
   </div>
   <script>
@@ -1499,6 +1515,9 @@
       }
     }
 
+    let fuyoPollingTimer = null;
+    let fuyoPollCount = 0;
+    
     function openFuyoForm() {
       const baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdbGr6tn2GQ6a7Fyg8v6IxN1Uies_Q35EWoehULIgrXGifkXA/viewform";
       const entry_Kanji = "entry.971256660";
@@ -1506,8 +1525,10 @@
       const entry_Dob   = "entry.1086113988";
       const entry_Zip   = "entry.1909395110";
       const entry_Addr  = "entry.426383806";
+      
       const cleanName = currentUser.name ? currentUser.name.replace(/\//g, ' ') : '';
       const cleanKana = currentUser.kana ? currentUser.kana.replace(/\//g, ' ') : '';
+      
       let dobFormatted = "";
       if (currentUser.dob) {
         const dObj = new Date(currentUser.dob); 
@@ -1516,13 +1537,58 @@
         const d = String(dObj.getDate()).padStart(2, '0');
         dobFormatted = `${y}-${m}-${d}`;
       }
+      
       let url = baseUrl + "?usp=pp_url";
       url += `&${entry_Kanji}=${encodeURIComponent(cleanName)}`;
       url += `&${entry_Kana}=${encodeURIComponent(cleanKana)}`;
       url += `&${entry_Dob}=${dobFormatted}`;
       url += `&${entry_Zip}=${encodeURIComponent(currentUser.zip || '')}`;
       url += `&${entry_Addr}=${encodeURIComponent(currentUser.addr || '')}`;
+      
+      // 1. Mở Form sang tab mới
       window.open(url, '_blank');
+    
+      // 2. Hiện màn hình chờ tại Tab hiện tại
+      document.getElementById('fuyoWaitModal').style.display = 'flex';
+      
+      // 3. Khởi động hệ thống "Ping" (Polling) âm thầm gọi xuống server
+      fuyoPollCount = 0;
+      if (fuyoPollingTimer) clearInterval(fuyoPollingTimer);
+      
+      fuyoPollingTimer = setInterval(() => {
+        fuyoPollCount++;
+        // Nếu treo quá 15 phút (180 lần * 5s) tự động ngắt để đỡ tốn tài nguyên
+        if (fuyoPollCount > 180) {
+          cancelFuyoPolling();
+          return;
+        }
+    
+        google.script.run.withSuccessHandler(res => {
+          // Nếu Backend trả về thành công và Status đã đổi thành nộp xong
+          if (res.success && res.user && res.user.statusFuyo.indexOf('提出済') > -1) {
+            
+            clearInterval(fuyoPollingTimer); // Tắt ping
+            document.getElementById('fuyoWaitModal').style.display = 'none'; // Tắt màn hình chờ
+            
+            currentUser = res.user; // Cập nhật data mới nhất
+            
+            // KIỂM TRA: Nộp Fuyo xong có đạt 100% không?
+            if (currentUser.progress && currentUser.progress.indexOf("完了") > -1) {
+              document.getElementById('finalSuccessPopup').style.display = 'flex'; // Khóa màn hình 100%
+            } else {
+              renderMyPage(); // Load lại giao diện MyPage
+              showCustomAlert("扶養控除等申告書の提出を確認しました。");
+            }
+          }
+        }).getUserStatusById(currentUser.id);
+    
+      }, 5000); // Chọc xuống server 5 giây / 1 lần
+    }
+    
+    // Hàm để user chủ động hủy vòng lặp nếu họ không muốn điền Form nữa
+    function cancelFuyoPolling() {
+      if (fuyoPollingTimer) clearInterval(fuyoPollingTimer);
+      document.getElementById('fuyoWaitModal').style.display = 'none';
     }
 
     function submitSignature(type) {
