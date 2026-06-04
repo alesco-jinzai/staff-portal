@@ -47,7 +47,7 @@
     }
     .app-shell { 
       width: 100%; 
-      max-width: 600px; /* Nới rộng ra một chút cho thoáng, nếu mở trên iPad vẫn đẹp */
+      max-width: 600px;
       margin: 0 auto; 
       background: transparent; 
       min-height: 100vh; 
@@ -60,8 +60,8 @@
       padding: 20px 20px; 
       border-bottom: 2px solid var(--md-primary-container); 
       text-align: center; 
-      position: sticky; top: 0; z-index: 1000; /* Dính chặt trên nóc */
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05); /* Đổ bóng nhẹ cho đẹp */
+      position: sticky; top: 0; z-index: 1000;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
     header h1 { font-size: 20px; color: var(--md-primary); margin: 0; font-weight: 900; letter-spacing: 0.5px;}
     .content { padding: 24px; flex: 1; }
@@ -74,7 +74,7 @@
       display: flex; align-items: center; justify-content: center;
       width: 100%; height: 50px; 
       border: none; 
-      border-radius: var(--shape-full); /* Viên thuốc đặc trưng của M3 */
+      border-radius: var(--shape-full);
       font-size: 15px; font-weight: 500; letter-spacing: 0.5px;
       cursor: pointer; margin-bottom: 16px; 
       transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
@@ -129,7 +129,7 @@
       width: 100%; 
       height: 54px; 
       padding: 0 16px; 
-      background: var(--md-surface-container); /* Ép nền trắng cho đẹp */
+      background: var(--md-surface-container);
       border: 1px solid var(--md-outline); 
       border-radius: var(--shape-medium);
       font-size: 16px; 
@@ -153,7 +153,7 @@
     .task-card {
       background: var(--md-surface-container); 
       border: 1px solid var(--md-outline-variant); 
-      border-radius: var(--shape-large); /* Góc bo tròn bự 24px đặc trưng M3 */
+      border-radius: var(--shape-large);
       padding: 20px; 
       margin-bottom: 16px; 
       display: flex; align-items: center; justify-content: space-between; 
@@ -1718,16 +1718,14 @@
           return; 
       }
 
-      // Hàm này chuyên trị Form Chữ ký (Từ chối). Upload thì đã nằm ở hàm trên.
+      // 1. NẾU USER CHỌN TỪ CHỐI (KÝ TÊN)
       if (mode === '提供を拒否する') {
         const signInput = document.getElementById('mnRefuseSign');
         const errorMsg = document.getElementById('mnSignError');
 
-        // Reset CSS
         signInput.classList.remove('input-error');
         errorMsg.style.display = 'none';
 
-        // Validate
         if (!signInput.value.trim()) {
           signInput.classList.add('input-error'); 
           errorMsg.style.display = 'inline';      
@@ -1742,19 +1740,17 @@
           if (res.success) {
               currentUser.statusMyNumber = res.newVal;
 
-              // Cập nhật User từ Server
               if (res.user) currentUser = res.user; 
               else if (res.progress) currentUser.progress = res.progress;
 
-              // 👉 FIX LỖI POPUP Ở ĐÂY
               if (currentUser.progress && currentUser.progress.includes("完了")) {
-                  document.getElementById('finalSuccessPopup').style.display = 'flex'; // Hiện khóa màn hình
+                  document.getElementById('finalSuccessPopup').style.display = 'flex'; 
               } else {
                   showCustomAlert("提出が完了しました。");
                   routeUser();
               }
 
-              // Chạy Gen PDF Ngầm không đợi kết quả để tránh lag UI
+              // Chạy Gen PDF Ngầm
               google.script.run.generateMyNumberPdfBackground(currentUser.id); 
           } else {
               showCustomAlert("⚠️ エラーが発生しました。", true);
@@ -1763,6 +1759,11 @@
             setLoading(false);
             showCustomAlert("通信エラーが発生しました。", true);
         }).updateStaffData(currentUser.id, 'mynumber', signInput.value.trim());
+      } 
+      // 2. NẾU USER CHỌN UPLOAD ẢNH (ĐÃ SỬA LỖI Ở ĐÂY 👇)
+      else {
+        // Ném nhiệm vụ sang hàm chuyên Upload ảnh (Hàm này đã xử lý sẵn logic bắt buộc mặt sau của thẻ MyNumber)
+        handleFileUpload('mynumber', mode);
       }
     }
 
