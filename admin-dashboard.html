@@ -90,8 +90,6 @@
           <button class="tab-btn" id="tabArchive" onclick="switchTab(true)">アーカイブ</button>
         </div>
         <button class="btn" onclick="fetchData()">更新</button>
-        <!-- NÚT ĐĂNG XUẤT MÀU ĐỎ -->
-        <button class="btn" onclick="logoutAdmin()" style="background: #c62828;">ログアウト</button>
       </div>
     </div>
 
@@ -269,24 +267,17 @@
       filterData();
     }
 
-    // LẤY DỮ LIỆU + CÓ MẬT KHẨU BẢO MẬT + VƯỢT CORS LOCAL
-    function fetchData(forcePrompt = false) {
-      let pass = localStorage.getItem('alesco_admin_pass');
-
-      if (!pass || forcePrompt) {
-        pass = prompt("管理用パスワードを入力してください：\n(一度入力すると保存されます)");
-        if (!pass) return; 
-      }
-
+    function fetchData() {
       document.getElementById('loading').style.display = 'block';
       document.getElementById('staffTable').style.display = 'none';
       document.getElementById('noData').style.display = 'none';
 
+      // Chú ý: params giờ là mảng rỗng []
       fetch(GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: "getManagerDashboardData", params: [pass] }),
-        redirect: 'follow' // 👉 Lách luật CORS khi chạy ở ổ C:\
+        body: JSON.stringify({ action: "getManagerDashboardData", params: [] }),
+        redirect: 'follow' 
       })
       .then(res => {
         if (!res.ok) throw new Error("サーバーエラーが発生しました (HTTP " + res.status + ")");
@@ -294,8 +285,6 @@
       })
       .then(data => {
         if (data.result && data.result.success) {
-          localStorage.setItem('alesco_admin_pass', pass);
-
           globalStaffData = data.result.data;
           const now = new Date();
           const timeStr = String(now.getHours()).padStart(2,'0') + ":" + String(now.getMinutes()).padStart(2,'0') + ":" + String(now.getSeconds()).padStart(2,'0');
@@ -304,32 +293,18 @@
           buildDynamicDropdowns();
           filterData(); 
         } else {
+          // Xử lý lỗi sạch sẽ hơn
           let errorMsg = data.error || (data.result && data.result.message) || "データが空です";
-          
-          if (errorMsg.includes("パスワードが間違っています") || errorMsg.includes("権限がありません")) {
-            localStorage.removeItem('alesco_admin_pass');
-            alert("パスワードが間違っています。もう一度入力してください。");
-            fetchData(true); 
-          } else {
-            alert("エラーが発生しました: " + errorMsg);
-          }
+          alert("エラーが発生しました: " + errorMsg);
         }
       })
       .catch(err => {
         console.error(err);
-        alert("通信エラー: ネットワーク接続を確認してください。\n(ローカルファイルで実行中の場合、ブラウザのCORS制限か、Googleサーバーが応答していない可能性があります)");
+        alert("通信エラー: ネットワーク接続を確認してください。\n(Googleサーバーが応答していない可能性があります)");
       })
       .finally(() => {
         document.getElementById('loading').style.display = 'none';
       });
-    }
-
-    // ĐĂNG XUẤT XÓA MẬT KHẨU
-    function logoutAdmin() {
-      if (confirm("パスワードをクリアしてログアウトしますか？")) {
-        localStorage.removeItem('alesco_admin_pass');
-        location.reload(); 
-      }
     }
 
     // TẠO DROPDOWN TỰ ĐỘNG (QUỐC TỊCH & NGÔN NGỮ)
