@@ -2629,13 +2629,27 @@
         return;
       }
 
-      // KIỂM TRA: Nếu đã hoàn thành 100% -> Vào Chấm công
+      // 1. Kiểm tra xem User đang đứng ở Màn hình nào
+      const currentActiveView = document.querySelector('.view.active');
+      const isCurrentlyInMyPageOrTask = currentActiveView && (currentActiveView.id === 'viewMyPage' || currentActiveView.id === 'viewTaskDetail');
+
+      // 2. Logic điều hướng thông minh
       if (currentUser.progress && currentUser.progress.indexOf("完了") > -1) {
-        renderAttendanceView(); // Vẽ dữ liệu chấm công
-        showView('viewAttendance'); // Mở màn hình chấm công
+        
+        // Đã 100% NHƯNG đang thao tác ở MyPage -> Cho ở lại MyPage (Để up tiếp file nếu cần)
+        if (isCurrentlyInMyPageOrTask) {
+          renderMyPage();
+          showView('viewMyPage');
+        } 
+        // Nếu vừa Login xong (Hoặc bấm từ Nút Quay lại) -> Vào Chấm công
+        else {
+          renderAttendanceView(); 
+          showView('viewAttendance'); 
+        }
+
       } 
-      // NẾU CHƯA XONG -> Nhốt ở My Page bắt nộp tiếp
       else {
+        // CHƯA 100% -> Bắt buộc nhốt ở MyPage không cho đi đâu
         renderMyPage(); 
         showView('viewMyPage');
       }
@@ -3051,6 +3065,20 @@
         setLoading(false);
         showCustomAlert("通信エラー: " + err.message, true); // Đỏ (BÁO LỖI)
       });
+    }
+
+    function closeManualModal() {
+      document.getElementById('manualModal').style.display = 'none';
+      document.getElementById('manualDate').value = '';
+      document.getElementById('manualIn').value = '';
+      document.getElementById('manualOut').value = '';
+      document.getElementById('manualFee').value = '';
+    }
+
+    function closeShoninModal() {
+      document.getElementById('shoninModal').style.display = 'none';
+      document.getElementById('shoninApproverName').value = '';
+      document.getElementById('shoninPassword').value = '';
     }
 
     let shiftYear = new Date().getFullYear();
