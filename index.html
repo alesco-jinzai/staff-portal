@@ -1473,6 +1473,9 @@
 
       setLoading(true, "アップロード中...", "画像を圧縮・送信しています");
 
+      // 👉 FIX: Lưu lại tiến độ cũ trước khi gọi API
+      const oldProgress = currentUser.progress || ""; 
+
       try {
           const files = { f1: { data: await processImg(inputs[0].files[0]), label: "f1" } };
           if (inputs[1] && inputs[1].files[0]) {
@@ -1483,22 +1486,22 @@
             setLoading(false);
 
             if (res && res.success) {
-              // Cập nhật trạng thái hiển thị ngầm
               if (id === 'id') currentUser.statusID = res.newVal;
               if (id === 'bank') currentUser.statusBank = res.newVal;
               if (id === 'mynumber') currentUser.statusMyNumber = res.newVal;
               if (res.autoIdSkipped) currentUser.statusID = "提出不要 (マイナンバーカード提出済)";
 
-              // Đồng bộ lại cục User Data chuẩn nhất từ Backend trả về
               if (res.user) currentUser = res.user; 
               else if (res.progress) currentUser.progress = res.progress;
 
-              // 👉 FIX LỖI POPUP Ở ĐÂY: KHÔNG ROUTE ĐI NẾU ĐÃ 100%
-              if (currentUser.progress && currentUser.progress.includes("完了")) {
-                  document.getElementById('finalSuccessPopup').style.display = 'flex'; // Khóa màn hình
+              // 👉 FIX: Chỉ hiện Popup nếu CŨ CHƯA XONG mà MỚI ĐÃ XONG
+              const isNewlyCompleted = !oldProgress.includes("完了") && currentUser.progress.includes("完了");
+
+              if (isNewlyCompleted) {
+                  document.getElementById('finalSuccessPopup').style.display = 'flex'; 
               } else {
-                  showCustomAlert("提出が完了しました。"); // Chưa xong thì báo Toast xanh
-                  routeUser(); // Reset về MyPage
+                  showCustomAlert("提出が完了しました。"); 
+                  routeUser(); 
               }
             } else {
               let errMsg = res.message || res.error || "不明なエラーが発生しました";
@@ -1734,6 +1737,9 @@
 
         setLoading(true, "送信中...", "処理しています");
 
+        // 👉 FIX: Lưu lại tiến độ cũ
+        const oldProgress = currentUser.progress || "";
+
         google.script.run.withSuccessHandler(res => {
           setLoading(false);
 
@@ -1743,7 +1749,10 @@
               if (res.user) currentUser = res.user; 
               else if (res.progress) currentUser.progress = res.progress;
 
-              if (currentUser.progress && currentUser.progress.includes("完了")) {
+              // 👉 FIX: Chỉ nổ pháo hoa nếu là LẦN ĐẦU ĐẠT 100%
+              const isNewlyCompleted = !oldProgress.includes("完了") && currentUser.progress.includes("完了");
+
+              if (isNewlyCompleted) {
                   document.getElementById('finalSuccessPopup').style.display = 'flex'; 
               } else {
                   showCustomAlert("提出が完了しました。");
