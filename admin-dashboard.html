@@ -6,14 +6,17 @@
   <title>【管理用】スタッフ進捗確認ダッシュボード</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
+    /* CSS Tối ưu */
     :root { --primary: #0061A4; --bg: #f4f7fc; --surface: #ffffff; --text: #1A1C1E; --border: #e1e3e1; }
     body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+    
     .header-container { background: var(--surface); padding: 20px 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
     .header-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 15px; }
     .header-title-box { display: flex; align-items: baseline; gap: 15px; }
     .header-title-box h1 { margin: 0; font-size: 22px; color: var(--primary); }
     .header-title-box p { margin: 0; font-size: 13px; color: #666; font-weight: bold; }
     .header-actions { display: flex; align-items: center; gap: 15px; }
+    
     .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; width: 100%; }
     .tab-group { display: flex; background: #e1e3e1; border-radius: 8px; overflow: hidden; margin: 0; }
     .tab-btn { border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; background: transparent; color: #444; transition: 0.2s; font-size: 14px; }
@@ -22,6 +25,7 @@
     input[type="text"]:focus, select:focus { border-color: var(--primary); }
     .btn { background: var(--primary); color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; margin: 0;}
     .btn:hover { background: #004d82; }
+    
     table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
     th, td { padding: 15px 20px; text-align: left; border-bottom: 1px solid var(--border); }
     th { background: #e8f0fe; color: var(--primary); font-size: 14px; white-space: nowrap;}
@@ -38,8 +42,10 @@
     #loading { text-align: center; padding: 50px; font-size: 16px; color: #666; font-weight: bold; }
     .spinner { border: 4px solid rgba(0,0,0,0.1); border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+    /* MODAL */
     #detailModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-    .modal-content { background: #f8f9fa; width: 90%; max-width: 700px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; }
+    .modal-content { background: #f8f9fa; width: 90%; max-width: 750px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; position: relative;}
     .modal-header { background: var(--primary); color: white; padding: 25px 30px; display: flex; justify-content: space-between; align-items: flex-start; }
     .modal-header-left { display: flex; flex-direction: column; gap: 8px; flex: 1; }
     .modal-header h2 { margin: 0; font-size: 24px; font-weight: 700; line-height: 1.2; }
@@ -71,6 +77,7 @@
   </style>
 </head>
 <body>
+
   <div class="header-container">
     <div class="header-top">
       <div class="header-title-box">
@@ -83,15 +90,20 @@
           <button class="tab-btn" id="tabArchive" onclick="switchTab(true)">アーカイブ</button>
         </div>
         <button class="btn" onclick="fetchData()">更新</button>
+        <!-- NÚT ĐĂNG XUẤT MÀU ĐỎ -->
+        <button class="btn" onclick="logoutAdmin()" style="background: #c62828;">ログアウト</button>
       </div>
     </div>
+
     <div class="controls">
       <input type="text" id="searchInput" placeholder="名前、カナ、電話番号、ID、言語、住所など (スペース区切りで複数検索可)" oninput="filterData()" style="flex: 2; min-width: 250px;">
+      
       <select id="statusFilter" onchange="filterData()" style="flex: 1; min-width: 120px;">
         <option value="ALL">すべてのステータス</option>
         <option value="仮登録">仮登録</option>
         <option value="本登録">本登録</option>
       </select>
+
       <select id="progressFilter" onchange="filterData()" style="flex: 1; min-width: 140px;">
         <option value="ALL">提出状況 (すべて)</option>
         <option value="DONE">100% 完了</option>
@@ -100,14 +112,17 @@
         <option value="MISSING_BANK">未提出：口座情報</option>
         <option value="MISSING_FUYO">未提出：扶養申告書</option>
       </select>
+
       <select id="natFilter" onchange="filterData()" style="flex: 1; min-width: 110px;">
         <option value="ALL">国籍 (すべて)</option>
         <option value="日本">日本</option>
         <option value="FOREIGN">外国籍 (すべて)</option>
       </select>
+
       <select id="langFilter" onchange="filterData()" style="flex: 1; min-width: 110px;">
         <option value="ALL">言語 (すべて)</option>
       </select>
+
       <select id="empTypeFilter" onchange="filterData()" style="flex: 1; min-width: 130px;">
         <option value="ALL">雇用形態 (すべて)</option>
         <option value="メイン">メイン</option>
@@ -117,10 +132,12 @@
       </select>
     </div>
   </div>
+
   <div id="loading">
     <div class="spinner"></div>
     データを読み込んでいます...
   </div>
+
   <div style="overflow-x: auto;">
     <table id="staffTable" style="display: none;">
       <thead>
@@ -142,8 +159,9 @@
       該当するスタッフが見つかりません。
     </div>
   </div>
+
   <div id="detailModal" onclick="closeModalOutside(event)">
-    <div class="modal-content" style="position: relative;">
+    <div class="modal-content">
       <div id="copyToast">コピーしました</div>
       <div class="modal-header">
         <div class="modal-header-left">
@@ -221,20 +239,27 @@
       </div>
     </div>
   </div>
+
 <script>
+    // ⚠️ CHÚ Ý: ÔNG NHỚ THAY LẠI ĐƯỜNG LINK GAS_URL CỦA CÔNG TY VÀO ĐÂY NHÉ!
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxC71cAofv5QXr-pjKkmK8ehgNzo4M5wRMMjtG1enU-5w62j0slyK56XJtDvMimAlvE/exec";
+    
     const NAS_BASE_PATHS = [
       "\\\\landisk-9905cb\\disk1\\共有フォルダ（最新）\\★★CastingNavスタッフ個人情報※ﾌｫﾙﾀﾞ名変更禁止※\\★社員番号有り　※フォルダ名は絶対に変更しない！！※",
       "\\\\landisk-9905cb\\disk1\\共有フォルダ（最新）\\青戸\\★新規登録者個人情報（仮登録スタッフ）※ファイル名変更しない！！"
     ];
+
     let globalStaffData = [];
     let showArchive = false;
     let selectedFolderName = ""; 
+
     window.onload = fetchData;
+
     function switchTab(isArchiveMode) {
       showArchive = isArchiveMode;
       document.getElementById('tabMain').className = isArchiveMode ? "tab-btn" : "tab-btn active";
       document.getElementById('tabArchive').className = isArchiveMode ? "tab-btn active" : "tab-btn";
+      
       const statusSelect = document.getElementById('statusFilter');
       if (isArchiveMode) {
         statusSelect.innerHTML = '<option value="ALL">すべてのステータス</option><option value="退職済">退職済/削除済</option>';
@@ -243,33 +268,34 @@
       }
       filterData();
     }
+
+    // LẤY DỮ LIỆU + CÓ MẬT KHẨU BẢO MẬT + VƯỢT CORS LOCAL
     function fetchData(forcePrompt = false) {
-      // 1. Kiểm tra xem có Pass lưu trong máy chưa
       let pass = localStorage.getItem('alesco_admin_pass');
 
-      // Nếu chưa có, HOẶC bị ép hỏi lại (do nhập sai) -> Hiện bảng nhập Pass
       if (!pass || forcePrompt) {
         pass = prompt("管理用パスワードを入力してください：\n(一度入力すると保存されます)");
-        if (!pass) return; // Bấm Hủy thì dừng
+        if (!pass) return; 
       }
 
       document.getElementById('loading').style.display = 'block';
       document.getElementById('staffTable').style.display = 'none';
       document.getElementById('noData').style.display = 'none';
 
-      // 2. Gửi Pass lên Server kiểm tra
       fetch(GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: "getManagerDashboardData", params: [pass] })
+        body: JSON.stringify({ action: "getManagerDashboardData", params: [pass] }),
+        redirect: 'follow' // 👉 Lách luật CORS khi chạy ở ổ C:\
       })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error("サーバーエラーが発生しました (HTTP " + res.status + ")");
+        return res.json();
+      })
       .then(data => {
         if (data.result && data.result.success) {
-          // 🎉 ĐÚNG PASS -> LƯU VÀO BỘ NHỚ TRÌNH DUYỆT NGAY
           localStorage.setItem('alesco_admin_pass', pass);
 
-          // Render Data
           globalStaffData = data.result.data;
           const now = new Date();
           const timeStr = String(now.getHours()).padStart(2,'0') + ":" + String(now.getMinutes()).padStart(2,'0') + ":" + String(now.getSeconds()).padStart(2,'0');
@@ -278,37 +304,48 @@
           buildDynamicDropdowns();
           filterData(); 
         } else {
-          // ❌ LỖI HOẶC SAI PASS
-          let errorMsg = data.error || data.result.message;
+          let errorMsg = data.error || (data.result && data.result.message) || "データが空です";
           
-          // Nếu lỗi là do sai Pass -> Xóa sạch Pass cũ trong máy, ép hỏi lại luôn
-          if (errorMsg.includes("パスワードが間違っています")) {
+          if (errorMsg.includes("パスワードが間違っています") || errorMsg.includes("権限がありません")) {
             localStorage.removeItem('alesco_admin_pass');
             alert("パスワードが間違っています。もう一度入力してください。");
-            fetchData(true); // Đệ quy: Gọi lại hàm và ép hiện bảng Prompt
+            fetchData(true); 
           } else {
             alert("エラーが発生しました: " + errorMsg);
           }
         }
       })
       .catch(err => {
-        alert("通信エラー: ネットワーク接続を確認してください。");
+        console.error(err);
+        alert("通信エラー: ネットワーク接続を確認してください。\n(ローカルファイルで実行中の場合、ブラウザのCORS制限か、Googleサーバーが応答していない可能性があります)");
       })
       .finally(() => {
         document.getElementById('loading').style.display = 'none';
       });
     }
+
+    // ĐĂNG XUẤT XÓA MẬT KHẨU
+    function logoutAdmin() {
+      if (confirm("パスワードをクリアしてログアウトしますか？")) {
+        localStorage.removeItem('alesco_admin_pass');
+        location.reload(); 
+      }
+    }
+
+    // TẠO DROPDOWN TỰ ĐỘNG (QUỐC TỊCH & NGÔN NGỮ)
     function buildDynamicDropdowns() {
       const natSelect = document.getElementById('natFilter');
       const langSelect = document.getElementById('langFilter');
       const uniqueCountries = new Set();
       const uniqueLangs = new Set();
+
       globalStaffData.forEach(staff => {
         let nat = staff.nationality || "";
         if (nat && nat !== "日本") {
           let cleanNat = nat.replace(/外国籍[（(]?/, "").replace(/[）)]?$/, "").trim();
           if (cleanNat) uniqueCountries.add(cleanNat);
         }
+
         let langs = staff.languages || "";
         if (langs) {
            let splitLangs = langs.split(/[,、]/);
@@ -318,6 +355,7 @@
            });
         }
       });
+
       natSelect.innerHTML = `
         <option value="ALL">国籍 (すべて)</option>
         <option value="日本">日本</option>
@@ -329,6 +367,7 @@
         option.text = `- ${country}`;
         natSelect.appendChild(option);
       });
+
       langSelect.innerHTML = `<option value="ALL">言語 (すべて)</option>`;
       Array.from(uniqueLangs).sort().forEach(lang => {
         const option = document.createElement('option');
@@ -337,20 +376,26 @@
         langSelect.appendChild(option);
       });
     }
+
+    // BỘ LỌC + TÌM KIẾM MULTI-KEYWORD
     function filterData() {
       const rawSearchVal = document.getElementById('searchInput').value.toLowerCase().trim();
       const searchKeywords = rawSearchVal ? rawSearchVal.split(/[\s　]+/) : [];
+      
       const statusVal = document.getElementById('statusFilter').value;
       const progressFilter = document.getElementById('progressFilter').value;
       const natFilter = document.getElementById('natFilter').value;
       const langFilter = document.getElementById('langFilter').value; 
       const empTypeFilter = document.getElementById('empTypeFilter').value;
+      
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '';
       let count = 0;
+
       globalStaffData.forEach((staff, index) => {
         if (staff.isArchive !== showArchive) return;
         if (statusVal !== "ALL" && !staff.status.includes(statusVal)) return;
+
         let rawNat = staff.nationality || "";
         if (natFilter !== "ALL") {
           let cleanNat = rawNat.replace(/外国籍[（(]?/, "").replace(/[）)]?$/, "").trim();
@@ -358,11 +403,14 @@
           if (natFilter === "FOREIGN" && cleanNat === "日本") return;
           if (natFilter !== "日本" && natFilter !== "FOREIGN" && cleanNat !== natFilter) return;
         }
+
         let rawLang = staff.languages || "";
         if (langFilter !== "ALL") {
           if (!rawLang.includes(langFilter)) return;
         }
+
         if (empTypeFilter !== "ALL" && staff.empType !== empTypeFilter) return;
+
         if (progressFilter !== "ALL") {
           let fuyoStatus = staff.fuyo || "";
           if (progressFilter === "DONE" && !staff.progress.includes("完了")) return;
@@ -371,29 +419,36 @@
           if (progressFilter === "MISSING_BANK" && !(staff.bank || "").includes("未提出")) return;
           if (progressFilter === "MISSING_FUYO" && (!fuyoStatus.includes("未提出") || staff.empType !== 'メイン')) return;
         }
+
         if (searchKeywords.length > 0) {
           const cleanPhone = (staff.phone || "").replace(/[\s-]/g, '');
           const cleanName = (staff.name || "").replace(/[\s]/g, '');
           const cleanKana = (staff.kana || "").replace(/[\s]/g, '');
+          
           const searchableText = `${cleanName} ${cleanKana} ${(staff.phone || "")} ${cleanPhone} ${(staff.id || "")} ${rawLang} ${(staff.address || "")} ${(staff.email || "")} ${(staff.dob || "")}`.toLowerCase();
+          
           const isMatch = searchKeywords.every(keyword => searchableText.includes(keyword));
           if (!isMatch) return; 
         }
+
         let statusBadge = '';
         if (staff.status.includes("仮登録")) statusBadge = `<span class="badge st-kari">${staff.status}</span>`;
         else if (staff.status.includes("本登録")) statusBadge = `<span class="badge st-hon">${staff.status}</span>`;
         else statusBadge = `<span class="badge st-leave">${staff.status}</span>`;
+
         let progBadge = '';
         if (staff.progress.includes("完了")) progBadge = `<span class="badge pr-done">${staff.progress}</span>`;
         else if (staff.progress.includes("一部")) progBadge = `<span class="badge pr-part">${staff.progress}</span>`;
         else if (staff.progress.includes("のみ")) progBadge = `<span class="badge pr-kari">${staff.progress}</span>`;
         else progBadge = `<span class="badge pr-none">${staff.progress}</span>`;
+
         let countryName = rawNat;
         if (countryName.includes("外国籍")) {
             countryName = countryName.replace(/外国籍[（(]?/, "").replace(/[）)]?$/, "").trim();
         }
         let natBadge = `<strong style="color:var(--text);">${countryName || "-"}</strong>`;
         let langText = rawLang ? `<br><span style="font-size:11px; color:#666;">言語: ${rawLang}</span>` : '';
+
         const tr = document.createElement('tr');
         tr.onclick = () => openModal(index); 
         tr.innerHTML = `
@@ -415,6 +470,7 @@
         tbody.appendChild(tr);
         count++;
       });
+
       if (count > 0) {
         document.getElementById('staffTable').style.display = 'table';
         document.getElementById('noData').style.display = 'none';
@@ -423,14 +479,18 @@
         document.getElementById('noData').style.display = 'block';
       }
     }
+
     function formatDocStatus(val) {
       if (!val || val === "未提出") return `<span class="txt-ng">未提出</span>`;
       if (val.includes("提供拒否") || val.includes("提出不要")) return `<span style="color:#757575;">${val}</span>`;
       return `<span class="txt-ok">${val}</span>`;
     }
+
+    // COPY 1 CHẠM
     function copyToClipboard(elementId) {
       const text = document.getElementById(elementId).innerText;
       if (!text || text === "-") return;
+      
       navigator.clipboard.writeText(text).then(() => {
         const toast = document.getElementById('copyToast');
         toast.style.opacity = 1;
@@ -441,26 +501,33 @@
         }, 1500);
       });
     }
+
     function openModal(index) {
       const staff = globalStaffData[index];
+      
       document.getElementById('mName').innerText = staff.name || "-";
       document.getElementById('mKana').innerText = staff.kana || "-";
       document.getElementById('mId').innerText = staff.id || "未採番";
       document.getElementById('mEmpType').innerText = staff.empType || "未設定";
+      
       let rawNat = staff.nationality || "";
       let natClean = rawNat.replace(/外国籍[（(]?/, "").replace(/[）)]?$/, "").trim();
       let langInfo = staff.languages ? ` (${staff.languages})` : "";
       document.getElementById('mNatLang').innerText = natClean + langInfo;
+
       document.getElementById('mPhone').innerText = staff.phone || "-";
       document.getElementById('mEmail').innerText = staff.email || "-";
       document.getElementById('btnCopyEmail').style.display = staff.email ? 'flex' : 'none';
+
       document.getElementById('mDobGender').innerText = (staff.dob || "-") + "・" + (staff.gender || "-");
       document.getElementById('mAddress').innerText = staff.address || "-";
+
       document.getElementById('mProgress').innerText = staff.progress || "-";
       document.getElementById('mIdCard').innerHTML = formatDocStatus(staff.idCard);
       document.getElementById('mMyNum').innerHTML = formatDocStatus(staff.myNum);
       document.getElementById('mBank').innerHTML = formatDocStatus(staff.bank);
       document.getElementById('mFuyo').innerHTML = formatDocStatus(staff.fuyo);
+
       const remarksBox = document.getElementById('mRemarksContainer');
       if (staff.remarks && staff.remarks.trim() !== "") {
         document.getElementById('mRemarks').innerText = staff.remarks;
@@ -468,9 +535,11 @@
       } else {
         remarksBox.style.display = 'none';
       }
+
       selectedFolderName = staff.folderName || "";
       const btnOpenNas = document.getElementById('btnOpenNas');
       const warningBox = document.getElementById('mNoFolderWarning');
+
       if (selectedFolderName) {
         btnOpenNas.style.display = 'inline-flex';
         warningBox.style.display = 'none';
@@ -478,8 +547,10 @@
         btnOpenNas.style.display = 'none';
         warningBox.style.display = 'block'; 
       }
+
       document.getElementById('detailModal').style.display = 'flex';
     }
+
     function openNasFolder() {
       let pathsToTry = NAS_BASE_PATHS.map(basePath => basePath + "\\" + selectedFolderName);
       let joinedPaths = pathsToTry.join("||");
@@ -487,12 +558,14 @@
       let uri = "alesco://" + encodedPaths;
       window.location.href = uri;
     }
+
     function closeModal() {
       document.getElementById('detailModal').style.display = 'none';
     }
+
     function closeModalOutside(e) {
       if (e.target.id === 'detailModal') closeModal();
     }
   </script>
 </body>
-</html>f
+</html>
