@@ -4,20 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>【管理用】スタッフ進捗確認ダッシュボード</title>
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    /* CSS Tối ưu */
+    /* CSS CƠ BẢN */
     :root { --primary: #0061A4; --bg: #f4f7fc; --surface: #ffffff; --text: #1A1C1E; --border: #e1e3e1; }
     body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-    
     .header-container { background: var(--surface); padding: 20px 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
     .header-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 15px; }
     .header-title-box { display: flex; align-items: baseline; gap: 15px; }
     .header-title-box h1 { margin: 0; font-size: 22px; color: var(--primary); }
     .header-title-box p { margin: 0; font-size: 13px; color: #666; font-weight: bold; }
     .header-actions { display: flex; align-items: center; gap: 15px; }
-    
     .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; width: 100%; }
     .tab-group { display: flex; background: #e1e3e1; border-radius: 8px; overflow: hidden; margin: 0; }
     .tab-btn { border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; background: transparent; color: #444; transition: 0.2s; font-size: 14px; }
@@ -44,7 +41,7 @@
     .spinner { border: 4px solid rgba(0,0,0,0.1); border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     
-    /* MODAL */
+    /* UI MODAL CHI TIẾT */
     #detailModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
     .modal-content { background: #f8f9fa; width: 90%; max-width: 750px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; position: relative;}
     .modal-header { background: var(--primary); color: white; padding: 25px 30px; display: flex; justify-content: space-between; align-items: flex-start; }
@@ -56,7 +53,7 @@
     .modal-body { padding: 30px; overflow-y: auto; }
     .info-card { background: #ffffff; border-radius: 12px; border: 1px solid var(--border); padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
     .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 30px; }
-    .info-item { display: flex; flex-direction: column; gap: 5px; }
+    .info-item { display: flex; flex-direction: column; gap: 5px; min-height: 45px;}
     .info-label { font-size: 12px; color: #7f8c8d; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
     .info-value { font-size: 15px; color: #2c3e50; font-weight: 600; display: flex; align-items: flex-start; gap: 8px; word-break: break-all;}
     .info-value.highlight { color: var(--primary); }
@@ -75,6 +72,12 @@
     .btn-nas:active { transform: translateY(0); }
     .btn-nas svg { width: 18px; height: 18px; fill: currentColor; }
     #copyToast { position: absolute; top: 10px; right: 10px; background: #333; color: #fff; padding: 5px 12px; font-size: 12px; border-radius: 20px; opacity: 0; transition: 0.3s; pointer-events: none;}
+    
+    /* CSS DÀNH CHO EDIT LANGUAGE */
+    .btn-edit { background: none; border: 1px solid #C4C7C5; border-radius: 4px; padding: 3px 6px; cursor: pointer; color: var(--primary); font-size: 11px; display: inline-flex; align-items: center; gap: 4px; font-weight: bold;}
+    .btn-edit:hover { background: #e8f0fe; border-color: var(--primary);}
+    #langEditArea input { height: 32px; padding: 5px 10px; font-size: 14px; font-weight: normal; margin-right: 5px; flex: 1;}
+    .btn-small { height: 32px; padding: 0 12px; border-radius: 6px; font-size: 12px; margin: 0; min-width: unset;}
   </style>
 </head>
 <body>
@@ -144,7 +147,9 @@
           <th>登録日</th>
           <th>ID</th>
           <th>氏名</th>
-          <th>国籍 / 言語</th>
+          <!-- ĐÃ TÁCH THÀNH 2 CỘT QUỐC TỊCH & NGÔN NGỮ -->
+          <th>国籍</th>
+          <th>対応言語</th>
           <th>電話番号</th>
           <th>雇用形態</th>
           <th>ステータス</th>
@@ -177,6 +182,7 @@
         <div id="mNoFolderWarning" style="display:none; background:#ffebee; color:#c62828; padding:15px; border-radius:8px; border:1px solid #ffcdd2; margin-bottom:20px; font-size:13px; font-weight:bold;">
           ⚠️ スプレッドシートにフォルダ名が記録されていないため、個人フォルダを開けません。
         </div>
+        
         <div class="info-card">
           <div class="info-grid">
             <div class="info-item">
@@ -186,17 +192,29 @@
                 <button class="copy-btn" onclick="copyToClipboard('mId')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
               </div>
             </div>
-            <div class="info-item">
-              <span class="info-label">電話番号</span>
-              <div class="info-value">
-                <span id="mPhone"></span>
-                <button class="copy-btn" onclick="copyToClipboard('mPhone')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
-              </div>
-            </div>
+            
             <div class="info-item">
               <span class="info-label">雇用形態</span>
               <div class="info-value" id="mEmpType"></div>
             </div>
+
+            <div class="info-item">
+              <span class="info-label">国籍</span>
+              <div class="info-value" id="mNationality"></div>
+            </div>
+
+            <!-- CHỨC NĂNG EDIT NGÔN NGỮ NẰM Ở ĐÂY -->
+            <div class="info-item">
+              <span class="info-label">対応言語</span>
+              <div id="mLanguageContainer"></div>
+            </div>
+            
+            <!-- KHU VỰC HIỂN THỊ ĐA SỐ ĐIỆN THOẠI -->
+            <div class="info-item">
+              <span class="info-label">電話番号</span>
+              <div id="mPhoneContainer" style="display: flex; flex-direction: column; gap: 8px;"></div>
+            </div>
+
             <div class="info-item">
               <span class="info-label">メールアドレス</span>
               <div class="info-value">
@@ -204,14 +222,12 @@
                 <button class="copy-btn" id="btnCopyEmail" onclick="copyToClipboard('mEmail')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
               </div>
             </div>
-            <div class="info-item">
-              <span class="info-label">国籍 / 言語</span>
-              <div class="info-value highlight" id="mNatLang"></div>
-            </div>
+            
             <div class="info-item">
               <span class="info-label">生年月日・性別</span>
               <div class="info-value" id="mDobGender"></div>
             </div>
+
             <div class="info-item" style="grid-column: 1 / -1;">
               <span class="info-label">現住所</span>
               <div class="info-value">
@@ -221,6 +237,7 @@
             </div>
           </div>
         </div>
+
         <div class="info-card">
           <div class="status-header">📄 提出書類ステータス</div>
           <div class="status-list">
@@ -240,7 +257,7 @@
   </div>
 
 <script>
-    // ⚠️ CHÚ Ý: ÔNG NHỚ THAY LẠI ĐƯỜNG LINK GAS_URL CỦA CÔNG TY VÀO ĐÂY NHÉ!
+    // ⚠️ ĐỔI LẠI URL NÀY
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxC71cAofv5QXr-pjKkmK8ehgNzo4M5wRMMjtG1enU-5w62j0slyK56XJtDvMimAlvE/exec";
     
     const NAS_BASE_PATHS = [
@@ -251,6 +268,7 @@
     let globalStaffData = [];
     let showArchive = false;
     let selectedFolderName = ""; 
+    let currentViewingIndex = -1; // Biến lưu index của nhân viên đang xem Modal
 
     window.onload = fetchData;
 
@@ -258,7 +276,6 @@
       showArchive = isArchiveMode;
       document.getElementById('tabMain').className = isArchiveMode ? "tab-btn" : "tab-btn active";
       document.getElementById('tabArchive').className = isArchiveMode ? "tab-btn active" : "tab-btn";
-      
       const statusSelect = document.getElementById('statusFilter');
       if (isArchiveMode) {
         statusSelect.innerHTML = '<option value="ALL">すべてのステータス</option><option value="退職済">退職済/削除済</option>';
@@ -273,7 +290,6 @@
       document.getElementById('staffTable').style.display = 'none';
       document.getElementById('noData').style.display = 'none';
 
-      // Chú ý: params giờ là mảng rỗng []
       fetch(GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -294,34 +310,29 @@
           buildDynamicDropdowns();
           filterData(); 
         } else {
-          // Xử lý lỗi sạch sẽ hơn
-          let errorMsg = data.error || (data.result && data.result.message) || "データが空です";
-          alert("エラーが発生しました: " + errorMsg);
+          alert("エラーが発生しました: " + (data.error || (data.result && data.result.message)));
         }
       })
       .catch(err => {
         console.error(err);
-        alert("通信エラー: ネットワーク接続を確認してください。\n(Googleサーバーが応答していない可能性があります)");
+        alert("通信エラー: ネットワーク接続を確認してください。");
       })
       .finally(() => {
         document.getElementById('loading').style.display = 'none';
       });
     }
 
-    // TẠO DROPDOWN TỰ ĐỘNG (QUỐC TỊCH & NGÔN NGỮ)
     function buildDynamicDropdowns() {
       const natSelect = document.getElementById('natFilter');
       const langSelect = document.getElementById('langFilter');
       const uniqueCountries = new Set();
       const uniqueLangs = new Set();
-
       globalStaffData.forEach(staff => {
         let nat = staff.nationality || "";
         if (nat && nat !== "日本") {
           let cleanNat = nat.replace(/外国籍[（(]?/, "").replace(/[）)]?$/, "").trim();
           if (cleanNat) uniqueCountries.add(cleanNat);
         }
-
         let langs = staff.languages || "";
         if (langs) {
            let splitLangs = langs.split(/[,、]/);
@@ -331,7 +342,6 @@
            });
         }
       });
-
       natSelect.innerHTML = `
         <option value="ALL">国籍 (すべて)</option>
         <option value="日本">日本</option>
@@ -343,7 +353,6 @@
         option.text = `- ${country}`;
         natSelect.appendChild(option);
       });
-
       langSelect.innerHTML = `<option value="ALL">言語 (すべて)</option>`;
       Array.from(uniqueLangs).sort().forEach(lang => {
         const option = document.createElement('option');
@@ -353,17 +362,14 @@
       });
     }
 
-    // BỘ LỌC + TÌM KIẾM MULTI-KEYWORD
     function filterData() {
       const rawSearchVal = document.getElementById('searchInput').value.toLowerCase().trim();
       const searchKeywords = rawSearchVal ? rawSearchVal.split(/[\s　]+/) : [];
-      
       const statusVal = document.getElementById('statusFilter').value;
       const progressFilter = document.getElementById('progressFilter').value;
       const natFilter = document.getElementById('natFilter').value;
       const langFilter = document.getElementById('langFilter').value; 
       const empTypeFilter = document.getElementById('empTypeFilter').value;
-      
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '';
       let count = 0;
@@ -397,12 +403,11 @@
         }
 
         if (searchKeywords.length > 0) {
-          const cleanPhone = (staff.phone || "").replace(/[\s-]/g, '');
+          const cleanMobile = (staff.mobile || "").replace(/[\s-]/g, '');
+          const cleanLandline = (staff.landline || "").replace(/[\s-]/g, '');
           const cleanName = (staff.name || "").replace(/[\s]/g, '');
           const cleanKana = (staff.kana || "").replace(/[\s]/g, '');
-          
-          const searchableText = `${cleanName} ${cleanKana} ${(staff.phone || "")} ${cleanPhone} ${(staff.id || "")} ${rawLang} ${(staff.address || "")} ${(staff.email || "")} ${(staff.dob || "")}`.toLowerCase();
-          
+          const searchableText = `${cleanName} ${cleanKana} ${(staff.mobile||"")} ${cleanMobile} ${(staff.landline||"")} ${cleanLandline} ${(staff.id||"")} ${rawLang} ${(staff.address||"")} ${(staff.email||"")} ${(staff.dob||"")}`.toLowerCase();
           const isMatch = searchKeywords.every(keyword => searchableText.includes(keyword));
           if (!isMatch) return; 
         }
@@ -422,8 +427,22 @@
         if (countryName.includes("外国籍")) {
             countryName = countryName.replace(/外国籍[（(]?/, "").replace(/[）)]?$/, "").trim();
         }
+        
+        // 👉 TÁCH 2 CỘT QUỐC TỊCH & NGÔN NGỮ CHO BẢNG MÀN HÌNH CHÍNH
         let natBadge = `<strong style="color:var(--text);">${countryName || "-"}</strong>`;
-        let langText = rawLang ? `<br><span style="font-size:11px; color:#666;">言語: ${rawLang}</span>` : '';
+        let langText = rawLang || "-";
+
+        // 👉 HIỂN THỊ ĐA SỐ ĐIỆN THOẠI TRÊN BẢNG
+        let mobile = staff.mobile || "";
+        let landline = staff.landline || "";
+        let phoneHtml = "";
+        if (mobile && landline) {
+          phoneHtml = `${mobile}<br><span style="font-size:10px; color:#888;">+ 固定電話あり</span>`;
+        } else if (mobile) {
+          phoneHtml = mobile;
+        } else {
+          phoneHtml = landline || "-";
+        }
 
         const tr = document.createElement('tr');
         tr.onclick = () => openModal(index); 
@@ -434,11 +453,9 @@
             <strong style="color:var(--text);">${staff.name}</strong><br>
             <span style="font-size:11px; color:#666;">${staff.kana}</span>
           </td>
-          <td style="vertical-align: middle;">
-            ${natBadge}
-            ${langText}
-          </td>
-          <td style="font-family:monospace;">${staff.phone}</td>
+          <td style="vertical-align: middle;">${natBadge}</td>
+          <td style="vertical-align: middle;">${langText}</td>
+          <td style="font-family:monospace;">${phoneHtml}</td>
           <td>${staff.empType || "-"}</td>
           <td>${statusBadge}</td>
           <td>${progBadge}</td>
@@ -462,11 +479,9 @@
       return `<span class="txt-ok">${val}</span>`;
     }
 
-    // COPY 1 CHẠM
     function copyToClipboard(elementId) {
       const text = document.getElementById(elementId).innerText;
       if (!text || text === "-") return;
-      
       navigator.clipboard.writeText(text).then(() => {
         const toast = document.getElementById('copyToast');
         toast.style.opacity = 1;
@@ -479,6 +494,7 @@
     }
 
     function openModal(index) {
+      currentViewingIndex = index; // Lưu vị trí nhân viên đang xem
       const staff = globalStaffData[index];
       
       document.getElementById('mName').innerText = staff.name || "-";
@@ -488,16 +504,49 @@
       
       let rawNat = staff.nationality || "";
       let natClean = rawNat.replace(/外国籍[（(]?/, "").replace(/[）)]?$/, "").trim();
-      let langInfo = staff.languages ? ` (${staff.languages})` : "";
-      document.getElementById('mNatLang').innerText = natClean + langInfo;
+      document.getElementById('mNationality').innerText = natClean || "-";
+      
+      // XÂY DỰNG GIAO DIỆN EDIT NGÔN NGỮ TRONG MODAL
+      let langHtml = `
+          <div id="langDisplayArea" class="info-value" style="display:flex; align-items:center; gap:8px;">
+              <span id="mLangText">${staff.languages || "未設定"}</span>
+              <button class="btn-edit" onclick="editLanguage()">
+                 <svg style="width:12px; height:12px; fill:currentColor;" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg> 編集
+              </button>
+          </div>
+          <div id="langEditArea" style="display:none; align-items:center; gap:5px; margin-top:0;">
+              <input type="text" id="langInput" value="${staff.languages || ""}" placeholder="例: 英語、ベトナム語">
+              <button class="btn btn-primary btn-small" id="btnSaveLang" onclick="saveLanguage()">保存</button>
+              <button class="btn btn-gray btn-small" id="btnCancelLang" onclick="cancelEditLanguage()">✕</button>
+          </div>
+      `;
+      document.getElementById('mLanguageContainer').innerHTML = langHtml;
 
-      document.getElementById('mPhone').innerText = staff.phone || "-";
+      // XÂY DỰNG GIAO DIỆN ĐA SỐ ĐIỆN THOẠI TRONG MODAL
+      let mobile = staff.mobile;
+      let landline = staff.landline;
+      let phoneModalHtml = "";
+      
+      if (mobile) {
+          phoneModalHtml += `<div class="info-value" style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:13px; color:#888;">📱携帯</span> <span id="mMobile">${mobile}</span>
+              <button class="copy-btn" onclick="copyToClipboard('mMobile')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
+          </div>`;
+      }
+      if (landline) {
+          phoneModalHtml += `<div class="info-value" style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:13px; color:#888;">☎️固定</span> <span id="mLandline">${landline}</span>
+              <button class="copy-btn" onclick="copyToClipboard('mLandline')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
+          </div>`;
+      }
+      if (!mobile && !landline) phoneModalHtml = `<span class="info-value">-</span>`;
+      
+      document.getElementById('mPhoneContainer').innerHTML = phoneModalHtml;
+
       document.getElementById('mEmail').innerText = staff.email || "-";
       document.getElementById('btnCopyEmail').style.display = staff.email ? 'flex' : 'none';
-
       document.getElementById('mDobGender').innerText = (staff.dob || "-") + "・" + (staff.gender || "-");
       document.getElementById('mAddress').innerText = staff.address || "-";
-
       document.getElementById('mProgress').innerText = staff.progress || "-";
       document.getElementById('mIdCard').innerHTML = formatDocStatus(staff.idCard);
       document.getElementById('mMyNum').innerHTML = formatDocStatus(staff.myNum);
@@ -527,6 +576,75 @@
       document.getElementById('detailModal').style.display = 'flex';
     }
 
+    // ==========================================
+    // LOGIC CẬP NHẬT NGÔN NGỮ (CRUD)
+    // ==========================================
+    function editLanguage() {
+        document.getElementById('langDisplayArea').style.display = 'none';
+        document.getElementById('langEditArea').style.display = 'flex';
+        document.getElementById('langInput').focus();
+    }
+
+    function cancelEditLanguage() {
+        document.getElementById('langDisplayArea').style.display = 'flex';
+        document.getElementById('langEditArea').style.display = 'none';
+    }
+
+    function saveLanguage() {
+        if(currentViewingIndex === -1) return;
+        
+        const newLang = document.getElementById('langInput').value.trim();
+        const staff = globalStaffData[currentViewingIndex];
+        
+        // Khóa các nút lại trong lúc đợi Server
+        const btnSave = document.getElementById('btnSaveLang');
+        const btnCancel = document.getElementById('btnCancelLang');
+        const input = document.getElementById('langInput');
+        
+        btnSave.disabled = true; btnSave.innerText = "保存中...";
+        btnCancel.disabled = true; input.disabled = true;
+
+        fetch(GAS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ 
+                action: "updateStaffLanguage", 
+                params: [staff.id, staff.isArchive, newLang] 
+            }),
+            redirect: 'follow'
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.result && data.result.success) {
+                // Thành công: Cập nhật biến RAM, vẽ lại giao diện ẩn, thoát chế độ Edit
+                staff.languages = newLang;
+                document.getElementById('mLangText').innerText = newLang || "未設定";
+                
+                // Show Toast Notification trên Modal
+                const toast = document.getElementById('copyToast');
+                toast.innerText = "言語を更新しました";
+                toast.style.background = "#2e7d32"; // Màu xanh lá
+                toast.style.opacity = 1; toast.style.top = '25px';
+                setTimeout(() => { toast.style.opacity = 0; toast.style.top = '10px'; toast.style.background = "#333"; toast.innerText = "コピーしました";}, 2000);
+                
+                cancelEditLanguage();
+                
+                // Vẽ lại Dropdown Ngôn ngữ và Bảng Danh sách bên ngoài ngầm
+                buildDynamicDropdowns();
+                filterData();
+            } else {
+                alert("保存に失敗しました: " + (data.error || data.result.message));
+            }
+        })
+        .catch(err => {
+            alert("通信エラーが発生しました。");
+        })
+        .finally(() => {
+            btnSave.disabled = false; btnSave.innerText = "保存";
+            btnCancel.disabled = false; input.disabled = false;
+        });
+    }
+
     function openNasFolder() {
       let pathsToTry = NAS_BASE_PATHS.map(basePath => basePath + "\\" + selectedFolderName);
       let joinedPaths = pathsToTry.join("||");
@@ -537,6 +655,7 @@
 
     function closeModal() {
       document.getElementById('detailModal').style.display = 'none';
+      cancelEditLanguage(); // Đóng modal thì reset trạng thái edit ngôn ngữ
     }
 
     function closeModalOutside(e) {
