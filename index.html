@@ -1523,77 +1523,69 @@
     
     function openFuyoForm() {
       const baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdbGr6tn2GQ6a7Fyg8v6IxN1Uies_Q35EWoehULIgrXGifkXA/viewform";
-      const entry_Kanji = "entry.971256660";
-      const entry_Kana  = "entry.821590571";
-      const entry_Dob   = "entry.1086113988";
-      const entry_Zip   = "entry.1909395110";
-      const entry_Addr  = "entry.426383806";
-      
       const cleanName = currentUser.name ? currentUser.name.replace(/\//g, ' ') : '';
       const cleanKana = currentUser.kana ? currentUser.kana.replace(/\//g, ' ') : '';
-      
       let dobFormatted = "";
       if (currentUser.dob) {
         const dObj = new Date(currentUser.dob); 
-        const y = dObj.getFullYear();
-        const m = String(dObj.getMonth() + 1).padStart(2, '0');
-        const d = String(dObj.getDate()).padStart(2, '0');
-        dobFormatted = `${y}-${m}-${d}`;
+        dobFormatted = `${dObj.getFullYear()}-${String(dObj.getMonth() + 1).padStart(2, '0')}-${String(dObj.getDate()).padStart(2, '0')}`;
       }
       
-      let url = baseUrl + "?usp=pp_url";
-      url += `&${entry_Kanji}=${encodeURIComponent(cleanName)}`;
-      url += `&${entry_Kana}=${encodeURIComponent(cleanKana)}`;
-      url += `&${entry_Dob}=${dobFormatted}`;
-      url += `&${entry_Zip}=${encodeURIComponent(currentUser.zip || '')}`;
-      url += `&${entry_Addr}=${encodeURIComponent(currentUser.addr || '')}`;
+      let url = baseUrl + `?usp=pp_url&entry.971256660=${encodeURIComponent(cleanName)}&entry.821590571=${encodeURIComponent(cleanKana)}&entry.1086113988=${dobFormatted}&entry.1909395110=${encodeURIComponent(currentUser.zip || '')}&entry.426383806=${encodeURIComponent(currentUser.addr || '')}`;
       
-      // 1. Mở Form sang tab mới
+      // 1. Mở Form
       window.open(url, '_blank');
-    
-      // 2. Hiện màn hình chờ tại Tab hiện tại
+      
+      // 2. Hiện màn hình Chờ Loading
       document.getElementById('fuyoWaitModal').style.display = 'flex';
       
-      // 3. Khởi động hệ thống "Ping" (Polling) âm thầm gọi xuống server
+      // 👉 3. CHỤP LẠI TRẠNG THÁI HIỆN TẠI (Điểm mấu chốt)
+      const oldFuyoStatus = currentUser.statusFuyo || ""; 
+      const oldProgress = currentUser.progress || ""; 
+      
       fuyoPollCount = 0;
       if (fuyoPollingTimer) clearInterval(fuyoPollingTimer);
       
+      // 4. Vòng lặp chờ nộp Form
       fuyoPollingTimer = setInterval(() => {
         fuyoPollCount++;
-        // Nếu treo quá 15 phút (180 lần * 5s) tự động ngắt để đỡ tốn tài nguyên
-        if (fuyoPollCount > 180) {
-          cancelFuyoPolling();
-          return;
-        }
+        if (fuyoPollCount > 180) { cancelFuyoPolling(); return; }
     
         google.script.run.withSuccessHandler(res => {
-          // Nếu Backend trả về thành công và Status đã đổi thành nộp xong
-          if (res.success && res.user && res.user.statusFuyo.indexOf('提出済') > -1) {
+          if (res.success && res.user) {
             
-            clearInterval(fuyoPollingTimer); // Tắt ping
-            document.getElementById('fuyoWaitModal').style.display = 'none'; // Tắt màn hình chờ
-            
-            currentUser = res.user; // Cập nhật data mới nhất
-            
-            // KIỂM TRA: Nộp Fuyo xong có đạt 100% không?
-            if (currentUser.progress && currentUser.progress.indexOf("完了") > -1) {
-              document.getElementById('finalSuccessPopup').style.display = 'flex'; // Khóa màn hình 100%
-            } else {
-              renderMyPage(); // Load lại giao diện MyPage
-              showCustomAlert("扶養控除等申告書の提出を確認しました。");
+            // KIỂM TRA 1: Sheet đã ghi nhận có nộp Fuyo mới chưa?
+            if (res.user.statusFuyo !== oldFuyoStatus) {
+              
+              clearInterval(fuyoPollingTimer); 
+              document.getElementById('fuyoWaitModal').style.display = 'none'; 
+              
+              currentUser = res.user; 
+              
+              // 👉 KIỂM TRA 2: Có phải NHỜ nộp cái Fuyo này mà tiến độ ĐẠT 100% LẦN ĐẦU không?
+              const isNewlyCompleted = !oldProgress.includes("完了") && currentUser.progress.includes("完了");
+
+              if (isNewlyCompleted) {
+                // Tình huống A: Lính mới nộp giấy tờ cuối cùng -> NỔ PHÁO HOA!
+                document.getElementById('finalSuccessPopup').style.display = 'flex'; 
+              } else {
+                // Tình huống B: Nộp bổ sung (đã 100% từ trước) HOẶC nộp xong vẫn còn thiếu giấy khác
+                // -> Về MyPage, báo Toast Xanh lá.
+                renderMyPage(); 
+                showView('viewMyPage');
+                showCustomAlert("扶養控除等申告書の提出を確認しました。");
+              }
             }
           }
         }).getUserStatusById(currentUser.id);
-    
-      }, 5000); // Chọc xuống server 5 giây / 1 lần
+      }, 5000); 
     }
     
-    // Hàm để user chủ động hủy vòng lặp nếu họ không muốn điền Form nữa
     function cancelFuyoPolling() {
       if (fuyoPollingTimer) clearInterval(fuyoPollingTimer);
       document.getElementById('fuyoWaitModal').style.display = 'none';
     }
-
+    
     function submitSignature(type) {
       const signInput = document.getElementById('taskSign');
       const checkInput = document.getElementById('taskCheck');
