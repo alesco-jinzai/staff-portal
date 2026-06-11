@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>勤怠・シフト管理ダッシュボード</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* CSS ĐỒNG BỘ VỚI TRANG QUẢN LÝ ỨNG VIÊN */
+    :root { --primary: #0061A4; --bg: #f4f7fc; --surface: #ffffff; --text: #1A1C1E; --border: #e1e3e1; }
+    body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
+    
+    .top-navbar { background: var(--surface); box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: 64px; display: flex; align-items: center; padding: 0 20px; position: sticky; top: 0; z-index: 9999; }
+    .nav-logo { height: 28px; margin-right: 40px; cursor: pointer; }
+    .nav-menu { display: flex; height: 100%; gap: 10px; }
+    .nav-btn { display: flex; align-items: center; gap: 8px; padding: 0 20px; color: #5f6368; text-decoration: none; font-weight: 700; font-size: 14px; border-bottom: 3px solid transparent; transition: all 0.2s ease; height: 100%; box-sizing: border-box; }
+    .nav-btn:hover { color: var(--primary); background: #f8f9fa; }
+    .nav-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: #f0f4f8; }
+    .nav-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+    .main-content { padding: 20px; }
+    
+    .header-container { background: var(--surface); padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; }
+    .header-title-box { display: flex; align-items: baseline; gap: 15px; }
+    .header-title-box h1 { margin: 0; font-size: 20px; color: var(--primary); }
+    .header-actions { display: flex; gap: 10px; }
+
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; width: 100%; }
+    input[type="month"], input[type="text"], select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-weight: bold; outline: none; color: #333; }
+    input:focus, select:focus { border-color: var(--primary); }
+    
+    .btn { background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;}
+    .btn:hover { background: #004d82; }
+    .btn-secondary { background: #5f6368; }
+    .btn-secondary:hover { background: #3c4043; }
+
+    table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px;}
+    th, td { padding: 10px 15px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }
+    th { background: #e8f0fe; color: var(--primary); white-space: nowrap; font-weight: 700;}
+    tr:hover { background: #f8f9fa; }
+    
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; white-space: nowrap; }
+    .bg-ok { background: #e8f5e9; color: #2e7d32; }
+    .bg-ng { background: #ffebee; color: #c62828; }
+    .bg-yukyu { background: #fff3e0; color: #e65100; }
+    
+    .memo-input { width: 100%; box-sizing: border-box; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
+    
+    #loading { text-align: center; padding: 50px; font-size: 15px; color: #666; font-weight: bold; }
+    .spinner { border: 4px solid rgba(0,0,0,0.1); border-top: 4px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <div class="top-navbar">
+    <img src="logo.png" alt="ALESCO" class="nav-logo" onerror="this.src='https://alesco-v.co.jp/wp/wp-content/uploads/ALESCO-LOGO.png'">
+    <div class="nav-menu">
+      <a href="admin-dashboard.html" class="nav-btn">
+        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        スタッフ進捗管理
+      </a>
+      <a href="attendance.html" class="nav-btn active">
+        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/><path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+        勤怠・シフト管理
+      </a>
+    </div>
+  </div>
+
+  <div class="main-content">
+    
+    <div class="header-container">
+      <div class="header-top">
+        <div class="header-title-box">
+          <h1>勤怠履歴ダッシュボード</h1>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary">＋ 新規登録</button>
+          <button class="btn btn-secondary">CSV出力</button>
+          <button class="btn btn-secondary">PDF出力</button>
+        </div>
+      </div>
+
+      <div class="controls">
+        <input type="month" id="monthFilter" onchange="loadData()">
+        <select id="employeeFilter" onchange="renderTable()"><option value="">すべての社員</option></select>
+        <select id="locationFilter" onchange="renderTable()"><option value="">すべての勤務地</option></select>
+        <input type="text" id="searchInput" placeholder="検索 (名前, ID...)" oninput="renderTable()" style="flex:1;">
+      </div>
+    </div>
+
+    <div id="loading"><div class="spinner"></div>データを読み込んでいます...</div>
+
+    <div style="overflow-x: auto;">
+      <table id="dataTable" style="display: none;">
+        <thead>
+          <tr>
+            <th>社員番号</th>
+            <th>名前</th>
+            <th>日付</th>
+            <th>出勤(実)</th>
+            <th>出勤(丸)</th>
+            <th>退勤(実)</th>
+            <th>退勤(丸)</th>
+            <th>実働時間</th>
+            <th>勤務地</th>
+            <th>交通費</th>
+            <th>承認</th>
+            <th>メモ (直接編集可)</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+        <tfoot id="tableFoot" style="background:#f4f7fc; font-weight:bold;">
+            <tr>
+                <td colspan="7" style="text-align:right;">合計:</td>
+                <td id="totalHours" style="color:var(--primary); font-size:16px;">00:00</td>
+                <td></td>
+                <td id="totalFee" style="color:var(--primary); font-size:16px;">¥0</td>
+                <td colspan="3"></td>
+            </tr>
+        </tfoot>
+      </table>
+    </div>
+
+  </div>
+
+<script>
+  // Sửa URL này thành link Web App của ông
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbyCgWzH-b8t1vK.../exec"; 
+  let globalData = [];
+
+  window.onload = () => {
+    const d = new Date();
+    document.getElementById('monthFilter').value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    loadData();
+  };
+
+  function loadData() {
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('dataTable').style.display = 'none';
+
+    const monthStr = document.getElementById('monthFilter').value; // YYYY-MM
+
+    fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: "getNewAttendanceData", params: [monthStr] })
+    })
+    .then(r => r.json())
+    .then(res => {
+      if(res.result && res.result.success) {
+        globalData = res.result.data;
+        updateDropdowns();
+        renderTable();
+      } else {
+        alert("エラー: " + (res.error || res.result.message));
+      }
+    })
+    .finally(() => {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('dataTable').style.display = 'table';
+    });
+  }
+
+  function updateDropdowns() {
+    const empSel = document.getElementById('employeeFilter');
+    const locSel = document.getElementById('locationFilter');
+    
+    const emps = [...new Set(globalData.map(d => d.empId))].sort();
+    const locs = [...new Set(globalData.filter(d => d.type === 'working').map(d => d.location))].sort();
+
+    empSel.innerHTML = '<option value="">すべての社員</option>' + emps.map(e => `<option value="${e}">${e}</option>`).join('');
+    locSel.innerHTML = '<option value="">すべての勤務地</option>' + locs.map(l => `<option value="${l}">${l}</option>`).join('');
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    const empF = document.getElementById('employeeFilter').value;
+    const locF = document.getElementById('locationFilter').value;
+    const search = document.getElementById('searchInput').value.toLowerCase();
+
+    tbody.innerHTML = '';
+    let totalMs = 0, totalCost = 0;
+
+    let filtered = globalData.filter(r => {
+      if (empF && r.empId != empF) return false;
+      if (locF && r.location != locF && r.type !== 'yukyu') return false;
+      if (search && !Object.values(r).join(' ').toLowerCase().includes(search)) return false;
+      return true;
+    });
+
+    filtered.forEach(row => {
+      const isYukyu = (row.type === 'yukyu');
+      
+      if (!isYukyu) {
+        totalCost += Number(row.transportCost) || 0;
+        if(row.workDuration && row.workDuration.includes(':')) {
+           let p = row.workDuration.split(':');
+           totalMs += (parseInt(p[0])*60 + parseInt(p[1])) * 60000;
+        }
+      }
+
+      let approvalHtml = isYukyu 
+        ? `<span class="badge bg-yukyu">${row.approverName || '申請中'}</span>` 
+        : (row.approverName ? `<span class="badge bg-ok">${row.approverName}</span>` : `<span class="badge" style="background:#eee;color:#666;">未承認</span>`);
+
+      let workDurHtml = isYukyu ? '<span style="color:#e65100; font-weight:bold;">有給休暇</span>' : `<strong>${row.workDuration || ''}</strong>`;
+
+      let tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-family:monospace;">${row.empId}</td>
+        <td><strong>${row.name}</strong></td>
+        <td>${row.date}</td>
+        <td style="color:#888">${isYukyu ? '' : (row.checkInActual || '')}</td>
+        <td><strong>${isYukyu ? '' : (row.checkIn || '')}</strong></td>
+        <td style="color:#888">${isYukyu ? '' : (row.checkOutActual || '')}</td>
+        <td><strong style="${(!row.checkOut && !isYukyu) ? 'color:red;' : ''}">${isYukyu ? '' : (row.checkOut || '未退勤')}</strong></td>
+        <td>${workDurHtml}</td>
+        <td>${isYukyu ? '' : (row.location || '')}</td>
+        <td>${isYukyu ? '' : '¥'+(Number(row.transportCost)||0).toLocaleString()}</td>
+        <td>${approvalHtml}</td>
+        <td>
+          ${isYukyu ? '' : `<input type="text" class="memo-input" value="${row.memo}" placeholder="メモを入力..." onchange="alert('Hàm lưu Memo sẽ làm ở Bước 2!')">`}
+        </td>
+        <td>
+          ${isYukyu ? '' : `<button class="btn btn-secondary" style="padding:4px 10px; font-size:11px;" onclick="alert('Hàm Sửa Ca làm sẽ làm ở Bước 2!')">編集</button>`}
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Cập nhật tổng
+    document.getElementById('totalFee').innerText = '¥' + totalCost.toLocaleString();
+    let th = Math.floor(totalMs / 3600000);
+    let tm = Math.floor((totalMs % 3600000) / 60000);
+    document.getElementById('totalHours').innerText = `${String(th).padStart(2,'0')}:${String(tm).padStart(2,'0')}`;
+  }
+</script>
+</body>
+</html>
