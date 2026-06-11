@@ -1412,9 +1412,36 @@
     function previewImg(input, imgId) {
       const f = input.files[0];
       if(f) {
-        const r = new FileReader();
-        r.onload = e => { document.getElementById(imgId).src = e.target.result; document.getElementById(imgId+'-c').style.display = 'block'; };
-        r.readAsDataURL(f);
+        const container = document.getElementById(imgId + '-c');
+        const imgEl = document.getElementById(imgId);
+        
+        // Tạo thêm thẻ <p> để hiện tên file nếu chưa có
+        let pdfLabel = document.getElementById(imgId + '_pdfLabel');
+        if (!pdfLabel) {
+            pdfLabel = document.createElement('p');
+            pdfLabel.id = imgId + '_pdfLabel';
+            pdfLabel.className = 'pdf-label';
+            container.appendChild(pdfLabel);
+        }
+
+        // Nếu KHÔNG PHẢI ảnh (là PDF, Docx) -> Hiện tên file, ẩn khung ảnh
+        if (!f.type.startsWith('image/')) {
+           imgEl.style.display = 'none';
+           pdfLabel.innerText = "📄 " + f.name;
+           pdfLabel.style.display = 'block';
+           container.style.display = 'block';
+        } 
+        // Nếu LÀ ảnh -> Hiện ảnh, ẩn chữ
+        else {
+           const r = new FileReader();
+           r.onload = e => { 
+             imgEl.src = e.target.result; 
+             imgEl.style.display = 'block'; 
+             pdfLabel.style.display = 'none';
+             container.style.display = 'block'; 
+           };
+           r.readAsDataURL(f);
+        }
       }
     }
 
@@ -1769,25 +1796,48 @@
     }
 
     async function processImg(file, addWatermark = true) {
-      return new Promise(res => {
-        const r = new FileReader(); r.readAsDataURL(file);
+      return new Promise(resolve => {
+        const r = new FileReader(); 
+        r.readAsDataURL(file);
         r.onload = e => {
-          const img = new Image(); img.src = e.target.result;
+          
+          // 👉 NẾU FILE LÀ PDF HOẶC WORD: TRẢ VỀ LUÔN, KHÔNG VẼ CANVAS
+          if (!file.type.startsWith('image/')) {
+             return resolve(e.target.result); 
+          }
+
+          // 👉 NẾU LÀ ẢNH THÌ MỚI XỬ LÝ ÉP CÂN
+          const img = new Image(); 
+          img.src = e.target.result;
           img.onload = () => {
-            const c = document.createElement('canvas'); const ctx = c.getContext('2d');
-            const MAX = 1400; let w=img.width, h=img.height;
-            if(w>h) { if(w>MAX) { h*=MAX/w; w=MAX; } } else { if(h>MAX) { w*=MAX/h; h=MAX; } }
-            c.width=w; c.height=h; ctx.drawImage(img, 0,0,w,h);
+            const c = document.createElement('canvas'); 
+            const ctx = c.getContext('2d');
+            
+            const MAX = 1000; 
+            let w = img.width, h = img.height;
+            if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } 
+            else { if(h > MAX) { w *= MAX/h; h = MAX; } }
+            
+            c.width = w; 
+            c.height = h; 
+            ctx.drawImage(img, 0, 0, w, h);
+            
             if (addWatermark) {
               const dateStr = new Date().toLocaleDateString('ja-JP');
               const watermarkText = "株式会社アレスコ / 社外秘 / " + dateStr;
               const fontSize = Math.floor(w / 20);
               ctx.font = "bold " + fontSize + "px 'Noto Sans JP', sans-serif";
-              ctx.fillStyle = "rgba(200, 200, 200, 0.35)"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-              ctx.translate(w / 2, h / 2); ctx.rotate(-45 * Math.PI / 180);
-              ctx.fillText(watermarkText, 0, -h/4); ctx.fillText(watermarkText, 0, 0); ctx.fillText(watermarkText, 0, h/4);
+              ctx.fillStyle = "rgba(200, 200, 200, 0.35)"; 
+              ctx.textAlign = "center"; 
+              ctx.textBaseline = "middle";
+              ctx.translate(w / 2, h / 2); 
+              ctx.rotate(-45 * Math.PI / 180);
+              ctx.fillText(watermarkText, 0, -h/4); 
+              ctx.fillText(watermarkText, 0, 0); 
+              ctx.fillText(watermarkText, 0, h/4);
             }
-            res(c.toDataURL('image/jpeg', 0.75));
+            
+            resolve(c.toDataURL('image/jpeg', 0.6));
           };
         };
       });
