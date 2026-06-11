@@ -9,28 +9,88 @@
   <style>
     /* CSS CƠ BẢN */
     :root { --primary: #0061A4; --bg: #f4f7fc; --surface: #ffffff; --text: #1A1C1E; --border: #e1e3e1; }
-    body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-    .header-container { background: var(--surface); padding: 20px 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
-    .header-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 15px; }
+    
+    /* Đổi padding thành 0 để Menu tràn viền */
+    body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
+    
+    /* ✨ NAV BAR ÉP CÂN ✨ */
+    .top-navbar { 
+      background: var(--surface); 
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+      height: 48px; /* ÉP CHIỀU CAO MENU TỪ 64px XUỐNG 48px */
+      display: flex; 
+      align-items: center; 
+      padding: 0 20px; 
+      position: sticky; 
+      top: 0; 
+      z-index: 9999; 
+    }
+    .nav-logo { height: 22px; margin-right: 30px; cursor: pointer; } /* Thu nhỏ Logo */
+    .nav-menu { display: flex; height: 100%; gap: 10px; }
+    .nav-btn { 
+      display: flex; align-items: center; gap: 6px;
+      padding: 0 15px; color: #5f6368; text-decoration: none; 
+      font-weight: 700; font-size: 13px; /* Font nhỏ lại 1 chút */
+      border-bottom: 3px solid transparent; 
+      transition: all 0.2s ease; height: 100%; box-sizing: border-box; 
+    }
+    .nav-btn:hover { color: var(--primary); background: #f8f9fa; }
+    .nav-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: #f0f4f8; }
+    .nav-btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+    /* Khu vực chứa nội dung chính */
+    .main-content { padding: 15px 20px; } /* Gọt bớt khoảng trống trên dưới */
+
+    /* ✨ CỤM HEADER & FILTER ÉP CÂN ✨ */
+    .header-container { 
+      background: var(--surface); 
+      padding: 12px 20px; /* Thu nhỏ vùng đệm của khung trắng */
+      border-radius: 8px; 
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+      margin-bottom: 15px; 
+    }
+    .header-top { 
+      display: flex; justify-content: space-between; align-items: center; 
+      border-bottom: 1px solid var(--border); 
+      padding-bottom: 10px; /* Gọt khoảng trống */
+      margin-bottom: 10px; 
+    }
     .header-title-box { display: flex; align-items: baseline; gap: 15px; }
-    .header-title-box h1 { margin: 0; font-size: 22px; color: var(--primary); }
-    .header-title-box p { margin: 0; font-size: 13px; color: #666; font-weight: bold; }
-    .header-actions { display: flex; align-items: center; gap: 15px; }
+    .header-title-box h1 { margin: 0; font-size: 18px; color: var(--primary); } /* Tiêu đề nhỏ lại */
+    .header-title-box p { margin: 0; font-size: 12px; color: #666; font-weight: bold; }
+    .header-actions { display: flex; align-items: center; gap: 10px; }
+    
+    /* Gọn gàng hóa form nhập liệu và nút bấm */
     .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; width: 100%; }
-    .tab-group { display: flex; background: #e1e3e1; border-radius: 8px; overflow: hidden; margin: 0; }
-    .tab-btn { border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; background: transparent; color: #444; transition: 0.2s; font-size: 14px; }
+    .tab-group { display: flex; background: #e1e3e1; border-radius: 6px; overflow: hidden; margin: 0; }
+    .tab-btn { border: none; padding: 6px 15px; font-weight: bold; cursor: pointer; background: transparent; color: #444; transition: 0.2s; font-size: 12px; }
     .tab-btn.active { background: var(--primary); color: white; }
-    input[type="text"], select { padding: 10px 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: bold; outline: none; color: #333; }
+    
+    input[type="text"], select { 
+      padding: 6px 10px; /* Ô tìm kiếm hẹp lại */
+      border: 1px solid var(--border); 
+      border-radius: 6px; 
+      font-size: 12px; 
+      font-weight: bold; outline: none; color: #333; 
+    }
     input[type="text"]:focus, select:focus { border-color: var(--primary); }
-    .btn { background: var(--primary); color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; margin: 0;}
+    
+    .btn { 
+      background: var(--primary); color: white; border: none; 
+      padding: 6px 18px; /* Nút bấm nhỏ lại */
+      border-radius: 6px; cursor: pointer; font-weight: bold; 
+      font-size: 12px; transition: 0.2s; margin: 0;
+    }
     .btn:hover { background: #004d82; }
     
-    table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-    th, td { padding: 15px 20px; text-align: left; border-bottom: 1px solid var(--border); }
-    th { background: #e8f0fe; color: var(--primary); font-size: 14px; white-space: nowrap;}
-    td { font-size: 14px; cursor: pointer; }
+    /* BẢNG DATA */
+    table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    th, td { padding: 10px 15px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: #e8f0fe; color: var(--primary); font-size: 13px; white-space: nowrap;}
+    td { font-size: 13px; cursor: pointer; }
     tr:hover { background: #f8f9fa; }
-    .badge { padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; white-space: nowrap; display: inline-block;}
+    
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; white-space: nowrap; display: inline-block;}
     .st-kari { background: #fff3e0; color: #b28900; border: 1px solid #ffe082; }
     .st-hon { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
     .st-leave { background: #eeeeee; color: #757575; border: 1px solid #e0e0e0; }
@@ -38,224 +98,241 @@
     .pr-part { background: #e3f2fd; color: #0277bd; }
     .pr-none { background: #ffebee; color: #c62828; }
     .pr-kari { background: #f5f5f5; color: #616161; }
+    
     #loading { text-align: center; padding: 50px; font-size: 16px; color: #666; font-weight: bold; }
-    .spinner { border: 4px solid rgba(0,0,0,0.1); border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+    .spinner { border: 4px solid rgba(0,0,0,0.1); border-top: 4px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     
-    /* UI MODAL CHI TIẾT */
+    /* MODAL CHI TIẾT (GIỮ NGUYÊN) */
     #detailModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-    .modal-content { background: #f8f9fa; width: 90%; max-width: 750px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; position: relative;}
-    .modal-header { background: var(--primary); color: white; padding: 25px 30px; display: flex; justify-content: space-between; align-items: flex-start; }
-    .modal-header-left { display: flex; flex-direction: column; gap: 8px; flex: 1; }
-    .modal-header h2 { margin: 0; font-size: 24px; font-weight: 700; line-height: 1.2; }
-    .modal-header .kana { font-size: 13px; opacity: 0.8; font-weight: 500; }
-    .btn-close { background: transparent; border: none; color: white; font-size: 32px; cursor: pointer; line-height: 1; padding: 0; opacity: 0.8; transition: 0.2s; }
+    .modal-content { background: #f8f9fa; width: 90%; max-width: 750px; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; position: relative;}
+    .modal-header { background: var(--primary); color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .modal-header-left { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+    .modal-header h2 { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.2; }
+    .modal-header .kana { font-size: 12px; opacity: 0.8; font-weight: 500; }
+    .btn-close { background: transparent; border: none; color: white; font-size: 28px; cursor: pointer; line-height: 1; padding: 0; opacity: 0.8; transition: 0.2s; }
     .btn-close:hover { opacity: 1; transform: scale(1.1); }
-    .modal-body { padding: 30px; overflow-y: auto; }
-    .info-card { background: #ffffff; border-radius: 12px; border: 1px solid var(--border); padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 30px; }
-    .info-item { display: flex; flex-direction: column; gap: 5px; min-height: 45px;}
-    .info-label { font-size: 12px; color: #7f8c8d; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-    .info-value { font-size: 15px; color: #2c3e50; font-weight: 600; display: flex; align-items: flex-start; gap: 8px; word-break: break-all;}
-    .info-value.highlight { color: var(--primary); }
+    .modal-body { padding: 25px; overflow-y: auto; }
+    .info-card { background: #ffffff; border-radius: 8px; border: 1px solid var(--border); padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 20px; }
+    .info-item { display: flex; flex-direction: column; gap: 4px; min-height: 40px;}
+    .info-label { font-size: 11px; color: #7f8c8d; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-value { font-size: 14px; color: #2c3e50; font-weight: 600; display: flex; align-items: flex-start; gap: 8px; word-break: break-all;}
     .copy-btn { background: #f1f3f4; border: none; border-radius: 4px; padding: 4px; cursor: pointer; color: #5f6368; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
     .copy-btn:hover { background: #e8eaed; color: var(--primary); }
     .copy-btn svg { width: 14px; height: 14px; fill: currentColor; }
-    .status-header { font-size: 15px; font-weight: 700; color: #2c3e50; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-    .status-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #e1e3e1; font-size: 14px; }
+    .status-header { font-size: 14px; font-weight: 700; color: #2c3e50; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .status-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #e1e3e1; font-size: 13px; }
     .status-row:last-child { border-bottom: none; padding-bottom: 0;}
     .status-title { font-weight: 600; color: #555; }
     .status-val { text-align: right; white-space: pre-wrap; font-weight: 600; }
     .txt-ok { color: #00796b; }
     .txt-ng { color: #d32f2f; }
-    .btn-nas { background: #fbc02d; color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(251, 192, 45, 0.3); margin-top: 10px;}
+    .btn-nas { background: #fbc02d; color: #000; border: none; padding: 8px 15px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(251, 192, 45, 0.3); margin-top: 10px;}
     .btn-nas:hover { background: #f9a825; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(251, 192, 45, 0.4); }
     .btn-nas:active { transform: translateY(0); }
-    .btn-nas svg { width: 18px; height: 18px; fill: currentColor; }
+    .btn-nas svg { width: 16px; height: 16px; fill: currentColor; }
     #copyToast { position: absolute; top: 10px; right: 10px; background: #333; color: #fff; padding: 5px 12px; font-size: 12px; border-radius: 20px; opacity: 0; transition: 0.3s; pointer-events: none;}
     
-    /* CSS DÀNH CHO EDIT LANGUAGE */
     .btn-edit { background: none; border: 1px solid #C4C7C5; border-radius: 4px; padding: 3px 6px; cursor: pointer; color: var(--primary); font-size: 11px; display: inline-flex; align-items: center; gap: 4px; font-weight: bold;}
     .btn-edit:hover { background: #e8f0fe; border-color: var(--primary);}
-    #langEditArea input { height: 32px; padding: 5px 10px; font-size: 14px; font-weight: normal; margin-right: 5px; flex: 1;}
-    .btn-small { height: 32px; padding: 0 12px; border-radius: 6px; font-size: 12px; margin: 0; min-width: unset;}
+    #langEditArea input { height: 28px; padding: 5px 10px; font-size: 13px; font-weight: normal; margin-right: 5px; flex: 1; border-radius: 4px; border: 1px solid var(--border);}
+    .btn-small { height: 28px; padding: 0 10px; border-radius: 4px; font-size: 11px; margin: 0; min-width: unset;}
   </style>
 </head>
 <body>
 
-  <div class="header-container">
-    <div class="header-top">
-      <div class="header-title-box">
-        <h1>スタッフ進捗管理ダッシュボード</h1>
-        <p id="lastUpdate">最終更新: --:--</p>
-      </div>
-      <div class="header-actions">
-        <div class="tab-group">
-          <button class="tab-btn active" id="tabMain" onclick="switchTab(false)">稼働中</button>
-          <button class="tab-btn" id="tabArchive" onclick="switchTab(true)">アーカイブ</button>
-        </div>
-        <button class="btn" onclick="fetchData()">更新</button>
-      </div>
-    </div>
-
-    <div class="controls">
-      <input type="text" id="searchInput" placeholder="名前、カナ、電話番号、ID、言語、住所など (スペース区切りで複数検索可)" oninput="filterData()" style="flex: 2; min-width: 250px;">
+  <!-- ✨ THANH MENU ĐIỀU HƯỚNG TỔNG -->
+  <div class="top-navbar">
+    <img src="logo.png" alt="ALESCO" class="nav-logo" onerror="this.src='https://alesco-v.co.jp/wp/wp-content/uploads/ALESCO-LOGO.png'">
+    
+    <div class="nav-menu">
+      <a href="admin-dashboard.html" class="nav-btn active">
+        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        スタッフ進捗管理
+      </a>
       
-      <select id="statusFilter" onchange="filterData()" style="flex: 1; min-width: 120px;">
-        <option value="ALL">すべてのステータス</option>
-        <option value="仮登録">仮登録</option>
-        <option value="本登録">本登録</option>
-      </select>
-
-      <select id="progressFilter" onchange="filterData()" style="flex: 1; min-width: 140px;">
-        <option value="ALL">提出状況 (すべて)</option>
-        <option value="DONE">100% 完了</option>
-        <option value="MISSING_ID">未提出：身分証</option>
-        <option value="MISSING_MYNUM">未提出：マイナンバー</option>
-        <option value="MISSING_BANK">未提出：口座情報</option>
-        <option value="MISSING_FUYO">未提出：扶養申告書</option>
-      </select>
-
-      <select id="natFilter" onchange="filterData()" style="flex: 1; min-width: 110px;">
-        <option value="ALL">国籍 (すべて)</option>
-        <option value="日本">日本</option>
-        <option value="FOREIGN">外国籍 (すべて)</option>
-      </select>
-
-      <select id="langFilter" onchange="filterData()" style="flex: 1; min-width: 110px;">
-        <option value="ALL">言語 (すべて)</option>
-      </select>
-
-      <select id="empTypeFilter" onchange="filterData()" style="flex: 1; min-width: 130px;">
-        <option value="ALL">雇用形態 (すべて)</option>
-        <option value="メイン">メイン</option>
-        <option value="ダブルワーク">ダブルワーク</option>
-        <option value="フリーランス">フリーランス</option>
-        <option value="ワーキングホリデー">ワーキングホリデー</option>
-      </select>
+      <a href="attendance.html" class="nav-btn">
+        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/><path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+        勤怠・シフト管理
+      </a>
     </div>
   </div>
 
-  <div id="loading">
-    <div class="spinner"></div>
-    データを読み込んでいます...
-  </div>
-
-  <div style="overflow-x: auto;">
-    <table id="staffTable" style="display: none;">
-      <thead>
-        <tr>
-          <th>登録日</th>
-          <th>ID</th>
-          <th>氏名</th>
-          <!-- ĐÃ TÁCH THÀNH 2 CỘT QUỐC TỊCH & NGÔN NGỮ -->
-          <th>国籍</th>
-          <th>対応言語</th>
-          <th>電話番号</th>
-          <th>雇用形態</th>
-          <th>ステータス</th>
-          <th>提出進捗</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-      </tbody>
-    </table>
-    <div id="noData" style="display:none; text-align:center; padding: 40px; background:white; border-radius:12px; color:#666;">
-      該当するスタッフが見つかりません。
-    </div>
-  </div>
-
-  <div id="detailModal" onclick="closeModalOutside(event)">
-    <div class="modal-content">
-      <div id="copyToast">コピーしました</div>
-      <div class="modal-header">
-        <div class="modal-header-left">
-          <div class="kana" id="mKana">カナ</div>
-          <h2 id="mName">氏名</h2>
-          <button class="btn-nas" id="btnOpenNas" onclick="openNasFolder()" style="display:none;">
-            <svg viewBox="0 0 24 24"><path d="M20,6h-8l-2-2H4C2.9,4,2.01,4.9,2.01,6L2,18c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V8C22,6.9,21.1,6,20,6z M20,18H4V8h16V18z"/></svg>
-            個人フォルダを開く
-          </button>
+  <!-- ✨ BỌC NỘI DUNG CŨ BẰNG .main-content -->
+  <div class="main-content">
+    
+    <div class="header-container">
+      <div class="header-top">
+        <div class="header-title-box">
+          <h1>スタッフ進捗管理ダッシュボード</h1>
+          <p id="lastUpdate">最終更新: --:--</p>
         </div>
-        <button class="btn-close" onclick="closeModal()">×</button>
+        <div class="header-actions">
+          <div class="tab-group">
+            <button class="tab-btn active" id="tabMain" onclick="switchTab(false)">稼働中</button>
+            <button class="tab-btn" id="tabArchive" onclick="switchTab(true)">アーカイブ</button>
+          </div>
+          <button class="btn" onclick="fetchData()">更新</button>
+        </div>
       </div>
-      <div class="modal-body">
-        <div id="mNoFolderWarning" style="display:none; background:#ffebee; color:#c62828; padding:15px; border-radius:8px; border:1px solid #ffcdd2; margin-bottom:20px; font-size:13px; font-weight:bold;">
-          ⚠️ スプレッドシートにフォルダ名が記録されていないため、個人フォルダを開けません。
-        </div>
+
+      <div class="controls">
+        <input type="text" id="searchInput" placeholder="名前、カナ、電話番号、ID、言語、住所など (スペース区切りで複数検索可)" oninput="filterData()" style="flex: 2; min-width: 250px;">
         
-        <div class="info-card">
-          <div class="info-grid">
-            <div class="info-item">
-              <span class="info-label">スタッフID</span>
-              <div class="info-value">
-                <span id="mId"></span>
-                <button class="copy-btn" onclick="copyToClipboard('mId')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
+        <select id="statusFilter" onchange="filterData()" style="flex: 1; min-width: 120px;">
+          <option value="ALL">すべてのステータス</option>
+          <option value="仮登録">仮登録</option>
+          <option value="本登録">本登録</option>
+        </select>
+
+        <select id="progressFilter" onchange="filterData()" style="flex: 1; min-width: 140px;">
+          <option value="ALL">提出状況 (すべて)</option>
+          <option value="DONE">100% 完了</option>
+          <option value="MISSING_ID">未提出：身分証</option>
+          <option value="MISSING_MYNUM">未提出：マイナンバー</option>
+          <option value="MISSING_BANK">未提出：口座情報</option>
+          <option value="MISSING_FUYO">未提出：扶養申告書</option>
+        </select>
+
+        <select id="natFilter" onchange="filterData()" style="flex: 1; min-width: 110px;">
+          <option value="ALL">国籍 (すべて)</option>
+          <option value="日本">日本</option>
+          <option value="FOREIGN">外国籍 (すべて)</option>
+        </select>
+
+        <select id="langFilter" onchange="filterData()" style="flex: 1; min-width: 110px;">
+          <option value="ALL">言語 (すべて)</option>
+        </select>
+
+        <select id="empTypeFilter" onchange="filterData()" style="flex: 1; min-width: 130px;">
+          <option value="ALL">雇用形態 (すべて)</option>
+          <option value="メイン">メイン</option>
+          <option value="ダブルワーク">ダブルワーク</option>
+          <option value="フリーランス">フリーランス</option>
+          <option value="ワーキングホリデー">ワーキングホリデー</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="loading">
+      <div class="spinner"></div>
+      データを読み込んでいます...
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table id="staffTable" style="display: none;">
+        <thead>
+          <tr>
+            <th>登録日</th>
+            <th>ID</th>
+            <th>氏名</th>
+            <th>国籍</th>
+            <th>対応言語</th>
+            <th>電話番号</th>
+            <th>雇用形態</th>
+            <th>ステータス</th>
+            <th>提出進捗</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+      </table>
+      <div id="noData" style="display:none; text-align:center; padding: 40px; background:white; border-radius:12px; color:#666;">
+        該当するスタッフが見つかりません。
+      </div>
+    </div>
+
+    <div id="detailModal" onclick="closeModalOutside(event)">
+      <div class="modal-content">
+        <div id="copyToast">コピーしました</div>
+        <div class="modal-header">
+          <div class="modal-header-left">
+            <div class="kana" id="mKana">カナ</div>
+            <h2 id="mName">氏名</h2>
+            <button class="btn-nas" id="btnOpenNas" onclick="openNasFolder()" style="display:none;">
+              <svg viewBox="0 0 24 24"><path d="M20,6h-8l-2-2H4C2.9,4,2.01,4.9,2.01,6L2,18c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V8C22,6.9,21.1,6,20,6z M20,18H4V8h16V18z"/></svg>
+              個人フォルダを開く
+            </button>
+          </div>
+          <button class="btn-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div id="mNoFolderWarning" style="display:none; background:#ffebee; color:#c62828; padding:15px; border-radius:8px; border:1px solid #ffcdd2; margin-bottom:20px; font-size:13px; font-weight:bold;">
+            ⚠️ スプレッドシートにフォルダ名が記録されていないため、個人フォルダを開けません。
+          </div>
+          
+          <div class="info-card">
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">スタッフID</span>
+                <div class="info-value">
+                  <span id="mId"></span>
+                  <button class="copy-btn" onclick="copyToClipboard('mId')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
+                </div>
               </div>
-            </div>
-            
-            <div class="info-item">
-              <span class="info-label">雇用形態</span>
-              <div class="info-value" id="mEmpType"></div>
-            </div>
-
-            <div class="info-item">
-              <span class="info-label">国籍</span>
-              <div class="info-value" id="mNationality"></div>
-            </div>
-
-            <!-- CHỨC NĂNG EDIT NGÔN NGỮ NẰM Ở ĐÂY -->
-            <div class="info-item">
-              <span class="info-label">対応言語</span>
-              <div id="mLanguageContainer"></div>
-            </div>
-            
-            <!-- KHU VỰC HIỂN THỊ ĐA SỐ ĐIỆN THOẠI -->
-            <div class="info-item">
-              <span class="info-label">電話番号</span>
-              <div id="mPhoneContainer" style="display: flex; flex-direction: column; gap: 8px;"></div>
-            </div>
-
-            <div class="info-item">
-              <span class="info-label">メールアドレス</span>
-              <div class="info-value">
-                <span id="mEmail" style="word-break: break-all;"></span>
-                <button class="copy-btn" id="btnCopyEmail" onclick="copyToClipboard('mEmail')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
+              
+              <div class="info-item">
+                <span class="info-label">雇用形態</span>
+                <div class="info-value" id="mEmpType"></div>
               </div>
-            </div>
-            
-            <div class="info-item">
-              <span class="info-label">生年月日・性別</span>
-              <div class="info-value" id="mDobGender"></div>
-            </div>
 
-            <div class="info-item" style="grid-column: 1 / -1;">
-              <span class="info-label">現住所</span>
-              <div class="info-value">
-                <span id="mAddress"></span>
-                <button class="copy-btn" onclick="copyToClipboard('mAddress')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
+              <div class="info-item">
+                <span class="info-label">国籍</span>
+                <div class="info-value" id="mNationality"></div>
+              </div>
+
+              <div class="info-item">
+                <span class="info-label">対応言語</span>
+                <div id="mLanguageContainer"></div>
+              </div>
+              
+              <div class="info-item">
+                <span class="info-label">電話番号</span>
+                <div id="mPhoneContainer" style="display: flex; flex-direction: column; gap: 8px;"></div>
+              </div>
+
+              <div class="info-item">
+                <span class="info-label">メールアドレス</span>
+                <div class="info-value">
+                  <span id="mEmail" style="word-break: break-all;"></span>
+                  <button class="copy-btn" id="btnCopyEmail" onclick="copyToClipboard('mEmail')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
+                </div>
+              </div>
+              
+              <div class="info-item">
+                <span class="info-label">生年月日・性別</span>
+                <div class="info-value" id="mDobGender"></div>
+              </div>
+
+              <div class="info-item" style="grid-column: 1 / -1;">
+                <span class="info-label">現住所</span>
+                <div class="info-value">
+                  <span id="mAddress"></span>
+                  <button class="copy-btn" onclick="copyToClipboard('mAddress')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="info-card">
-          <div class="status-header">📄 提出書類ステータス</div>
-          <div class="status-list">
-            <div class="status-row"><div class="status-title">進捗状況</div><div class="status-val" id="mProgress"></div></div>
-            <div class="status-row"><div class="status-title">身分証明書</div><div class="status-val" id="mIdCard"></div></div>
-            <div class="status-row"><div class="status-title">マイナンバー</div><div class="status-val" id="mMyNum"></div></div>
-            <div class="status-row"><div class="status-title">銀行口座</div><div class="status-val" id="mBank"></div></div>
-            <div class="status-row"><div class="status-title">扶養控除等申告書</div><div class="status-val" id="mFuyo"></div></div>
+          <div class="info-card">
+            <div class="status-header">📄 提出書類ステータス</div>
+            <div class="status-list">
+              <div class="status-row"><div class="status-title">進捗状況</div><div class="status-val" id="mProgress"></div></div>
+              <div class="status-row"><div class="status-title">身分証明書</div><div class="status-val" id="mIdCard"></div></div>
+              <div class="status-row"><div class="status-title">マイナンバー</div><div class="status-val" id="mMyNum"></div></div>
+              <div class="status-row"><div class="status-title">銀行口座</div><div class="status-val" id="mBank"></div></div>
+              <div class="status-row"><div class="status-title">扶養控除等申告書</div><div class="status-val" id="mFuyo"></div></div>
+            </div>
           </div>
-        </div>
-        <div class="info-card" id="mRemarksContainer" style="background:#fff8e1; border-color:#ffe082;">
-          <div class="status-header" style="color:#f57c00;">⚠️ 備考・特記事項</div>
-          <div style="font-size:14px; white-space:pre-wrap; font-weight: 600; color: #424242;" id="mRemarks"></div>
+          <div class="info-card" id="mRemarksContainer" style="background:#fff8e1; border-color:#ffe082;">
+            <div class="status-header" style="color:#f57c00;">⚠️ 備考・特記事項</div>
+            <div style="font-size:14px; white-space:pre-wrap; font-weight: 600; color: #424242;" id="mRemarks"></div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </div> <!-- Đóng thẻ main-content -->
 
 <script>
     // ⚠️ ĐỔI LẠI URL NÀY
