@@ -7,31 +7,50 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    /* CSS ĐỒNG BỘ VỚI TRANG QUẢN LÝ ỨNG VIÊN */
+    /* CSS CƠ BẢN */
     :root { --primary: #0061A4; --bg: #f4f7fc; --surface: #ffffff; --text: #1A1C1E; --border: #e1e3e1; }
     body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
     
-    .top-navbar { background: var(--surface); box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: 64px; display: flex; align-items: center; padding: 0 20px; position: sticky; top: 0; z-index: 9999; }
-    .nav-logo { height: 28px; margin-right: 40px; cursor: pointer; }
+    /* ✨ NAV BAR ÉP CÂN ✨ */
+    .top-navbar { 
+      background: var(--surface); 
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+      height: 48px; 
+      display: flex; 
+      align-items: center; 
+      padding: 0 20px; 
+      position: sticky; 
+      top: 0; 
+      z-index: 9999; 
+    }
+    .nav-logo { height: 22px; margin-right: 30px; cursor: pointer; } 
     .nav-menu { display: flex; height: 100%; gap: 10px; }
-    .nav-btn { display: flex; align-items: center; gap: 8px; padding: 0 20px; color: #5f6368; text-decoration: none; font-weight: 700; font-size: 14px; border-bottom: 3px solid transparent; transition: all 0.2s ease; height: 100%; box-sizing: border-box; }
+    .nav-btn { 
+      display: flex; align-items: center; gap: 6px;
+      padding: 0 15px; color: #5f6368; text-decoration: none; 
+      font-weight: 700; font-size: 13px; 
+      border-bottom: 3px solid transparent; 
+      transition: all 0.2s ease; height: 100%; box-sizing: border-box; 
+    }
     .nav-btn:hover { color: var(--primary); background: #f8f9fa; }
     .nav-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: #f0f4f8; }
-    .nav-btn svg { width: 18px; height: 18px; fill: currentColor; }
+    .nav-btn svg { width: 16px; height: 16px; fill: currentColor; }
 
-    .main-content { padding: 20px; }
-    
-    .header-container { background: var(--surface); padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
-    .header-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; }
+    /* Khu vực chứa nội dung chính */
+    .main-content { padding: 15px 20px; } 
+
+    /* ✨ CỤM HEADER & FILTER ÉP CÂN ✨ */
+    .header-container { background: var(--surface); padding: 12px 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 10px; }
     .header-title-box { display: flex; align-items: baseline; gap: 15px; }
-    .header-title-box h1 { margin: 0; font-size: 20px; color: var(--primary); }
-    .header-actions { display: flex; gap: 10px; }
-
+    .header-title-box h1 { margin: 0; font-size: 18px; color: var(--primary); } 
+    .header-actions { display: flex; align-items: center; gap: 10px; }
+    
     .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; width: 100%; }
-    input[type="month"], input[type="text"], select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-weight: bold; outline: none; color: #333; }
+    input[type="month"], input[type="text"], select { padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-weight: bold; outline: none; color: #333; }
     input:focus, select:focus { border-color: var(--primary); }
     
-    .btn { background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;}
+    .btn { background: var(--primary); color: white; border: none; padding: 6px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;}
     .btn:hover { background: #004d82; }
     .btn-secondary { background: #5f6368; }
     .btn-secondary:hover { background: #3c4043; }
@@ -129,7 +148,7 @@
 
 <script>
   // Sửa URL này thành link Web App của ông
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbyCgWzH-b8t1vK.../exec"; 
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbxC71cAofv5QXr-pjKkmK8ehgNzo4M5wRMMjtG1enU-5w62j0slyK56XJtDvMimAlvE/exec"; 
   let globalData = [];
 
   window.onload = () => {
