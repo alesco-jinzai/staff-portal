@@ -3239,7 +3239,7 @@
       const fDay = new Date(shiftYear, shiftMonth - 1, 1).getDay();
       const mDays = new Date(shiftYear, shiftMonth, 0).getDate();
       let html = `<div class="calendar-header">${['日','月','火','水','木','金','土'].map(d=>`<div>${d}</div>`).join('')}</div><div class="calendar-grid">`;
-      html += ''.padStart(fDay * 28, '<div class="calendar-day"></div>');
+      html += '<div class="calendar-day"></div>'.repeat(fDay);
       for (let i = 1; i <= mDays; i++) {
         const dStr = `${shiftYear}-${String(shiftMonth).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
         const sHtml = (byDate[dStr] || []).map(s => `<div class="shift-entry">${s.startTime}<br>${s.locationName}</div>`).join('');
