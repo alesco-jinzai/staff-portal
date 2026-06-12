@@ -1801,12 +1801,10 @@
         r.readAsDataURL(file);
         r.onload = e => {
           
-          // 👉 NẾU FILE LÀ PDF HOẶC WORD: TRẢ VỀ LUÔN, KHÔNG VẼ CANVAS
           if (!file.type.startsWith('image/')) {
              return resolve(e.target.result); 
           }
 
-          // 👉 NẾU LÀ ẢNH THÌ MỚI XỬ LÝ ÉP CÂN
           const img = new Image(); 
           img.src = e.target.result;
           img.onload = () => {
@@ -1822,19 +1820,32 @@
             c.height = h; 
             ctx.drawImage(img, 0, 0, w, h);
             
+            // ĐÓNG DẤU LƯỚI CHỮ RỖNG RUỘT (HOLLOW GRID WATERMARK)
             if (addWatermark) {
               const dateStr = new Date().toLocaleDateString('ja-JP');
-              const watermarkText = "株式会社アレスコ / 社外秘 / " + dateStr;
-              const fontSize = Math.floor(w / 20);
+              const text = "株式会社アレスコ提出用 (" + dateStr + ")";
+              
+              // Thiết lập font và KIỂU CHỮ RỖNG (Stroke)
+              const fontSize = Math.max(16, Math.floor(w / 25));
               ctx.font = "bold " + fontSize + "px 'Noto Sans JP', sans-serif";
-              ctx.fillStyle = "rgba(200, 200, 200, 0.35)"; 
-              ctx.textAlign = "center"; 
-              ctx.textBaseline = "middle";
+              ctx.strokeStyle = "rgba(50, 50, 50, 0.25)"; // Viền màu xám, trong suốt 25%
+              ctx.lineWidth = 1.5; // Viền mỏng để không che số
+              
+              // Xoay nghiêng Canvas
               ctx.translate(w / 2, h / 2); 
-              ctx.rotate(-45 * Math.PI / 180);
-              ctx.fillText(watermarkText, 0, -h/4); 
-              ctx.fillText(watermarkText, 0, 0); 
-              ctx.fillText(watermarkText, 0, h/4);
+              ctx.rotate(-25 * Math.PI / 180);
+              
+              // Tính toán độ rộng để lặp chữ kín toàn bộ ảnh
+              const diag = Math.sqrt(w*w + h*h);
+              const stepX = ctx.measureText(text).width + 50; // Khoảng cách ngang
+              const stepY = fontSize * 4;                     // Khoảng cách dọc
+              
+              // Vòng lặp vẽ lưới chữ đè lên toàn bộ ảnh
+              for (let x = -diag; x < diag; x += stepX) {
+                for (let y = -diag; y < diag; y += stepY) {
+                  ctx.strokeText(text, x, y); // DÙNG STROKE ĐỂ VẼ VIỀN CHỮ
+                }
+              }
             }
             
             resolve(c.toDataURL('image/jpeg', 0.6));
