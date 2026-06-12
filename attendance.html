@@ -127,10 +127,18 @@
     .btn-edit { background: none; border: 1px solid #C4C7C5; border-radius: 4px; padding: 3px 6px; cursor: pointer; color: var(--primary); font-size: 11px; display: inline-flex; align-items: center; gap: 4px; font-weight: bold;}
     .btn-edit:hover { background: #e8f0fe; border-color: var(--primary);}
     #langEditArea input { height: 28px; padding: 5px 10px; font-size: 13px; font-weight: normal; margin-right: 5px; flex: 1; border-radius: 4px; border: 1px solid var(--border);}
+
+    /* THÔNG BÁO GÓC MÀN HÌNH (TOAST) */
+    #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+    .toast { background: #333; color: #fff; padding: 12px 20px; border-radius: 6px; font-size: 13px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transform: translateX(100%); transition: all 0.3s ease; }
+    .toast.show { opacity: 1; transform: translateX(0); }
+    .toast.success { background: #2e7d32; }
+    .toast.error { background: #c62828; }
+
   </style>
 </head>
 <body>
-
+  <div id="toast-container"></div>
   <div class="top-navbar">
     <img src="logo.png" alt="ALESCO" class="nav-logo" onerror="this.src='https://alesco-v.co.jp/wp/wp-content/uploads/ALESCO-LOGO.png'">
     <div class="nav-menu">
@@ -154,7 +162,7 @@
         </div>
         <div class="header-actions">
           <button class="btn btn-secondary">＋ 新規登録</button>
-          <button class="btn btn-secondary">CSV出力</button>
+          <button class="btn btn-secondary" onclick="exportCSV()">CSV出力</button>
           <button class="btn btn-secondary">PDF出力</button>
         </div>
       </div>
@@ -300,7 +308,7 @@
         <td>${isYukyu ? '' : '¥'+(Number(row.transportCost)||0).toLocaleString()}</td>
         <td>${approvalHtml}</td>
         <td>
-          ${isYukyu ? '' : `<input type="text" class="memo-input" value="${row.memo}" placeholder="メモを入力..." onchange="alert('Hàm lưu Memo sẽ làm ở Bước 2!')">`}
+          ${isYukyu ? '' : `<input type="text" class="memo-input" value="${row.memo}" placeholder="メモを入力..." onchange="saveMemo(this, ${row.rowIndex})">`}
         </td>
         <td>
           ${isYukyu ? '' : `<button class="btn btn-secondary" style="padding:4px 10px; font-size:11px;" onclick="alert('Hàm Sửa Ca làm sẽ làm ở Bước 2!')">編集</button>`}
@@ -315,6 +323,91 @@
     let tm = Math.floor((totalMs % 3600000) / 60000);
     document.getElementById('totalHours').innerText = `${String(th).padStart(2,'0')}:${String(tm).padStart(2,'0')}`;
   }
+
+  // ==========================================
+  // HỆ THỐNG THÔNG BÁO BONG BÓNG (TOAST)
+  // ==========================================
+  function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerText = message;
+    container.appendChild(toast);
+    
+    // Hiệu ứng trượt ra
+    setTimeout(() => toast.classList.add('show'), 10);
+    // Tự động biến mất sau 3 giây
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  // ==========================================
+  // HÀM LƯU MEMO TRỰC TIẾP
+  // ==========================================
+  function saveMemo(inputEl, rowIndex) {
+    inputEl.style.backgroundColor = "#fff3e0"; // Đổi màu cam nhạt báo hiệu đang lưu
+    
+    fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: "updateAttendanceMemo", params: [rowIndex, inputEl.value] }),
+      redirect: 'follow'
+    })
+    .then(r => r.json())
+    .then(res => {
+      if(res.result && res.result.success) {
+        inputEl.style.backgroundColor = "#e8f5e9"; // Đổi màu xanh lá báo thành công
+        showToast("メモを保存しました！", "success");
+        setTimeout(() => inputEl.style.backgroundColor = "#fff", 2000); // Trả lại màu trắng
+      } else {
+        inputEl.style.backgroundColor = "#ffebee"; // Đỏ báo lỗi
+        showToast("エラー: " + (res.error || res.result.message), "error");
+      }
+    })
+    .catch(err => {
+      inputEl.style.backgroundColor = "#ffebee";
+      showToast("通信エラーが発生しました。", "error");
+    });
+  }
+
+  // ==========================================
+  // HÀM XUẤT CSV TỪ BẢNG ĐANG HIỂN THỊ
+  // ==========================================
+  function exportCSV() {
+    const rows = document.querySelectorAll("#tableBody tr");
+    if(rows.length === 0) return showToast("出力するデータがありません。", "error");
+
+    showToast("CSVをダウンロードしています...", "success");
+    
+    // Thêm BOM để Excel Nhật mở không bị lỗi Font
+    let csv = "\uFEFF社員番号,名前,日付,出勤(実),出勤(丸),退勤(実),退勤(丸),実働時間,勤務地,交通費,承認状態,メモ\n";
+    
+    rows.forEach(tr => {
+      let cols = tr.querySelectorAll("td");
+      let rowData = [];
+      // Lấy data từ cột 0 đến 11 (Bỏ cột 12 là nút Thao tác)
+      for(let i = 0; i <= 11; i++) { 
+        let text = "";
+        if (i === 11) { // Nếu là cột Memo thì phải lấy value của ô input
+          text = cols[i].querySelector('input').value;
+        } else {
+          text = cols[i].innerText;
+        }
+        // Bao chuỗi trong dấu ngoặc kép để chống lỗi dấu phẩy
+        rowData.push(`"${text.replace(/"/g, '""')}"`);
+      }
+      csv += rowData.join(",") + "\n";
+    });
+
+    const monthVal = document.getElementById('monthFilter').value;
+    const link = document.createElement("a");
+    link.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
+    link.download = `勤怠データ_${monthVal}.csv`;
+    link.click();
+  }
+
 </script>
 </body>
 </html>
