@@ -225,19 +225,21 @@
       <div style="padding:25px; display:flex; flex-direction:column; gap:15px;">
         <input type="hidden" id="editRowIndex">
         
+        <!-- CHỖ CHỌN NHÂN VIÊN -->
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">社員 (ID - 名前)</label>
           <div class="dropdown-container">
-            <input type="text" id="editEmpInput" style="width:100%; height:40px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none; box-sizing:border-box;" placeholder="名前またはIDで検索..." autocomplete="off">
+            <!-- ĐÃ THÊM: autocomplete="nope" role="presentation" để vô hiệu hóa trình duyệt -->
+            <input type="text" id="editEmpInput" style="width:100%; height:40px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none; box-sizing:border-box;" placeholder="名前またはIDで検索..." autocomplete="nope" role="presentation">
             <div id="empSmartList" class="dropdown-list"></div>
           </div>
         </div>
         
-        <!-- CHỖ CHỌN CỬA HÀNG (ĐÃ SỬA THÀNH SMART DROPDOWN) -->
+        <!-- CHỖ CHỌN CỬA HÀNG -->
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">勤務地</label>
           <div class="dropdown-container">
-            <input type="text" id="editLocInput" style="width:100%; height:40px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none; box-sizing:border-box;" placeholder="勤務地を検索..." autocomplete="off">
+            <input type="text" id="editLocInput" style="width:100%; height:40px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none; box-sizing:border-box;" placeholder="勤務地を検索..." autocomplete="nope" role="presentation">
             <div id="locSmartList" class="dropdown-list"></div>
           </div>
         </div>
@@ -305,6 +307,7 @@
         globalData = res.result.data;
         updateDropdowns();
         renderTable();
+        fetchMasterDataForForm();
       } else {
         alert("エラー: " + (res.error || res.result.message));
       }
@@ -485,69 +488,67 @@
 
   // 👉 HÀM THÊM MỚI (Mở khóa ô Tên và Cửa hàng)
   function openAddModal() {
-    document.getElementById('editModal').style.display = 'flex';
-    document.getElementById('btnSaveRecord').disabled = true;
-    document.getElementById('btnDeleteRecord').style.display = "none";
+    document.getElementById('modalTitle').innerText = "勤務記録の新規登録";
+    document.getElementById('editRowIndex').value = "";
     
-    fetchMasterDataForForm().then(() => {
-      document.getElementById('modalTitle').innerText = "勤務記録の新規登録";
-      document.getElementById('editRowIndex').value = "";
-      
-      const empInput = document.getElementById('editEmpInput');
-      const locInput = document.getElementById('editLocInput');
-      
-      // Mở khóa các ô nhập liệu
-      empInput.value = ""; empInput.readOnly = false; empInput.style.backgroundColor = "#fff";
-      locInput.value = ""; locInput.readOnly = false; locInput.style.backgroundColor = "#fff";
-      
-      document.getElementById('editDate').value = "";
-      document.getElementById('editCheckIn').value = "";
-      document.getElementById('editCheckOut').value = "";
-      document.getElementById('editFee').value = "";
-      
-      populateEmpList(); 
-      document.getElementById('locSmartList').innerHTML = ""; 
-      
-      // Bật lại chức năng Smart Dropdown cho ô Tên và Cửa hàng
+    const empInput = document.getElementById('editEmpInput');
+    const locInput = document.getElementById('editLocInput');
+    
+    empInput.value = ""; empInput.readOnly = false; empInput.style.backgroundColor = "#fff";
+    locInput.value = ""; locInput.readOnly = false; locInput.style.backgroundColor = "#fff";
+    
+    document.getElementById('editDate').value = "";
+    document.getElementById('editCheckIn').value = "";
+    document.getElementById('editCheckOut').value = "";
+    document.getElementById('editFee').value = "";
+    
+    document.getElementById('btnSaveRecord').disabled = false;
+    document.getElementById('btnDeleteRecord').style.display = "none";
+    document.getElementById('locSmartList').innerHTML = ""; 
+    
+    // Nếu chưa có Data Master thì phải chờ 1 nhịp, có rồi thì gọi hàm vẽ Dropdown luôn
+    if (masterEmployees.length === 0) {
+      document.getElementById('btnSaveRecord').innerText = "読み込み中...";
+      document.getElementById('btnSaveRecord').disabled = true;
+      fetchMasterDataForForm().then(() => {
+        document.getElementById('btnSaveRecord').innerText = "保存する";
+        document.getElementById('btnSaveRecord').disabled = false;
+        setupSmartDropdown('editEmpInput', 'empSmartList', masterEmployees.map(e => `${e.id} | ${e.name.replace(/\//g, ' ')}`));
+      });
+    } else {
       setupSmartDropdown('editEmpInput', 'empSmartList', masterEmployees.map(e => `${e.id} | ${e.name.replace(/\//g, ' ')}`));
-      
-      document.getElementById('btnSaveRecord').disabled = false;
-    });
+    }
+    
+    document.getElementById('editModal').style.display = 'flex';
   }
 
   // 👉 HÀM SỬA (Khóa cứng ô Tên và Cửa hàng)
   function openEditModal(rowObj) {
-    document.getElementById('editModal').style.display = 'flex';
-    document.getElementById('btnSaveRecord').disabled = true;
+    document.getElementById('modalTitle').innerText = "勤務記録の修正";
+    document.getElementById('editRowIndex').value = rowObj.rowIndex;
+    
+    const empInput = document.getElementById('editEmpInput');
+    const locInput = document.getElementById('editLocInput');
+    
+    empInput.value = `${rowObj.empId} | ${rowObj.empName.replace(/\//g, ' ')}`;
+    empInput.readOnly = true; 
+    empInput.style.backgroundColor = "#f1f3f4";
+    empInput.onfocus = null; empInput.onkeyup = null; 
+    
+    locInput.value = rowObj.location || "";
+    locInput.readOnly = true;
+    locInput.style.backgroundColor = "#f1f3f4";
+    locInput.onfocus = null; locInput.onkeyup = null;
+    
+    document.getElementById('editDate').value = rowObj.date.replace(/\//g, '-');
+    document.getElementById('editCheckIn').value = rowObj.checkInActual || "";
+    document.getElementById('editCheckOut').value = rowObj.checkOutActual || "";
+    document.getElementById('editFee').value = rowObj.fee || "";
+    
+    document.getElementById('btnSaveRecord').disabled = false;
     document.getElementById('btnDeleteRecord').style.display = "block";
     
-    fetchMasterDataForForm().then(() => {
-      document.getElementById('modalTitle').innerText = "勤務記録の修正";
-      document.getElementById('editRowIndex').value = rowObj.rowIndex;
-      
-      const empInput = document.getElementById('editEmpInput');
-      const locInput = document.getElementById('editLocInput');
-      
-      // 👉 YÊU CẦU 3: Gán giá trị và Khóa cứng (Read-only), đổi màu nền xám
-      // 👉 YÊU CẦU 1: Xóa dấu / trong tên nhân viên
-      empInput.value = `${rowObj.empId} | ${rowObj.empName.replace(/\//g, ' ')}`;
-      empInput.readOnly = true; 
-      empInput.style.backgroundColor = "#f1f3f4";
-      // Xóa các sự kiện xổ xuống (Dropdown) để nó không hiện ra khi bấm vào
-      empInput.onfocus = null; empInput.onkeyup = null; 
-      
-      locInput.value = rowObj.location || "";
-      locInput.readOnly = true;
-      locInput.style.backgroundColor = "#f1f3f4";
-      locInput.onfocus = null; locInput.onkeyup = null;
-      
-      document.getElementById('editDate').value = rowObj.date.replace(/\//g, '-');
-      document.getElementById('editCheckIn').value = rowObj.checkInActual || "";
-      document.getElementById('editCheckOut').value = rowObj.checkOutActual || "";
-      document.getElementById('editFee').value = rowObj.fee || "";
-      
-      document.getElementById('btnSaveRecord').disabled = false;
-    });
+    document.getElementById('editModal').style.display = 'flex';
   }
 
   function populateEmpList() {
@@ -665,7 +666,7 @@
 
     document.getElementByI
   }
-  
+
 </script>
 </body>
 </html>
