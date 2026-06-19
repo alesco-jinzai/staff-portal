@@ -54,6 +54,17 @@
     .toast.show { opacity: 1; transform: translateX(0); }
     .toast.success { background: #2e7d32; }
     .toast.error { background: #c62828; }
+
+    /* MODAL THÊM/SỬA CA LÀM */
+    #editModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+    .modal-content-small { background: var(--surface); width: 90%; max-width: 450px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; display: flex; flex-direction: column; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; padding: 0 20px;}
+    .form-group label { font-size: 11px; color: #7f8c8d; font-weight: 700; }
+    .form-group input, .form-group select { height: 36px; padding: 0 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; font-weight: 600; color: var(--text); }
+    .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
+    .btn-danger { background: #d32f2f; color: white; border: none; padding: 0 20px; height: 36px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; margin-left: 20px;}
+    .btn-danger:hover { background: #b71c1c; }
+
   </style>
 </head>
 <body>
@@ -80,7 +91,7 @@
           <h1>勤怠履歴ダッシュボード</h1>
         </div>
         <div class="header-actions">
-          <button class="btn btn-secondary">＋ 新規登録</button>
+          <button class="btn btn-secondary" onclick="openAddModal()">＋ 新規登録</button>
           <button class="btn btn-secondary" onclick="exportCSV()">CSV出力</button>
           <button class="btn btn-secondary">PDF出力</button>
         </div>
@@ -131,6 +142,52 @@
 
   <!-- DIV HỨNG TOAST -->
   <div id="toast-container"></div>
+
+  <!-- MODAL THÊM/SỬA CA LÀM -->
+  <div id="editModal" onclick="if(event.target.id==='editModal') document.getElementById('editModal').style.display='none'">
+    <div class="modal-content-small">
+      <div class="modal-header">
+        <h2 id="modalTitle">勤務記録の修正</h2>
+        <button class="btn-close" onclick="document.getElementById('editModal').style.display='none'">×</button>
+      </div>
+      <div style="padding: 10px 0;">
+        <input type="hidden" id="editRowIndex">
+        <div class="form-group">
+          <label>社員 (ID - 名前)</label>
+          <select id="editEmpSelect"><option value="">選択してください</option></select>
+        </div>
+        <div class="form-group">
+          <label>勤務地</label>
+          <select id="editLocSelect"><option value="">選択してください</option></select>
+        </div>
+        <div class="form-group">
+          <label>日付</label>
+          <input type="date" id="editDate">
+        </div>
+        <div style="display:flex; padding:0 20px; gap:10px; margin-bottom:12px;">
+          <div style="flex:1; display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size: 11px; color: #7f8c8d; font-weight: 700;">出勤時刻 (実際)</label>
+            <input type="time" id="editCheckIn">
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size: 11px; color: #7f8c8d; font-weight: 700;">退勤時刻 (実際)</label>
+            <input type="time" id="editCheckOut">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>交通費 (半角数字)</label>
+          <input type="number" id="editFee" placeholder="例: 500">
+        </div>
+      </div>
+      <div style="padding: 15px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between;">
+        <button id="btnDeleteRecord" class="btn-danger" style="display:none;" onclick="deleteRecord()">削除</button>
+        <div style="display:flex; gap:10px; margin-left:auto;">
+          <button class="btn btn-secondary" onclick="document.getElementById('editModal').style.display='none'">キャンセル</button>
+          <button id="btnSaveRecord" class="btn btn-primary" onclick="saveRecord()">保存する</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <script>
   // ⚠️ SỬA LINK APP SCRIPT CỦA ÔNG VÀO ĐÂY
@@ -223,7 +280,7 @@
           <input type="text" class="memo-input" value="${row.memo}" placeholder="メモを入力..." onchange="saveMemo(this, ${row.rowIndex})">
         </td>
         <td>
-          <button class="btn btn-secondary" style="padding:4px 10px; font-size:11px;" onclick="alert('Hàm Sửa Ca làm sẽ làm ở Bước 2!')">編集</button>
+          <button class="btn btn-secondary" style="padding:4px 10px; font-size:11px;" onclick='openEditModal(${JSON.stringify(row)})'>編集</button>
         </td>
       `;
       tbody.appendChild(tr);
@@ -305,6 +362,158 @@
     link.download = `勤怠データ_${monthVal}.csv`;
     link.click();
   }
+
+  // ==========================================
+  // HỆ THỐNG POPUP THÊM / SỬA CA LÀM BẰNG TAY
+  // ==========================================
+  
+  // Biến lưu danh sách nhân viên và cửa hàng để đổ vào Popup
+  let allEmployees = [];
+  let allLocations = [];
+
+  function fetchMasterDataForForm() {
+    // Nếu có rồi thì không gọi lại
+    if (allEmployees.length > 0 && allLocations.length > 0) return Promise.resolve();
+    
+    return fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: "getMasterDataForForm", params: [] }),
+      redirect: 'follow' 
+    })
+    .then(r => r.json())
+    .then(res => {
+      if(res.result && res.result.success) {
+        allEmployees = res.result.employees;
+        allLocations = res.result.locations;
+      }
+    });
+  }
+
+  function openAddModal() {
+    document.getElementById('modalTitle').innerText = "勤務記録の新規登録";
+    document.getElementById('editRowIndex').value = "";
+    document.getElementById('editDate').value = "";
+    document.getElementById('editCheckIn').value = "";
+    document.getElementById('editCheckOut').value = "";
+    document.getElementById('editFee').value = "";
+    document.getElementById('btnDeleteRecord').style.display = "none";
+    
+    showModalWithData("", "");
+  }
+
+  function openEditModal(rowObj) {
+    document.getElementById('modalTitle').innerText = "勤務記録の修正";
+    document.getElementById('editRowIndex').value = rowObj.rowIndex;
+    document.getElementById('editDate').value = rowObj.date.replace(/\//g, '-');
+    document.getElementById('editCheckIn').value = rowObj.checkInActual || "";
+    document.getElementById('editCheckOut').value = rowObj.checkOutActual || "";
+    document.getElementById('editFee').value = rowObj.fee || "";
+    document.getElementById('btnDeleteRecord').style.display = "block";
+    
+    showModalWithData(rowObj.empId, rowObj.location);
+  }
+
+  function showModalWithData(empIdSelected, locSelected) {
+    document.getElementById('editModal').style.display = 'flex';
+    document.getElementById('btnSaveRecord').innerText = "保存する";
+    document.getElementById('btnSaveRecord').disabled = true;
+
+    fetchMasterDataForForm().then(() => {
+      const empSel = document.getElementById('editEmpSelect');
+      const locSel = document.getElementById('editLocSelect');
+      
+      empSel.innerHTML = '<option value="">選択してください</option>' + allEmployees.map(e => `<option value="${e.id}|${e.name}" ${e.id === empIdSelected ? 'selected' : ''}>${e.id} - ${e.name}</option>`).join('');
+      locSel.innerHTML = '<option value="">選択してください</option>' + allLocations.map(l => `<option value="${l}" ${l === locSelected ? 'selected' : ''}>${l}</option>`).join('');
+      
+      document.getElementById('btnSaveRecord').disabled = false;
+    });
+  }
+
+  function saveRecord() {
+    const rIndex = document.getElementById('editRowIndex').value;
+    const empData = document.getElementById('editEmpSelect').value;
+    const loc = document.getElementById('editLocSelect').value;
+    const dDate = document.getElementById('editDate').value;
+    const cIn = document.getElementById('editCheckIn').value;
+    const cOut = document.getElementById('editCheckOut').value;
+    const cFee = document.getElementById('editFee').value;
+
+    if (!empData || !loc || !dDate || !cIn) {
+      return showToast("エラー：社員、勤務地、日付、出勤時刻は必須です。", "error");
+    }
+
+    const [empId, empName] = empData.split('|');
+
+    const record = {
+      employeeId: empId,
+      employeeName: empName,
+      date: dDate,
+      location: loc,
+      checkIn: cIn,
+      checkOut: cOut,
+      transportCost: cFee
+    };
+
+    document.getElementById('btnSaveRecord').innerText = "保存中...";
+    document.getElementById('btnSaveRecord').disabled = true;
+
+    const actionName = rIndex ? "updateAttendanceRecord" : "addManualAttendanceRecord";
+    const params = rIndex ? [record, rIndex] : [record];
+
+    fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: actionName, params: params }),
+      redirect: 'follow'
+    })
+    .then(r => r.json())
+    .then(res => {
+      if(res.result && res.result.success) {
+        showToast(res.result.message, "success");
+        document.getElementById('editModal').style.display = 'none';
+        loadData(); // Tải lại bảng
+      } else {
+        showToast("エラー: " + (res.error || res.result.message), "error");
+      }
+    })
+    .finally(() => {
+      document.getElementById('btnSaveRecord').innerText = "保存する";
+      document.getElementById('btnSaveRecord').disabled = false;
+    });
+  }
+
+  function deleteRecord() {
+    const rIndex = document.getElementById('editRowIndex').value;
+    if (!rIndex) return;
+
+    if (!confirm("本当にこの記録を削除しますか？\n（この操作は元に戻せません）")) return;
+
+    document.getElementById('btnDeleteRecord').innerText = "削除中...";
+    document.getElementById('btnDeleteRecord').disabled = true;
+
+    fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: "deleteAttendanceRecord", params: [rIndex] }),
+      redirect: 'follow'
+    })
+    .then(r => r.json())
+    .then(res => {
+      if(res.result && res.result.success) {
+        showToast("記録を削除しました。", "success");
+        document.getElementById('editModal').style.display = 'none';
+        loadData(); // Tải lại bảng
+      } else {
+        showToast("エラー: " + (res.error || res.result.message), "error");
+      }
+    })
+    .finally(() => {
+      document.getElementById('btnDeleteRecord').innerText = "削除";
+      document.getElementById('btnDeleteRecord').disabled = false;
+    });
+  }
+
 </script>
 </body>
 </html>
