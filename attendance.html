@@ -114,6 +114,25 @@
     
     .btn-group-right { display: flex; gap: 10px; }
 
+    /* ========================================= */
+    /* ✨ SMART DROPDOWN (LỌC TÌM KIẾM SIÊU TỐC) ✨ */
+    /* ========================================= */
+    .dropdown-container { position: relative; width: 100%; }
+    .dropdown-list {
+      display: none; position: absolute; top: 100%; left: 0; width: 100%;
+      max-height: 200px; overflow-y: auto; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 1001; margin-top: 4px;
+    }
+    .dropdown-list.show { display: block; }
+    .dropdown-item {
+      padding: 10px 15px; font-size: 13px; font-weight: 600; color: var(--text);
+      cursor: pointer; transition: background 0.2s; border-bottom: 1px solid #f0f0f0;
+    }
+    .dropdown-item:last-child { border-bottom: none; }
+    .dropdown-item:hover { background: #e8f0fe; color: var(--primary); }
+    .dropdown-empty { padding: 10px 15px; font-size: 13px; color: #888; text-align: center; font-weight: 500; }
+
   </style>
 </head>
 <body>
@@ -208,15 +227,19 @@
         
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">社員 (ID - 名前)</label>
-          <!-- Để HR gõ tìm kiếm cho lẹ, dùng input list -->
-          <input type="text" id="editEmpInput" list="empList" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;" placeholder="名前またはIDを入力">
-          <datalist id="empList"></datalist>
+          <div class="dropdown-container">
+            <input type="text" id="editEmpInput" style="width:100%; height:40px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none; box-sizing:border-box;" placeholder="名前またはIDで検索..." autocomplete="off">
+            <div id="empSmartList" class="dropdown-list"></div>
+          </div>
         </div>
         
+        <!-- CHỖ CHỌN CỬA HÀNG (ĐÃ SỬA THÀNH SMART DROPDOWN) -->
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">勤務地</label>
-          <input type="text" id="editLocInput" list="locList" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;" placeholder="勤務地を入力">
-          <datalist id="locList"></datalist>
+          <div class="dropdown-container">
+            <input type="text" id="editLocInput" style="width:100%; height:40px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none; box-sizing:border-box;" placeholder="勤務地を検索..." autocomplete="off">
+            <div id="locSmartList" class="dropdown-list"></div>
+          </div>
         </div>
         
         <div style="display:flex; flex-direction:column; gap:6px;">
@@ -429,7 +452,7 @@
   }
 
   // ==========================================
-  // HỆ THỐNG POPUP THÊM / SỬA CA LÀM BẰNG TAY (BẢN SMART FILTER)
+  // HỆ THỐNG POPUP THÊM / SỬA CA LÀM (BẢN SMART DROPDOWN)
   // ==========================================
   
   let masterEmployees = [];
@@ -453,8 +476,11 @@
         masterEmployees = res.result.employees;
         masterLocations = res.result.allLocations;
       } else {
-        showToast("データ読み込みエラー: " + res.error, "error");
+        showToast("データ読み込みエラー: " + (res.error || res.result.message), "error");
       }
+    })
+    .catch(err => {
+      showToast("通信エラーが発生しました。", "error");
     });
   }
 
@@ -473,8 +499,8 @@
       document.getElementById('editCheckOut').value = "";
       document.getElementById('editFee').value = "";
       
-      populateEmpList(); // Đổ Full danh sách nhân viên
-      document.getElementById('locList').innerHTML = ""; // Xóa trắng cửa hàng, đợi chọn nhân viên
+      setupSmartDropdown('editEmpInput', 'empSmartList', masterEmployees.map(e => `${e.id} | ${e.name}`));
+      setupSmartDropdown('editLocInput', 'locSmartList', []); // Ban đầu trống, đợi chọn nhân viên
       
       document.getElementById('btnSaveRecord').disabled = false;
     });
@@ -494,42 +520,71 @@
       document.getElementById('editCheckOut').value = rowObj.checkOutActual || "";
       document.getElementById('editFee').value = rowObj.fee || "";
       
-      populateEmpList();
-      handleEmpSelection(); // Tự động lọc cửa hàng theo nhân viên này
-      document.getElementById('editLocInput').value = rowObj.location || ""; // Gán lại cửa hàng cũ
+      setupSmartDropdown('editEmpInput', 'empSmartList', masterEmployees.map(e => `${e.id} | ${e.name}`));
+      handleEmpSelection(); // Lọc cửa hàng
+      document.getElementById('editLocInput').value = rowObj.location || ""; 
       
       document.getElementById('btnSaveRecord').disabled = false;
     });
   }
 
-  function populateEmpList() {
-    const empHtml = masterEmployees.map(e => `<option value="${e.id} | ${e.name}">`).join('');
-    document.getElementById('empList').innerHTML = empHtml;
+  // 👉 TÍNH NĂNG SMART DROPDOWN (Lọc như Google Search)
+  function setupSmartDropdown(inputId, listId, dataArray) {
+    const input = document.getElementById(inputId);
+    const list = document.getElementById(listId);
+    
+    // Gõ phím -> Lọc
+    input.onkeyup = function() {
+      const filter = input.value.toLowerCase();
+      let html = '';
+      dataArray.forEach(item => {
+        if (item.toLowerCase().includes(filter)) {
+          html += `<div class="dropdown-item" onmousedown="selectDropdownItem('${inputId}', '${listId}', '${item}')">${item}</div>`;
+        }
+      });
+      list.innerHTML = html || '<div class="dropdown-empty">結果がありません</div>';
+      list.classList.add('show');
+    };
+    
+    // Click vào ô -> Hiện toàn bộ
+    input.onfocus = function() {
+      input.onkeyup();
+    };
+    
+    // Click ra ngoài -> Ẩn
+    input.onblur = function() {
+      setTimeout(() => list.classList.remove('show'), 150); // Delay chút để kịp nhận click
+    };
   }
 
-  // 👉 TÍNH NĂNG ĐỈNH CAO: Tự động lọc Cửa hàng khi Gõ tên Nhân viên
-  document.getElementById('editEmpInput').addEventListener('input', handleEmpSelection);
-  
-  function handleEmpSelection() {
-    const inputVal = document.getElementById('editEmpInput').value;
-    const empId = inputVal.split('|')[0].trim();
+  function selectDropdownItem(inputId, listId, value) {
+    document.getElementById(inputId).value = value;
+    document.getElementById(listId).classList.remove('show');
     
-    // Tìm nhân viên trong danh sách Master
+    // Nếu vừa chọn Nhân viên -> Lọc lại danh sách Cửa hàng
+    if (inputId === 'editEmpInput') {
+      handleEmpSelection();
+    }
+  }
+
+  // 👉 LỌC CỬA HÀNG THEO NHÂN VIÊN
+  function handleEmpSelection() {
+    const empData = document.getElementById('editEmpInput').value;
+    const empId = empData.split('|')[0].trim();
     const selectedEmp = masterEmployees.find(e => e.id === empId);
     
+    let locArray = [];
     if (selectedEmp && selectedEmp.allowedLocations.length > 0) {
-      // Nếu có cửa hàng, chỉ đổ danh sách cửa hàng được phép vào Datalist
-      const locHtml = selectedEmp.allowedLocations.map(loc => `<option value="${loc}">`).join('');
-      document.getElementById('locList').innerHTML = locHtml;
+      locArray = selectedEmp.allowedLocations; // Lấy cửa hàng được cấp quyền
     } else {
-      // Nếu không, đổ Full danh sách cửa hàng
-      document.getElementById('locList').innerHTML = masterLocations.map(l => `<option value="${l.name}">`).join('');
+      locArray = masterLocations.map(l => l.name); // Hoặc lấy toàn bộ nếu chưa cấp quyền
     }
     
-    // Xóa cửa hàng hiện tại nếu nó không nằm trong danh sách mới
-    document.getElementById('editLocInput').value = "";
+    setupSmartDropdown('editLocInput', 'locSmartList', locArray);
+    document.getElementById('editLocInput').value = ""; // Xóa cửa hàng cũ
   }
 
+  // 👉 HÀM LƯU VÀ XÓA (Giữ nguyên như cũ)
   function saveRecord() {
     const rIndex = document.getElementById('editRowIndex').value;
     const empData = document.getElementById('editEmpInput').value;
@@ -550,15 +605,7 @@
       empName = parts[1].trim();
     }
 
-    const record = {
-      employeeId: empId,
-      employeeName: empName,
-      date: dDate,
-      location: loc,
-      checkIn: cIn,
-      checkOut: cOut,
-      transportCost: cFee
-    };
+    const record = { employeeId: empId, employeeName: empName, date: dDate, location: loc, checkIn: cIn, checkOut: cOut, transportCost: cFee };
 
     document.getElementById('btnSaveRecord').innerText = "保存中...";
     document.getElementById('btnSaveRecord').disabled = true;
@@ -577,10 +624,8 @@
       if(res.result && res.result.success) {
         showToast(res.result.message, "success");
         document.getElementById('editModal').style.display = 'none';
-        loadData(); // Tải lại bảng ngay
-      } else {
-        showToast("エラー: " + (res.error || res.result.message), "error");
-      }
+        loadData(); 
+      } else { showToast("エラー: " + (res.error || res.result.message), "error"); }
     })
     .finally(() => {
       document.getElementById('btnSaveRecord').innerText = "保存する";
@@ -591,7 +636,6 @@
   function deleteRecord() {
     const rIndex = document.getElementById('editRowIndex').value;
     if (!rIndex) return;
-
     if (!confirm("本当にこの記録を削除しますか？\n（この操作は元に戻せません）")) return;
 
     document.getElementById('btnDeleteRecord').innerText = "削除中...";
@@ -609,9 +653,7 @@
         showToast("記録を削除しました。", "success");
         document.getElementById('editModal').style.display = 'none';
         loadData(); 
-      } else {
-        showToast("エラー: " + (res.error || res.result.message), "error");
-      }
+      } else { showToast("エラー: " + (res.error || res.result.message), "error"); }
     })
     .finally(() => {
       document.getElementById('btnDeleteRecord').innerText = "削除";
