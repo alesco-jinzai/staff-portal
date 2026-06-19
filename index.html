@@ -547,13 +547,17 @@
           </div>
         </div>
         <div id="kariStep4" style="display:none;">
-          <h3>4. 履歴書のアップロード</h3>
-          <p style="font-size:13px; color:#5f6368; margin-bottom:15px;">
-            履歴書・職務経歴書等の画像またはPDFファイルをご提出ください。<span style="color:var(--error); font-weight:bold;">（必須）</span>
+          <h3>4. 履歴書・資格証明書のアップロード</h3>
+          <p style="font-size:13px; color:#5f6368; margin-bottom:15px; line-height: 1.5;">
+            履歴書・職務経歴書、または<b>お仕事に関連する資格証明書（語学検定の認定書など）</b>の画像またはPDFファイルをご提出ください。
+            <br>
+            <span style="color:var(--md-error); font-weight:bold; font-size: 11px;">※ 履歴書・職務経歴書はアップロード必須です。</span>
           </p>
-          <p style="font-size:11px; color:var(--error); margin-bottom:15px; line-height:1.4;">
+          
+          <p style="font-size:11px; color:var(--md-error); margin-bottom:15px; line-height:1.4;">
             ※ ファイルの容量が大きい場合（PDF等）、アップロードに時間がかかることがあります。画面を閉じずにお待ちください。
           </p>
+
           <div id="kariUploadZone">
             <div class="upload-box dynamic-upload" id="kariBox_1">
               <label>履歴書 <span class="error-message" id="kariError_1" style="display:none;">（ファイルを選択してください）</span></label>
@@ -567,11 +571,13 @@
               </div>
             </div>
           </div>
+
           <div style="text-align:center; margin-bottom: 25px;">
             <button type="button" class="btn btn-outline" style="width:auto; display:inline-block; padding:10px 20px; font-size:14px; margin:0;" onclick="addUploadBox()">
-              ＋ ファイルを追加する
+              ＋ 職務経歴書・資格証明書を追加する
             </button>
           </div>
+          
           <div class="btn-group">
               <button class="btn btn-primary" onclick="prepareKariConfirm()">入力内容を確認する</button>
               <button class="btn btn-gray" onclick="nextKariStep(3)">戻る</button>
