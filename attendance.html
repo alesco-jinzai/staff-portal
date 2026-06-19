@@ -193,53 +193,59 @@
   <div id="toast-container"></div>
 
   <!-- MODAL THÊM/SỬA CA LÀM -->
-  <div id="editModal" onclick="if(event.target.id==='editModal') document.getElementById('editModal').style.display='none'">
-    <div class="modal-content-small">
+  <div id="editModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(2px);" onclick="if(event.target.id==='editModal') document.getElementById('editModal').style.display='none'">
+    <div style="background:var(--surface); width:90%; max-width:450px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2); overflow:hidden; display:flex; flex-direction:column; animation: slideDown 0.3s ease;">
       
-      <div class="modal-header">
-        <h2 id="modalTitle">勤務記録の修正</h2>
-        <button class="btn-close" onclick="document.getElementById('editModal').style.display='none'">×</button>
+      <!-- HEADER -->
+      <div style="background:var(--primary); color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center;">
+        <h2 id="modalTitle" style="margin:0; font-size:18px; font-weight:700;">勤務記録の修正</h2>
+        <button style="background:transparent; border:none; color:white; font-size:26px; cursor:pointer; line-height:1; padding:0; transition:0.2s;" onclick="document.getElementById('editModal').style.display='none'">×</button>
       </div>
 
-      <div class="modal-body">
+      <!-- BODY -->
+      <div style="padding:25px; display:flex; flex-direction:column; gap:15px;">
         <input type="hidden" id="editRowIndex">
         
-        <div class="form-group">
-          <label>社員 (ID - 名前)</label>
-          <select id="editEmpSelect"><option value="">選択してください</option></select>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="font-size:12px; color:#5f6368; font-weight:700;">社員 (ID - 名前)</label>
+          <!-- Để HR gõ tìm kiếm cho lẹ, dùng input list -->
+          <input type="text" id="editEmpInput" list="empList" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;" placeholder="名前またはIDを入力">
+          <datalist id="empList"></datalist>
         </div>
         
-        <div class="form-group">
-          <label>勤務地</label>
-          <select id="editLocSelect"><option value="">選択してください</option></select>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="font-size:12px; color:#5f6368; font-weight:700;">勤務地</label>
+          <input type="text" id="editLocInput" list="locList" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;" placeholder="勤務地を入力">
+          <datalist id="locList"></datalist>
         </div>
         
-        <div class="form-group">
-          <label>日付</label>
-          <input type="date" id="editDate">
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="font-size:12px; color:#5f6368; font-weight:700;">日付</label>
+          <input type="date" id="editDate" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
         </div>
         
-        <div class="time-group">
-          <div class="form-group">
-            <label>出勤時刻 (実際)</label>
-            <input type="time" id="editCheckIn">
+        <div style="display:flex; gap:15px;">
+          <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+            <label style="font-size:12px; color:#5f6368; font-weight:700;">出勤時刻 (実際)</label>
+            <input type="time" id="editCheckIn" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
           </div>
-          <div class="form-group">
-            <label>退勤時刻 (実際)</label>
-            <input type="time" id="editCheckOut">
+          <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+            <label style="font-size:12px; color:#5f6368; font-weight:700;">退勤時刻 (実際)</label>
+            <input type="time" id="editCheckOut" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
           </div>
         </div>
         
-        <div class="form-group">
-          <label>交通費 (半角数字)</label>
-          <input type="number" id="editFee" placeholder="例: 500">
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="font-size:12px; color:#5f6368; font-weight:700;">交通費 (半角数字)</label>
+          <input type="number" id="editFee" placeholder="例: 500" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
         </div>
       </div>
 
-      <div class="modal-footer">
-        <button id="btnDeleteRecord" class="btn-danger" style="display:none;" onclick="deleteRecord()">削除</button>
-        <div style="flex:1"></div> <!-- Đẩy cụm nút Save sang phải -->
-        <div class="btn-group-right">
+      <!-- FOOTER -->
+      <div style="padding:15px 25px; border-top:1px solid var(--border); background:#f8f9fa; display:flex; justify-content:space-between; align-items:center;">
+        <button id="btnDeleteRecord" style="background:#dc3545; color:white; border:none; height:36px; padding:0 20px; border-radius:6px; font-weight:bold; cursor:pointer; display:none;" onclick="deleteRecord()">削除</button>
+        <div style="flex:1"></div>
+        <div style="display:flex; gap:10px;">
           <button class="btn btn-secondary" onclick="document.getElementById('editModal').style.display='none'">キャンセル</button>
           <button id="btnSaveRecord" class="btn btn-primary" onclick="saveRecord()">保存する</button>
         </div>
