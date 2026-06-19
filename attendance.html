@@ -452,13 +452,12 @@
   }
 
   // ==========================================
-  // HỆ THỐNG POPUP THÊM / SỬA CA LÀM (BẢN SMART DROPDOWN)
+  // HỆ THỐNG POPUP THÊM / SỬA CA LÀM (BẢN SMART DROPDOWN & FIX AUTOFILL)
   // ==========================================
   
   let masterEmployees = [];
   let masterLocations = [];
 
-  // Tải dữ liệu Master từ Google Sheet (Chỉ tải 1 lần)
   function fetchMasterDataForForm() {
     if (masterEmployees.length > 0) return Promise.resolve();
     
@@ -484,6 +483,7 @@
     });
   }
 
+  // 👉 HÀM THÊM MỚI (Mở khóa ô Tên và Cửa hàng)
   function openAddModal() {
     document.getElementById('editModal').style.display = 'flex';
     document.getElementById('btnSaveRecord').disabled = true;
@@ -492,20 +492,30 @@
     fetchMasterDataForForm().then(() => {
       document.getElementById('modalTitle').innerText = "勤務記録の新規登録";
       document.getElementById('editRowIndex').value = "";
-      document.getElementById('editEmpInput').value = "";
-      document.getElementById('editLocInput').value = "";
+      
+      const empInput = document.getElementById('editEmpInput');
+      const locInput = document.getElementById('editLocInput');
+      
+      // Mở khóa các ô nhập liệu
+      empInput.value = ""; empInput.readOnly = false; empInput.style.backgroundColor = "#fff";
+      locInput.value = ""; locInput.readOnly = false; locInput.style.backgroundColor = "#fff";
+      
       document.getElementById('editDate').value = "";
       document.getElementById('editCheckIn').value = "";
       document.getElementById('editCheckOut').value = "";
       document.getElementById('editFee').value = "";
       
-      setupSmartDropdown('editEmpInput', 'empSmartList', masterEmployees.map(e => `${e.id} | ${e.name}`));
-      setupSmartDropdown('editLocInput', 'locSmartList', []); // Ban đầu trống, đợi chọn nhân viên
+      populateEmpList(); 
+      document.getElementById('locSmartList').innerHTML = ""; 
+      
+      // Bật lại chức năng Smart Dropdown cho ô Tên và Cửa hàng
+      setupSmartDropdown('editEmpInput', 'empSmartList', masterEmployees.map(e => `${e.id} | ${e.name.replace(/\//g, ' ')}`));
       
       document.getElementById('btnSaveRecord').disabled = false;
     });
   }
 
+  // 👉 HÀM SỬA (Khóa cứng ô Tên và Cửa hàng)
   function openEditModal(rowObj) {
     document.getElementById('editModal').style.display = 'flex';
     document.getElementById('btnSaveRecord').disabled = true;
@@ -514,18 +524,34 @@
     fetchMasterDataForForm().then(() => {
       document.getElementById('modalTitle').innerText = "勤務記録の修正";
       document.getElementById('editRowIndex').value = rowObj.rowIndex;
-      document.getElementById('editEmpInput').value = `${rowObj.empId} | ${rowObj.empName}`;
+      
+      const empInput = document.getElementById('editEmpInput');
+      const locInput = document.getElementById('editLocInput');
+      
+      // 👉 YÊU CẦU 3: Gán giá trị và Khóa cứng (Read-only), đổi màu nền xám
+      // 👉 YÊU CẦU 1: Xóa dấu / trong tên nhân viên
+      empInput.value = `${rowObj.empId} | ${rowObj.empName.replace(/\//g, ' ')}`;
+      empInput.readOnly = true; 
+      empInput.style.backgroundColor = "#f1f3f4";
+      // Xóa các sự kiện xổ xuống (Dropdown) để nó không hiện ra khi bấm vào
+      empInput.onfocus = null; empInput.onkeyup = null; 
+      
+      locInput.value = rowObj.location || "";
+      locInput.readOnly = true;
+      locInput.style.backgroundColor = "#f1f3f4";
+      locInput.onfocus = null; locInput.onkeyup = null;
+      
       document.getElementById('editDate').value = rowObj.date.replace(/\//g, '-');
       document.getElementById('editCheckIn').value = rowObj.checkInActual || "";
       document.getElementById('editCheckOut').value = rowObj.checkOutActual || "";
       document.getElementById('editFee').value = rowObj.fee || "";
       
-      setupSmartDropdown('editEmpInput', 'empSmartList', masterEmployees.map(e => `${e.id} | ${e.name}`));
-      handleEmpSelection(); // Lọc cửa hàng
-      document.getElementById('editLocInput').value = rowObj.location || ""; 
-      
       document.getElementById('btnSaveRecord').disabled = false;
     });
+  }
+
+  function populateEmpList() {
+    // Không dùng Datalist nữa vì ta đang dùng Smart Dropdown Custom
   }
 
   // 👉 TÍNH NĂNG SMART DROPDOWN (Lọc như Google Search)
@@ -533,8 +559,12 @@
     const input = document.getElementById(inputId);
     const list = document.getElementById(listId);
     
-    // Gõ phím -> Lọc
+    // 👉 YÊU CẦU 2: Tắt tính năng Autofill của Google Chrome (Chặn cái bảng trắng đè lên)
+    input.setAttribute("autocomplete", "new-password");
+
     input.onkeyup = function() {
+      if (input.readOnly) return; // Nếu đang bị khóa (Chế độ Sửa) thì không làm gì cả
+      
       const filter = input.value.toLowerCase();
       let html = '';
       dataArray.forEach(item => {
@@ -546,14 +576,12 @@
       list.classList.add('show');
     };
     
-    // Click vào ô -> Hiện toàn bộ
     input.onfocus = function() {
-      input.onkeyup();
+      if (!input.readOnly) input.onkeyup();
     };
     
-    // Click ra ngoài -> Ẩn
     input.onblur = function() {
-      setTimeout(() => list.classList.remove('show'), 150); // Delay chút để kịp nhận click
+      setTimeout(() => list.classList.remove('show'), 150); 
     };
   }
 
@@ -561,13 +589,11 @@
     document.getElementById(inputId).value = value;
     document.getElementById(listId).classList.remove('show');
     
-    // Nếu vừa chọn Nhân viên -> Lọc lại danh sách Cửa hàng
     if (inputId === 'editEmpInput') {
       handleEmpSelection();
     }
   }
 
-  // 👉 LỌC CỬA HÀNG THEO NHÂN VIÊN
   function handleEmpSelection() {
     const empData = document.getElementById('editEmpInput').value;
     const empId = empData.split('|')[0].trim();
@@ -575,16 +601,15 @@
     
     let locArray = [];
     if (selectedEmp && selectedEmp.allowedLocations.length > 0) {
-      locArray = selectedEmp.allowedLocations; // Lấy cửa hàng được cấp quyền
+      locArray = selectedEmp.allowedLocations; 
     } else {
-      locArray = masterLocations.map(l => l.name); // Hoặc lấy toàn bộ nếu chưa cấp quyền
+      locArray = masterLocations.map(l => l.name); 
     }
     
     setupSmartDropdown('editLocInput', 'locSmartList', locArray);
-    document.getElementById('editLocInput').value = ""; // Xóa cửa hàng cũ
+    document.getElementById('editLocInput').value = ""; 
   }
 
-  // 👉 HÀM LƯU VÀ XÓA (Giữ nguyên như cũ)
   function saveRecord() {
     const rIndex = document.getElementById('editRowIndex').value;
     const empData = document.getElementById('editEmpInput').value;
@@ -602,7 +627,7 @@
     if (empData.includes('|')) {
       const parts = empData.split('|');
       empId = parts[0].trim();
-      empName = parts[1].trim();
+      empName = parts[1].trim(); // Tên đã được xóa dấu gạch chéo
     }
 
     const record = { employeeId: empId, employeeName: empName, date: dDate, location: loc, checkIn: cIn, checkOut: cOut, transportCost: cFee };
@@ -638,28 +663,7 @@
     if (!rIndex) return;
     if (!confirm("本当にこの記録を削除しますか？\n（この操作は元に戻せません）")) return;
 
-    document.getElementById('btnDeleteRecord').innerText = "削除中...";
-    document.getElementById('btnDeleteRecord').disabled = true;
-
-    fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: "deleteAttendanceRecord", params: [rIndex] }),
-      redirect: 'follow'
-    })
-    .then(r => r.json())
-    .then(res => {
-      if(res.result && res.result.success) {
-        showToast("記録を削除しました。", "success");
-        document.getElementById('editModal').style.display = 'none';
-        loadData(); 
-      } else { showToast("エラー: " + (res.error || res.result.message), "error"); }
-    })
-    .finally(() => {
-      document.getElementById('btnDeleteRecord').innerText = "削除";
-      document.getElementById('btnDeleteRecord').disabled = false;
-    });
-  }
+    document.getElementByI
 
 </script>
 </body>
