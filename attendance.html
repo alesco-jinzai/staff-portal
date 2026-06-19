@@ -429,54 +429,105 @@
   }
 
   // ==========================================
-  // HỆ THỐNG POPUP THÊM / SỬA CA LÀM BẰNG TAY (BẢN CHỐT)
+  // HỆ THỐNG POPUP THÊM / SỬA CA LÀM BẰNG TAY (BẢN SMART FILTER)
   // ==========================================
+  
+  let masterEmployees = [];
+  let masterLocations = [];
 
-  function populateDatalists() {
-    // Bóc data trực tiếp từ biến globalData đang có sẵn trên web, nhanh gấp 100 lần!
-    const empSet = new Map();
-    const locSet = new Set();
+  // Tải dữ liệu Master từ Google Sheet (Chỉ tải 1 lần)
+  function fetchMasterDataForForm() {
+    if (masterEmployees.length > 0) return Promise.resolve();
     
-    globalData.forEach(r => {
-      empSet.set(r.empId, r.empName);
-      if (r.location) locSet.add(r.location);
+    document.getElementById('modalTitle').innerText = "データを読み込んでいます...";
+    
+    return fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: "getMasterDataForForm", params: [] }),
+      redirect: 'follow' 
+    })
+    .then(r => r.json())
+    .then(res => {
+      if(res.result && res.result.success) {
+        masterEmployees = res.result.employees;
+        masterLocations = res.result.allLocations;
+      } else {
+        showToast("データ読み込みエラー: " + res.error, "error");
+      }
     });
-
-    const empListHtml = Array.from(empSet).map(([id, name]) => `<option value="${id} | ${name}">`).join('');
-    const locListHtml = Array.from(locSet).map(loc => `<option value="${loc}">`).join('');
-
-    document.getElementById('empList').innerHTML = empListHtml;
-    document.getElementById('locList').innerHTML = locListHtml;
   }
 
   function openAddModal() {
-    document.getElementById('modalTitle').innerText = "勤務記録の新規登録";
-    document.getElementById('editRowIndex').value = "";
-    document.getElementById('editEmpInput').value = "";
-    document.getElementById('editLocInput').value = "";
-    document.getElementById('editDate').value = "";
-    document.getElementById('editCheckIn').value = "";
-    document.getElementById('editCheckOut').value = "";
-    document.getElementById('editFee').value = "";
+    document.getElementById('editModal').style.display = 'flex';
+    document.getElementById('btnSaveRecord').disabled = true;
     document.getElementById('btnDeleteRecord').style.display = "none";
     
-    populateDatalists();
-    document.getElementById('editModal').style.display = 'flex';
+    fetchMasterDataForForm().then(() => {
+      document.getElementById('modalTitle').innerText = "勤務記録の新規登録";
+      document.getElementById('editRowIndex').value = "";
+      document.getElementById('editEmpInput').value = "";
+      document.getElementById('editLocInput').value = "";
+      document.getElementById('editDate').value = "";
+      document.getElementById('editCheckIn').value = "";
+      document.getElementById('editCheckOut').value = "";
+      document.getElementById('editFee').value = "";
+      
+      populateEmpList(); // Đổ Full danh sách nhân viên
+      document.getElementById('locList').innerHTML = ""; // Xóa trắng cửa hàng, đợi chọn nhân viên
+      
+      document.getElementById('btnSaveRecord').disabled = false;
+    });
   }
 
   function openEditModal(rowObj) {
-    document.getElementById('modalTitle').innerText = "勤務記録の修正";
-    document.getElementById('editRowIndex').value = rowObj.rowIndex;
-    document.getElementById('editEmpInput').value = `${rowObj.empId} | ${rowObj.empName}`;
-    document.getElementById('editLocInput').value = rowObj.location || "";
-    document.getElementById('editDate').value = rowObj.date.replace(/\//g, '-');
-    document.getElementById('editCheckIn').value = rowObj.checkInActual || "";
-    document.getElementById('editCheckOut').value = rowObj.checkOutActual || "";
-    document.getElementById('editFee').value = rowObj.fee || "";
+    document.getElementById('editModal').style.display = 'flex';
+    document.getElementById('btnSaveRecord').disabled = true;
     document.getElementById('btnDeleteRecord').style.display = "block";
     
-    populateDatalists();
-    document.getElementById('editModal').style.display = 'flex';
+    fetchMasterDataForForm().then(() => {
+      document.getElementById('modalTitle').innerText = "勤務記録の修正";
+      document.getElementById('editRowIndex').value = rowObj.rowIndex;
+      document.getElementById('editEmpInput').value = `${rowObj.empId} | ${rowObj.empName}`;
+      document.getElementById('editDate').value = rowObj.date.replace(/\//g, '-');
+      document.getElementById('editCheckIn').value = rowObj.checkInActual || "";
+      document.getElementById('editCheckOut').value = rowObj.checkOutActual || "";
+      document.getElementById('editFee').value = rowObj.fee || "";
+      
+      populateEmpList();
+      handleEmpSelection(); // Tự động lọc cửa hàng theo nhân viên này
+      document.getElementById('editLocInput').value = rowObj.location || ""; // Gán lại cửa hàng cũ
+      
+      document.getElementById('btnSaveRecord').disabled = false;
+    });
+  }
+
+  function populateEmpList() {
+    const empHtml = masterEmployees.map(e => `<option value="${e.id} | ${e.name}">`).join('');
+    document.getElementById('empList').innerHTML = empHtml;
+  }
+
+  // 👉 TÍNH NĂNG ĐỈNH CAO: Tự động lọc Cửa hàng khi Gõ tên Nhân viên
+  document.getElementById('editEmpInput').addEventListener('input', handleEmpSelection);
+  
+  function handleEmpSelection() {
+    const inputVal = document.getElementById('editEmpInput').value;
+    const empId = inputVal.split('|')[0].trim();
+    
+    // Tìm nhân viên trong danh sách Master
+    const selectedEmp = masterEmployees.find(e => e.id === empId);
+    
+    if (selectedEmp && selectedEmp.allowedLocations.length > 0) {
+      // Nếu có cửa hàng, chỉ đổ danh sách cửa hàng được phép vào Datalist
+      const locHtml = selectedEmp.allowedLocations.map(loc => `<option value="${loc}">`).join('');
+      document.getElementById('locList').innerHTML = locHtml;
+    } else {
+      // Nếu không, đổ Full danh sách cửa hàng
+      document.getElementById('locList').innerHTML = masterLocations.map(l => `<option value="${l.name}">`).join('');
+    }
+    
+    // Xóa cửa hàng hiện tại nếu nó không nằm trong danh sách mới
+    document.getElementById('editLocInput').value = "";
   }
 
   function saveRecord() {
@@ -492,9 +543,7 @@
       return showToast("エラー：社員、勤務地、日付、出勤時刻は必須です。", "error");
     }
 
-    // Bóc tách ID và Tên (Từ chuỗi "123 | Nguyễn Văn A")
-    let empId = empData;
-    let empName = "";
+    let empId = empData, empName = "";
     if (empData.includes('|')) {
       const parts = empData.split('|');
       empId = parts[0].trim();
@@ -528,7 +577,7 @@
       if(res.result && res.result.success) {
         showToast(res.result.message, "success");
         document.getElementById('editModal').style.display = 'none';
-        loadData(); // Tải lại bảng ngay lập tức!
+        loadData(); // Tải lại bảng ngay
       } else {
         showToast("エラー: " + (res.error || res.result.message), "error");
       }
