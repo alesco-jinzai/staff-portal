@@ -7,138 +7,58 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    /* CSS CƠ BẢN */
+    /* ... (GIỮ NGUYÊN TOÀN BỘ PHẦN CSS Ở ĐÂY, KHÔNG ĐỔI GÌ CẢ) ... */
     :root { --primary: #0061A4; --bg: #f4f7fc; --surface: #ffffff; --text: #1A1C1E; --border: #e1e3e1; }
     body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
     
-    /* ✨ NAV BAR CHUẨN (CAO 56PX) ✨ */
-    .top-navbar { 
-      background: var(--surface); box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
-      height: 56px; display: flex; align-items: center; padding: 0 20px; 
-      position: sticky; top: 0; z-index: 9999; 
-    }
+    .top-navbar { background: var(--surface); box-shadow: 0 2px 8px rgba(0,0,0,0.08); height: 56px; display: flex; align-items: center; padding: 0 20px; position: sticky; top: 0; z-index: 9999; }
     .nav-logo { height: 24px; margin-right: 30px; cursor: pointer; } 
     .nav-menu { display: flex; height: 100%; gap: 10px; }
-    .nav-btn { 
-      display: flex; align-items: center; gap: 8px;
-      padding: 0 20px; color: #5f6368; text-decoration: none; 
-      font-weight: 700; font-size: 14px; border-bottom: 3px solid transparent; 
-      transition: 0.2s; height: 100%; box-sizing: border-box; 
-    }
+    .nav-btn { display: flex; align-items: center; gap: 8px; padding: 0 20px; color: #5f6368; text-decoration: none; font-weight: 700; font-size: 14px; border-bottom: 3px solid transparent; transition: 0.2s; height: 100%; box-sizing: border-box; }
     .nav-btn:hover { color: var(--primary); background: #f8f9fa; }
     .nav-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: #f0f4f8; }
     .nav-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
-    /* KHU VỰC NỘI DUNG */
     .main-content { padding: 20px; } 
 
-    /* ✨ CỤM HEADER & FILTER CHUẨN ✨ */
-    .header-container { 
-      background: var(--surface); padding: 16px 20px; border-radius: 8px; 
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 16px; 
-    }
-    .header-top { 
-      display: flex; justify-content: space-between; align-items: center; 
-      border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px; 
-    }
+    .header-container { background: var(--surface); padding: 16px 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 16px; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px; }
     .header-title-box { display: flex; align-items: baseline; gap: 15px; }
     .header-title-box h1 { margin: 0; font-size: 20px; color: var(--primary); } 
-    .header-title-box p { margin: 0; font-size: 12px; color: #666; font-weight: bold; }
     .header-actions { display: flex; align-items: center; gap: 10px; }
     
-    /* NÚT BẤM VÀ Ô NHẬP LIỆU CHỐT CỨNG CHIỀU CAO 36PX */
     .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; width: 100%; }
-    .tab-group { display: flex; background: #e1e3e1; border-radius: 6px; overflow: hidden; margin: 0; height: 36px;}
-    .tab-btn { border: none; padding: 0 15px; font-weight: bold; cursor: pointer; background: transparent; color: #444; transition: 0.2s; font-size: 13px; }
-    .tab-btn.active { background: var(--primary); color: white; }
-    
-    input[type="month"], input[type="text"], select { 
-      padding: 0 12px; border: 1px solid var(--border); border-radius: 6px; 
-      font-size: 13px; font-weight: bold; outline: none; color: #333; 
-      height: 36px; box-sizing: border-box; /* Cố định chiều cao */
-    }
+    input[type="month"], input[type="text"], select { padding: 0 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-weight: bold; outline: none; color: #333; height: 36px; box-sizing: border-box; }
     input[type="text"]:focus, select:focus { border-color: var(--primary); }
     
-    .btn { 
-      background: var(--primary); color: white; border: none; 
-      padding: 0 20px; height: 36px; border-radius: 6px; 
-      cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; margin: 0; 
-      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    }
+    .btn { background: var(--primary); color: white; border: none; padding: 0 20px; height: 36px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: 6px;}
     .btn:hover { background: #004d82; }
     .btn-secondary { background: #5f6368; }
     .btn-secondary:hover { background: #3c4043; }
     
-    /* BẢNG DATA */
     table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px;}
     th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }
     th { background: #e8f0fe; color: var(--primary); white-space: nowrap; font-weight: 700;}
     tr:hover { background: #f8f9fa; }
     
-    /* CÁC NHÃN (BADGES) */
     .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; white-space: nowrap; display: inline-block;}
-    .st-kari { background: #fff3e0; color: #b28900; border: 1px solid #ffe082; }
-    .st-hon { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
-    .st-leave { background: #eeeeee; color: #757575; border: 1px solid #e0e0e0; }
-    .pr-done { background: #e8f5e9; color: #2e7d32; }
-    .pr-part { background: #e3f2fd; color: #0277bd; }
-    .pr-none { background: #ffebee; color: #c62828; }
-    .pr-kari { background: #f5f5f5; color: #616161; }
     .bg-ok { background: #e8f5e9; color: #2e7d32; }
-    .bg-ng { background: #ffebee; color: #c62828; }
-    .bg-yukyu { background: #fff3e0; color: #e65100; }
-    
     .memo-input { width: 100%; box-sizing: border-box; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; height: 32px;}
-    
     #loading { text-align: center; padding: 40px; font-size: 15px; color: #666; font-weight: bold; }
     .spinner { border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
-    
-    /* MODAL CHI TIẾT (Trang Ứng viên) */
-    #detailModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-    .modal-content { background: #f8f9fa; width: 90%; max-width: 750px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; position: relative;}
-    .modal-header { background: var(--primary); color: white; padding: 20px 25px; display: flex; justify-content: space-between; align-items: flex-start; }
-    .modal-header-left { display: flex; flex-direction: column; gap: 5px; flex: 1; }
-    .modal-header h2 { margin: 0; font-size: 22px; font-weight: 700; line-height: 1.2; }
-    .modal-header .kana { font-size: 12px; opacity: 0.8; font-weight: 500; }
-    .btn-close { background: transparent; border: none; color: white; font-size: 28px; cursor: pointer; line-height: 1; padding: 0; opacity: 0.8; transition: 0.2s; }
-    .btn-close:hover { opacity: 1; transform: scale(1.1); }
-    .modal-body { padding: 25px; overflow-y: auto; }
-    .info-card { background: #ffffff; border-radius: 8px; border: 1px solid var(--border); padding: 20px; margin-bottom: 15px; }
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 20px; }
-    .info-item { display: flex; flex-direction: column; gap: 4px; min-height: 40px;}
-    .info-label { font-size: 11px; color: #7f8c8d; font-weight: 700; text-transform: uppercase; }
-    .info-value { font-size: 14px; color: #2c3e50; font-weight: 600; display: flex; align-items: flex-start; gap: 6px; word-break: break-all;}
-    .copy-btn { background: #f1f3f4; border: none; border-radius: 4px; padding: 4px; cursor: pointer; color: #5f6368; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
-    .copy-btn:hover { background: #e8eaed; color: var(--primary); }
-    .copy-btn svg { width: 14px; height: 14px; fill: currentColor; }
-    .status-header { font-size: 14px; font-weight: 700; color: #2c3e50; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-    .status-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #e1e3e1; font-size: 13px; }
-    .status-row:last-child { border-bottom: none; padding-bottom: 0;}
-    .status-title { font-weight: 600; color: #555; }
-    .status-val { text-align: right; white-space: pre-wrap; font-weight: 600; }
-    .txt-ok { color: #00796b; }
-    .txt-ng { color: #d32f2f; }
-    .btn-nas { background: #fbc02d; color: #000; border: none; padding: 8px 15px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease; margin-top: 10px;}
-    .btn-nas:hover { background: #f9a825; transform: translateY(-1px); }
-    .btn-nas svg { width: 16px; height: 16px; fill: currentColor; }
-    #copyToast { position: absolute; top: 10px; right: 10px; background: #333; color: #fff; padding: 5px 12px; font-size: 12px; border-radius: 20px; opacity: 0; transition: 0.3s; pointer-events: none;}
-    
-    .btn-edit { background: none; border: 1px solid #C4C7C5; border-radius: 4px; padding: 3px 6px; cursor: pointer; color: var(--primary); font-size: 11px; display: inline-flex; align-items: center; gap: 4px; font-weight: bold;}
-    .btn-edit:hover { background: #e8f0fe; border-color: var(--primary);}
-    #langEditArea input { height: 28px; padding: 5px 10px; font-size: 13px; font-weight: normal; margin-right: 5px; flex: 1; border-radius: 4px; border: 1px solid var(--border);}
 
-    /* THÔNG BÁO GÓC MÀN HÌNH (TOAST) */
+    /* TOAST CSS */
     #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
     .toast { background: #333; color: #fff; padding: 12px 20px; border-radius: 6px; font-size: 13px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transform: translateX(100%); transition: all 0.3s ease; }
     .toast.show { opacity: 1; transform: translateX(0); }
     .toast.success { background: #2e7d32; }
     .toast.error { background: #c62828; }
-
   </style>
 </head>
 <body>
-  <div id="toast-container"></div>
+
+  <!-- NAV BAR -->
   <div class="top-navbar">
     <img src="logo.png" alt="ALESCO" class="nav-logo" onerror="this.src='https://alesco-v.co.jp/wp/wp-content/uploads/ALESCO-LOGO.png'">
     <div class="nav-menu">
@@ -154,7 +74,6 @@
   </div>
 
   <div class="main-content">
-    
     <div class="header-container">
       <div class="header-top">
         <div class="header-title-box">
@@ -208,11 +127,13 @@
         </tfoot>
       </table>
     </div>
-
   </div>
 
+  <!-- DIV HỨNG TOAST -->
+  <div id="toast-container"></div>
+
 <script>
-  // Sửa URL này thành link Web App của ông
+  // ⚠️ SỬA LINK APP SCRIPT CỦA ÔNG VÀO ĐÂY
   const GAS_URL = "https://script.google.com/macros/s/AKfycbxC71cAofv5QXr-pjKkmK8ehgNzo4M5wRMMjtG1enU-5w62j0slyK56XJtDvMimAlvE/exec"; 
   let globalData = [];
 
@@ -225,14 +146,13 @@
   function loadData() {
     document.getElementById('loading').style.display = 'block';
     document.getElementById('dataTable').style.display = 'none';
-
-    const monthStr = document.getElementById('monthFilter').value; // YYYY-MM
+    const monthStr = document.getElementById('monthFilter').value;
 
     fetch(GAS_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Bắt buộc phải có dòng này
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ action: "getNewAttendanceData", params: [monthStr] }),
-      redirect: 'follow' // Bắt buộc phải có dòng này
+      redirect: 'follow' 
     })
     .then(r => r.json())
     .then(res => {
@@ -255,7 +175,7 @@
     const locSel = document.getElementById('locationFilter');
     
     const emps = [...new Set(globalData.map(d => d.empId))].sort();
-    const locs = [...new Set(globalData.filter(d => d.type === 'working').map(d => d.location))].sort();
+    const locs = [...new Set(globalData.map(d => d.location))].sort();
 
     empSel.innerHTML = '<option value="">すべての社員</option>' + emps.map(e => `<option value="${e}">${e}</option>`).join('');
     locSel.innerHTML = '<option value="">すべての勤務地</option>' + locs.map(l => `<option value="${l}">${l}</option>`).join('');
@@ -272,52 +192,43 @@
 
     let filtered = globalData.filter(r => {
       if (empF && r.empId != empF) return false;
-      if (locF && r.location != locF && r.type !== 'yukyu') return false;
+      if (locF && r.location != locF) return false;
       if (search && !Object.values(r).join(' ').toLowerCase().includes(search)) return false;
       return true;
     });
 
     filtered.forEach(row => {
-      const isYukyu = (row.type === 'yukyu');
-      
-      if (!isYukyu) {
-        totalCost += Number(row.transportCost) || 0;
-        if(row.workDuration && row.workDuration.includes(':')) {
-           let p = row.workDuration.split(':');
-           totalMs += (parseInt(p[0])*60 + parseInt(p[1])) * 60000;
-        }
+      totalCost += Number(row.fee) || 0;
+      if(row.duration && row.duration.includes(':')) {
+         let p = row.duration.split(':');
+         totalMs += (parseInt(p[0])*60 + parseInt(p[1])) * 60000;
       }
 
-      let approvalHtml = isYukyu 
-        ? `<span class="badge bg-yukyu">${row.approverName || '申請中'}</span>` 
-        : (row.approverName ? `<span class="badge bg-ok">${row.approverName}</span>` : `<span class="badge" style="background:#eee;color:#666;">未承認</span>`);
-
-      let workDurHtml = isYukyu ? '<span style="color:#e65100; font-weight:bold;">有給休暇</span>' : `<strong>${row.workDuration || ''}</strong>`;
+      let approvalHtml = row.isApproved ? `<span class="badge bg-ok">${row.approverName}</span>` : `<span class="badge" style="background:#eee;color:#666;">未承認</span>`;
 
       let tr = document.createElement('tr');
       tr.innerHTML = `
         <td style="font-family:monospace;">${row.empId}</td>
-        <td><strong>${row.name}</strong></td>
+        <td><strong>${row.empName}</strong></td>
         <td>${row.date}</td>
-        <td style="color:#888">${isYukyu ? '' : (row.checkInActual || '')}</td>
-        <td><strong>${isYukyu ? '' : (row.checkIn || '')}</strong></td>
-        <td style="color:#888">${isYukyu ? '' : (row.checkOutActual || '')}</td>
-        <td><strong style="${(!row.checkOut && !isYukyu) ? 'color:red;' : ''}">${isYukyu ? '' : (row.checkOut || '未退勤')}</strong></td>
-        <td>${workDurHtml}</td>
-        <td>${isYukyu ? '' : (row.location || '')}</td>
-        <td>${isYukyu ? '' : '¥'+(Number(row.transportCost)||0).toLocaleString()}</td>
+        <td style="color:#888">${row.checkInActual}</td>
+        <td><strong>${row.checkIn}</strong></td>
+        <td style="color:#888">${row.checkOutActual}</td>
+        <td><strong style="${!row.checkOut ? 'color:red;' : ''}">${row.checkOut || '未退勤'}</strong></td>
+        <td><strong>${row.duration}</strong></td>
+        <td>${row.location}</td>
+        <td>¥${(Number(row.fee)||0).toLocaleString()}</td>
         <td>${approvalHtml}</td>
         <td>
-          ${isYukyu ? '' : `<input type="text" class="memo-input" value="${row.memo}" placeholder="メモを入力..." onchange="saveMemo(this, ${row.rowIndex})">`}
+          <input type="text" class="memo-input" value="${row.memo}" placeholder="メモを入力..." onchange="saveMemo(this, ${row.rowIndex})">
         </td>
         <td>
-          ${isYukyu ? '' : `<button class="btn btn-secondary" style="padding:4px 10px; font-size:11px;" onclick="alert('Hàm Sửa Ca làm sẽ làm ở Bước 2!')">編集</button>`}
+          <button class="btn btn-secondary" style="padding:4px 10px; font-size:11px;" onclick="alert('Hàm Sửa Ca làm sẽ làm ở Bước 2!')">編集</button>
         </td>
       `;
       tbody.appendChild(tr);
     });
 
-    // Cập nhật tổng
     document.getElementById('totalFee').innerText = '¥' + totalCost.toLocaleString();
     let th = Math.floor(totalMs / 3600000);
     let tm = Math.floor((totalMs % 3600000) / 60000);
@@ -333,10 +244,7 @@
     toast.className = `toast ${type}`;
     toast.innerText = message;
     container.appendChild(toast);
-    
-    // Hiệu ứng trượt ra
     setTimeout(() => toast.classList.add('show'), 10);
-    // Tự động biến mất sau 3 giây
     setTimeout(() => {
       toast.classList.remove('show');
       setTimeout(() => toast.remove(), 300);
@@ -347,8 +255,7 @@
   // HÀM LƯU MEMO TRỰC TIẾP
   // ==========================================
   function saveMemo(inputEl, rowIndex) {
-    inputEl.style.backgroundColor = "#fff3e0"; // Đổi màu cam nhạt báo hiệu đang lưu
-    
+    inputEl.style.backgroundColor = "#fff3e0"; 
     fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -358,11 +265,11 @@
     .then(r => r.json())
     .then(res => {
       if(res.result && res.result.success) {
-        inputEl.style.backgroundColor = "#e8f5e9"; // Đổi màu xanh lá báo thành công
+        inputEl.style.backgroundColor = "#e8f5e9"; 
         showToast("メモを保存しました！", "success");
-        setTimeout(() => inputEl.style.backgroundColor = "#fff", 2000); // Trả lại màu trắng
+        setTimeout(() => inputEl.style.backgroundColor = "#fff", 2000); 
       } else {
-        inputEl.style.backgroundColor = "#ffebee"; // Đỏ báo lỗi
+        inputEl.style.backgroundColor = "#ffebee"; 
         showToast("エラー: " + (res.error || res.result.message), "error");
       }
     })
@@ -373,29 +280,20 @@
   }
 
   // ==========================================
-  // HÀM XUẤT CSV TỪ BẢNG ĐANG HIỂN THỊ
+  // HÀM XUẤT CSV 
   // ==========================================
   function exportCSV() {
     const rows = document.querySelectorAll("#tableBody tr");
     if(rows.length === 0) return showToast("出力するデータがありません。", "error");
 
     showToast("CSVをダウンロードしています...", "success");
-    
-    // Thêm BOM để Excel Nhật mở không bị lỗi Font
     let csv = "\uFEFF社員番号,名前,日付,出勤(実),出勤(丸),退勤(実),退勤(丸),実働時間,勤務地,交通費,承認状態,メモ\n";
     
     rows.forEach(tr => {
       let cols = tr.querySelectorAll("td");
       let rowData = [];
-      // Lấy data từ cột 0 đến 11 (Bỏ cột 12 là nút Thao tác)
       for(let i = 0; i <= 11; i++) { 
-        let text = "";
-        if (i === 11) { // Nếu là cột Memo thì phải lấy value của ô input
-          text = cols[i].querySelector('input').value;
-        } else {
-          text = cols[i].innerText;
-        }
-        // Bao chuỗi trong dấu ngoặc kép để chống lỗi dấu phẩy
+        let text = (i === 11) ? cols[i].querySelector('input').value : cols[i].innerText;
         rowData.push(`"${text.replace(/"/g, '""')}"`);
       }
       csv += rowData.join(",") + "\n";
@@ -407,7 +305,6 @@
     link.download = `勤怠データ_${monthVal}.csv`;
     link.click();
   }
-
 </script>
 </body>
 </html>
