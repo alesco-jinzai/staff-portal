@@ -1327,12 +1327,12 @@
           <div id="mnUploadZone" style="display:none;">
             <div class="upload-box" id="box_f1">
               <label>表面画像 <span class="error-message" id="error_f1" style="display:none; color:var(--error); font-weight:bold; margin-left:8px;">(画像を選択してください)</span></label>
-              <div class="file-input-wrapper"><input type="file" onchange="previewImg(this, 'p1')"></div>
+              <div class="file-input-wrapper"><input type="file" accept="image/jpeg, image/png, image/heic, application/pdf" onchange="previewImg(this, 'p1')"></div>
               <div class="preview-container" id="p1-c"><img id="p1" class="preview-img"></div>
             </div>
             <div class="upload-box" id="box_f2" style="display:none;">
               <label>裏面画像 <span class="error-message" id="error_f2" style="display:none; color:var(--error); font-weight:bold; margin-left:8px;">(裏面も必須です)</span></label>
-              <div class="file-input-wrapper"><input type="file" onchange="previewImg(this, 'p2')"></div>
+              <div class="file-input-wrapper"><input type="file" accept="image/jpeg, image/png, image/heic, application/pdf" onchange="previewImg(this, 'p2')"></div>
               <div class="preview-container" id="p2-c"><img id="p2" class="preview-img"></div>
             </div>
           </div>
@@ -1351,7 +1351,7 @@
         let html = historyHtml + `
           <div class="upload-box" id="box_f1">
             <label>1枚目の画像 <span class="error-message" id="error_f1" style="display:none; color:var(--error);">(画像を選択してください)</span></label>
-            <div class="file-input-wrapper"><input type="file" onchange="previewImg(this, 'p1')"></div>
+            <div class="file-input-wrapper"><input type="file" accept="image/jpeg, image/png, image/heic, application/pdf" onchange="previewImg(this, 'p1')"></div>
             <div class="preview-container" id="p1-c"><img id="p1" class="preview-img"></div>
           </div>
         `;
@@ -1359,7 +1359,7 @@
           html += `
             <div class="upload-box" id="box_f2">
               <label>2枚目の画像 (裏面等) <span class="error-message" id="error_f2" style="display:none; color:var(--error);">(裏面も必須です)</span></label>
-              <div class="file-input-wrapper"><input type="file" onchange="previewImg(this, 'p2')"></div>
+              <div class="file-input-wrapper"><input type="file" accept="image/jpeg, image/png, image/heic, application/pdf" onchange="previewImg(this, 'p2')"></div>
               <div class="preview-container" id="p2-c"><img id="p2" class="preview-img"></div>
             </div>
           `;
@@ -1418,6 +1418,12 @@
     function previewImg(input, imgId) {
       const f = input.files[0];
       if(f) {
+        // 👉 TÍNH NĂNG MỚI: KIỂM TRA ĐUÔI FILE CHỐNG UP BẬY
+        if (!f.type.startsWith('image/') && f.type !== 'application/pdf') {
+            alert("エラー：画像（JPG, PNGなど）またはPDFファイルのみアップロード可能です。\nファイルを選び直してください。");
+            input.value = ''; // Xóa sạch cái file lỗi họ vừa chọn
+            return; // Dừng lại, không cho chạy tiếp
+        }
         const container = document.getElementById(imgId + '-c');
         const imgEl = document.getElementById(imgId);
         
@@ -1817,44 +1823,55 @@
             const c = document.createElement('canvas'); 
             const ctx = c.getContext('2d');
             
-            const MAX = 1000; 
+            // 👉 NÂNG CẤP 1: Tăng độ phân giải lên 1600px để đọc rõ chữ nhỏ
+            const MAX = 1600; 
             let w = img.width, h = img.height;
-            if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } 
-            else { if(h > MAX) { w *= MAX/h; h = MAX; } }
+            if(w > h) { if(w > MAX) { h = Math.round(h * MAX/w); w = MAX; } } 
+            else { if(h > MAX) { w = Math.round(w * MAX/h); h = MAX; } }
             
             c.width = w; 
             c.height = h; 
+            
+            // 👉 NÂNG CẤP 2: Khử răng cưa khi thu nhỏ ảnh (Image Smoothing)
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
             ctx.drawImage(img, 0, 0, w, h);
             
-            // ĐÓNG DẤU LƯỚI CHỮ RỖNG RUỘT (HOLLOW GRID WATERMARK)
+            // ĐÓNG DẤU WATERMARK (Giữ nguyên)
             if (addWatermark) {
               const dateStr = new Date().toLocaleDateString('ja-JP');
               const text = "株式会社アレスコ提出用 (" + dateStr + ")";
-              
-              // Thiết lập font và KIỂU CHỮ RỖNG (Stroke)
-              const fontSize = Math.max(16, Math.floor(w / 25));
+              const fontSize = Math.max(20, Math.floor(w / 30)); // Đã điều chỉnh font size theo độ phân giải mới
               ctx.font = "bold " + fontSize + "px 'Noto Sans JP', sans-serif";
-              ctx.strokeStyle = "rgba(50, 50, 50, 0.25)"; // Viền màu xám, trong suốt 25%
-              ctx.lineWidth = 1.5; // Viền mỏng để không che số
+              ctx.strokeStyle = "rgba(50, 50, 50, 0.25)"; 
+              ctx.lineWidth = 2; // Viền đậm hơn một chút để dễ nhìn trên ảnh 1600px
               
-              // Xoay nghiêng Canvas
               ctx.translate(w / 2, h / 2); 
               ctx.rotate(-25 * Math.PI / 180);
               
-              // Tính toán độ rộng để lặp chữ kín toàn bộ ảnh
               const diag = Math.sqrt(w*w + h*h);
-              const stepX = ctx.measureText(text).width + 50; // Khoảng cách ngang
-              const stepY = fontSize * 4;                     // Khoảng cách dọc
+              const stepX = ctx.measureText(text).width + 80; 
+              const stepY = fontSize * 5;                     
               
-              // Vòng lặp vẽ lưới chữ đè lên toàn bộ ảnh
               for (let x = -diag; x < diag; x += stepX) {
                 for (let y = -diag; y < diag; y += stepY) {
-                  ctx.strokeText(text, x, y); // DÙNG STROKE ĐỂ VẼ VIỀN CHỮ
+                  ctx.strokeText(text, x, y); 
                 }
               }
             }
             
-            resolve(c.toDataURL('image/jpeg', 0.6));
+            // 👉 NÂNG CẤP 3: Vòng lặp ép cân (Bảo vệ API)
+            let quality = 0.85; // Mức bắt đầu: Giữ nguyên độ nét cao nhất
+            let base64Data = c.toDataURL('image/jpeg', quality);
+            
+            // Nếu dung lượng Base64 > 1.8MB (Tương đương ảnh nặng ~1.3MB), giảm chất lượng ép xuống
+            // Lý do: GAS chỉ nhận Payload an toàn dưới 5MB. Gửi 2 mặt ảnh thì mỗi ảnh chỉ nên loanh quanh 1.5MB.
+            while (base64Data.length > 1800000 && quality > 0.5) {
+                quality -= 0.1; // Hạ dần: 0.75 -> 0.65 -> 0.55
+                base64Data = c.toDataURL('image/jpeg', quality);
+            }
+            
+            resolve(base64Data);
           };
         };
       });
