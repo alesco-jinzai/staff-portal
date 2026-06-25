@@ -160,8 +160,7 @@
         </div>
         <div class="header-actions">
           <button class="btn btn-secondary" onclick="openAddModal()">＋ 新規登録</button>
-          <button class="btn btn-secondary" onclick="openExportModal('CSV')">CSV出力</button>
-          <button class="btn btn-secondary" onclick="openExportModal('PDF')">PDF出力</button>
+          <button class="btn btn-primary" onclick="openSmartExportModal()">📥 データ出力</button>
         </div>
       </div>
 
@@ -280,62 +279,85 @@
   </div>
 
   <!-- ========================================= -->
-  <!-- ✨ MODAL XUẤT CSV / PDF (DÙNG CHUNG) ✨ -->
+  <!-- STEP 1: MODAL CHỌN KHÁCH HÀNG ĐỂ XUẤT -->
   <!-- ========================================= -->
-  <div id="exportModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(2px);" onclick="if(event.target.id==='exportModal') closeExportModal()">
-    <div style="background:var(--surface); width:90%; max-width:450px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2); overflow:hidden; display:flex; flex-direction:column; animation: slideDown 0.3s ease;">
-      
-      <!-- HEADER -->
+  <div id="smartExportModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(2px);">
+    <div style="background:var(--surface); width:90%; max-width:400px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2); overflow:hidden; display:flex; flex-direction:column;">
       <div style="background:var(--primary); color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center;">
-        <h2 id="exportModalTitle" style="margin:0; font-size:18px; font-weight:700;">データ出力</h2>
-        <button style="background:transparent; border:none; color:white; font-size:26px; cursor:pointer; line-height:1; padding:0; transition:0.2s;" onclick="closeExportModal()">×</button>
+        <h2 style="margin:0; font-size:18px; font-weight:700;">データ出力 (STEP 1/2)</h2>
+        <button style="background:transparent; border:none; color:white; font-size:26px; cursor:pointer;" onclick="document.getElementById('smartExportModal').style.display='none'">×</button>
       </div>
-
-      <!-- BODY -->
       <div style="padding:25px; display:flex; flex-direction:column; gap:15px;">
-        <input type="hidden" id="exportType"> <!-- Lưu trạng thái đang xuất CSV hay PDF -->
-        
-        <div style="display:flex; flex-direction:column; gap:6px;">
-          <label style="font-size:12px; color:#5f6368; font-weight:700;">対象月</label>
-          <input type="month" id="exportMonth" onchange="refreshExportClients()" style="height:40px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
-        </div>
-        
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">顧客 (クライアント)</label>
-          <select id="exportClient" onchange="updateExportLocationDropdown()" style="height:40px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
-            <option value="">-- 月を選択してください --</option>
+          <select id="exportClient" onchange="updateExportLocationDropdown()" style="height:40px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; outline:none;">
+            <option value="">-- 読み込み中... --</option>
           </select>
         </div>
-
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">勤務地 (拠点)</label>
-          <select id="exportLocation" style="height:40px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
+          <select id="exportLocation" style="height:40px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; outline:none;">
             <option value="">-- 先に顧客を選択 --</option>
           </select>
         </div>
-        
-        <!-- KHU VỰC KYUKEI (GIỜ NGHỈ) -->
-        <div style="background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid var(--border); margin-top:5px;">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <input type="checkbox" id="exportEnableBreak" onchange="toggleBreakInput()" style="width:18px; height:18px; cursor:pointer;">
-                <label for="exportEnableBreak" style="font-size:13px; font-weight:700; color:var(--text); cursor:pointer;">休憩時間を控除する (実働時間を再計算)</label>
-            </div>
-            
-            <div id="exportBreakInputArea" style="display:none; margin-top:12px; flex-direction:column; gap:6px;">
-                <label style="font-size:11px; color:#5f6368; font-weight:700;">一律の休憩時間 (分)</label>
-                <input type="number" id="exportBreakMinutes" placeholder="例: 60" value="60" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; outline:none;">
-                <span style="font-size:11px; color:#107c41; font-weight:600; line-height:1.4;">
-                    ※メモ欄に「#休憩45」と入力されている日は、この設定を無視し個別の時間（45分）を優先して引きます。
-                </span>
-            </div>
-        </div>
+      </div>
+      <div style="padding:15px 25px; border-top:1px solid var(--border); background:#f8f9fa; display:flex; justify-content:flex-end; gap:10px;">
+        <button class="btn btn-secondary" onclick="document.getElementById('smartExportModal').style.display='none'">キャンセル</button>
+        <button class="btn btn-primary" onclick="openReviewBoard()">次へ (プレビュー) ➡</button>
+      </div>
+    </div>
+  </div>
 
+  <!-- ========================================= -->
+  <!-- STEP 2: BẢNG REVIEW & ĐIỀN GIỜ NGHỈ -->
+  <!-- ========================================= -->
+  <div id="reviewBoardModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1001; align-items:center; justify-content:center; backdrop-filter:blur(3px);">
+    <div style="background:var(--surface); width:95%; max-width:900px; height:85vh; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.3); overflow:hidden; display:flex; flex-direction:column;">
+      
+      <!-- HEADER -->
+      <div style="background:var(--primary); color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <h2 style="margin:0; font-size:18px; font-weight:700;">休憩時間の確認・編集 (STEP 2/2)</h2>
+            <p id="reviewBoardDesc" style="margin:5px 0 0 0; font-size:12px; opacity:0.9;"></p>
+        </div>
+        <button style="background:transparent; border:none; color:white; font-size:26px; cursor:pointer;" onclick="document.getElementById('reviewBoardModal').style.display='none'">×</button>
       </div>
 
-      <!-- FOOTER -->
-      <div style="padding:15px 25px; border-top:1px solid var(--border); background:#f8f9fa; display:flex; justify-content:flex-end; gap:10px;">
-        <button class="btn btn-secondary" onclick="closeExportModal()">キャンセル</button>
-        <button id="btnExecuteExport" class="btn btn-primary" onclick="executeExport()">出力する</button>
+      <!-- BULK APPLY BAR -->
+      <div style="padding:15px 20px; background:#e8f0fe; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
+        <span style="font-size:13px; font-weight:700; color:var(--primary);">💡 一括適用 (Áp dụng hàng loạt):</span>
+        <input type="number" id="bulkBreakInput" placeholder="例: 60" style="width:80px; height:32px; padding:0 10px; border:1px solid var(--border); border-radius:4px; font-size:14px; text-align:center;">
+        <span style="font-size:13px; color:#555;">分を</span>
+        <button class="btn btn-primary" style="height:32px; padding:0 15px; font-size:12px;" onclick="applyBulkBreak()">全行に適用</button>
+        <span style="font-size:11px; color:#666; margin-left:10px;">※異なる日は下の表で直接数値を修正してください。</span>
+      </div>
+
+      <!-- BẢNG DATA PREVIEW -->
+      <div style="flex:1; overflow:auto; padding:0;">
+        <table style="width:100%; border-collapse:collapse; font-size:13px; margin:0;">
+          <thead style="position:sticky; top:0; z-index:1; background:#f4f7fc; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+            <tr>
+              <th style="padding:10px;">社員名</th>
+              <th style="padding:10px;">日付</th>
+              <th style="padding:10px;">出勤</th>
+              <th style="padding:10px;">退勤</th>
+              <th style="padding:10px; background:#fff3e0; color:#e65100; width:120px;">休憩 (分) ✏️</th>
+              <th style="padding:10px; color:#006E1C;">実働時間</th>
+            </tr>
+          </thead>
+          <tbody id="reviewTableBody">
+            <!-- Render bằng JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- FOOTER: NÚT XUẤT FILE -->
+      <div style="padding:15px 25px; border-top:1px solid var(--border); background:#f8f9fa; display:flex; justify-content:space-between; align-items:center;">
+        <button class="btn btn-secondary" onclick="document.getElementById('reviewBoardModal').style.display='none'">戻る</button>
+        <div style="display:flex; gap:10px;">
+          <button id="btnExportCSV" class="btn" style="background:#107c41;" onclick="executeFinalExport('CSV')">📄 CSV 出力</button>
+          <button id="btnExportPDF" class="btn" style="background:#c62828;" onclick="executeFinalExport('PDF')">📕 PDF 出力</button>
+        </div>
       </div>
 
     </div>
@@ -730,108 +752,143 @@
     
   }
 
+// ==========================================
+  // JAVASCRIPT: SMART EXPORT & REVIEW BOARD
   // ==========================================
-  // JAVASCRIPT CHO XUẤT CSV & PDF
-  // ==========================================
-  let exportActiveClientDataCache = {}; // Biến lưu tạm danh sách Khách hàng & Cửa hàng
+  let exportActiveClientDataCache = {}; 
+  let previewDataArray = []; // Mảng chứa data đang được preview
 
-  function openExportModal(type) {
-      document.getElementById('exportType').value = type;
-      document.getElementById('exportModalTitle').innerText = (type === 'CSV') ? "CSVデータ出力" : "PDF勤務表出力";
-      
+  // 1. MỞ MODAL CHỌN KHÁCH HÀNG (Thay thế 2 nút cũ trên Dashboard)
+  function openSmartExportModal() {
       const currentMonth = document.getElementById('monthFilter').value;
-      if (!currentMonth) {
-          showToast('ダッシュボードで月を選択してください。', 'error');
-          return;
-      }
+      if (!currentMonth) return showToast('ダッシュボードで月を選択してください。', 'error');
       
-      document.getElementById('exportMonth').value = currentMonth;
-      
-      // Bật modal lên trước, hiện chữ Loading
       document.getElementById('exportClient').innerHTML = '<option value="">-- 読み込み中... --</option>';
       document.getElementById('exportLocation').innerHTML = '<option value="">-- 先に顧客を選択 --</option>';
-      document.getElementById('exportModal').style.display = 'flex';
+      document.getElementById('smartExportModal').style.display = 'flex';
 
-      refreshExportClients(); // Tải danh sách khách hàng
-  }
-
-  function closeExportModal() {
-      document.getElementById('exportModal').style.display = 'none';
-  }
-
-  function toggleBreakInput() {
-      const isChecked = document.getElementById('exportEnableBreak').checked;
-      document.getElementById('exportBreakInputArea').style.display = isChecked ? 'flex' : 'none';
-  }
-
-  function refreshExportClients() {
-      const month = document.getElementById('exportMonth').value;
-      if (!month) return;
-      
-      const clientSelect = document.getElementById('exportClient');
-      const locSelect = document.getElementById('exportLocation');
-      
-      google.script.run
-          .withSuccessHandler(data => {
-              exportActiveClientDataCache = data;
-              clientSelect.innerHTML = '<option value="">-- 顧客を選択 --</option>';
-              
-              const clientNames = Object.keys(data).sort();
-              if (clientNames.length === 0) {
-                  clientSelect.innerHTML = '<option value="">データなし</option>';
-              } else {
-                  clientNames.forEach(name => {
-                      clientSelect.innerHTML += `<option value="${name}">${name}</option>`;
-                  });
-              }
-          })
-          // Hàm này gọi xuống Backend (Ta sẽ code nó ở Bước 2)
-          .getActiveClientsAndLocations(month); 
+      // Gọi API lấy list Khách hàng
+      google.script.run.withSuccessHandler(data => {
+          exportActiveClientDataCache = data;
+          const clientSel = document.getElementById('exportClient');
+          clientSel.innerHTML = '<option value="">-- 顧客を選択 --</option>';
+          Object.keys(data).sort().forEach(name => clientSel.innerHTML += `<option value="${name}">${name}</option>`);
+      }).getActiveClientsAndLocations(currentMonth); 
   }
 
   function updateExportLocationDropdown() {
-      const selectedClientName = document.getElementById('exportClient').value;
-      const locSelect = document.getElementById('exportLocation');
-      
-      if (!selectedClientName || !exportActiveClientDataCache[selectedClientName]) {
-          locSelect.innerHTML = '<option value="">-- 先に顧客を選択 --</option>';
-          return;
+      const client = document.getElementById('exportClient').value;
+      const locSel = document.getElementById('exportLocation');
+      if (!client || !exportActiveClientDataCache[client]) {
+          locSel.innerHTML = '<option value="">-- 先に顧客を選択 --</option>'; return;
       }
-      
-      // Luôn có lựa chọn "Tất cả địa điểm"
-      locSelect.innerHTML = '<option value="">すべての勤務地</option>';
-      
-      const locations = exportActiveClientDataCache[selectedClientName].sort();
-      locations.forEach(locName => {
-          locSelect.innerHTML += `<option value="${locName}">${locName}</option>`;
-      });
+      locSel.innerHTML = '<option value="">すべての勤務地</option>';
+      exportActiveClientDataCache[client].sort().forEach(loc => locSel.innerHTML += `<option value="${loc}">${loc}</option>`);
   }
 
-  function executeExport() {
-      const type = document.getElementById('exportType').value;
-      const month = document.getElementById('exportMonth').value;
+  // 2. CHUYỂN SANG BẢNG REVIEW GIỜ NGHỈ
+  function openReviewBoard() {
       const client = document.getElementById('exportClient').value;
       const location = document.getElementById('exportLocation').value;
-      const enableBreak = document.getElementById('exportEnableBreak').checked;
-      const breakMinutes = enableBreak ? (document.getElementById('exportBreakMinutes').value || 0) : 0;
+      if (!client) return showToast('顧客を選択してください。', 'warning');
 
-      if (!month || !client) {
-          showToast('対象月と顧客は必須です。', 'error');
-          return;
+      // Tắt modal 1, bật modal 2
+      document.getElementById('smartExportModal').style.display = 'none';
+      document.getElementById('reviewBoardModal').style.display = 'flex';
+      
+      const monthStr = document.getElementById('monthFilter').value;
+      document.getElementById('reviewBoardDesc').innerText = `対象: ${monthStr} | 顧客: ${client} ${location ? '| 拠点: '+location : ''}`;
+
+      // Lọc dữ liệu từ globalData (cache trên màn hình)
+      const allowedLocs = exportActiveClientDataCache[client] || [];
+      previewDataArray = globalData.filter(r => {
+          if (location) return r.location === location;
+          return allowedLocs.includes(r.location) || r.type === 'yukyu';
+      });
+
+      // Lắp data vào mảng Preview và vẽ Bảng
+      previewDataArray = previewDataArray.map(r => {
+          let grossMins = 0;
+          if (r.duration && r.duration.includes(':')) {
+              let [h, m] = r.duration.split(':');
+              grossMins = (parseInt(h) * 60) + parseInt(m);
+          }
+          return { ...r, grossMins: grossMins, breakMins: 0, netMins: grossMins }; // Mặc định giờ nghỉ = 0
+      });
+
+      renderReviewTable();
+  }
+
+  // 3. VẼ BẢNG DATA & TÍNH TOÁN
+  function renderReviewTable() {
+      const tbody = document.getElementById('reviewTableBody');
+      tbody.innerHTML = '';
+      if(previewDataArray.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">データがありません</td></tr>'; return;
       }
 
-      const btn = document.getElementById('btnExecuteExport');
-      btn.disabled = true;
-      btn.textContent = '処理中...';
-
-      if (type === 'CSV') {
-          // GỌI HÀM XUẤT CSV Ở ĐÂY (Sẽ làm ở Bước 2)
-          console.log("XUẤT CSV", month, client, location, breakMinutes);
+      let html = '';
+      previewDataArray.forEach((row, index) => {
+          let isYukyu = (row.type === 'yukyu');
+          let trStyle = isYukyu ? 'background:#f9f9f9; color:#888;' : '';
           
-      } else if (type === 'PDF') {
-          // GỌI HÀM XUẤT PDF Ở ĐÂY (Sẽ làm ở Bước 3)
-          console.log("XUẤT PDF", month, client, location, breakMinutes);
-      }
+          // Ô Input giờ nghỉ (Bị khóa nếu là ngày phép)
+          let breakInput = isYukyu ? '-' : `<input type="number" class="break-input" data-index="${index}" value="${row.breakMins}" oninput="recalculateRow(${index})" style="width:60px; height:28px; text-align:center; border:1px solid #ffb74d; border-radius:4px; font-weight:bold; color:#e65100; outline:none;">`;
+          
+          let netTimeStr = isYukyu ? '<span style="color:#c62828; font-weight:bold;">有給休暇</span>' : `<span id="netTime_${index}" style="font-weight:bold; font-size:15px;">${minsToStr(row.netMins)}</span>`;
+
+          html += `
+          <tr style="border-bottom:1px solid #eee; ${trStyle}">
+              <td style="padding:10px;">${row.empName}<br><span style="font-size:10px; color:#888;">${row.empId}</span></td>
+              <td style="padding:10px; font-weight:500;">${row.date}</td>
+              <td style="padding:10px;">${isYukyu ? '-' : (row.checkIn || '')}</td>
+              <td style="padding:10px;">${isYukyu ? '-' : (row.checkOut || '未退勤')}</td>
+              <td style="padding:10px; background:#fffdf7;">${breakInput}</td>
+              <td style="padding:10px; color:#006E1C;">${netTimeStr}</td>
+          </tr>`;
+      });
+      tbody.innerHTML = html;
+  }
+
+  // 4. ÁP DỤNG 60 PHÚT HÀNG LOẠT
+  function applyBulkBreak() {
+      const bulkVal = parseInt(document.getElementById('bulkBreakInput').value) || 0;
+      previewDataArray.forEach((row, index) => {
+          if (row.type !== 'yukyu' && row.grossMins > 0) { // Đã đi làm là trừ
+              row.breakMins = bulkVal;
+              row.netMins = Math.max(0, row.grossMins - bulkVal);
+          }
+      });
+      renderReviewTable(); // Vẽ lại toàn bộ bảng cho nhanh
+      showToast(`${bulkVal}分を一括適用しました。`, 'success');
+  }
+
+  // 5. TỰ ĐỘNG TÍNH LẠI KHI ADMIN GÕ TAY VÀO 1 DÒNG
+  function recalculateRow(index) {
+      const row = previewDataArray[index];
+      const inputEl = document.querySelector(`.break-input[data-index="${index}"]`);
+      let breakVal = parseInt(inputEl.value) || 0;
+      
+      row.breakMins = breakVal;
+      row.netMins = Math.max(0, row.grossMins - breakVal); // Tránh âm giờ
+      
+      // Cập nhật ngay lập tức text Giờ Thực Làm trên màn hình
+      document.getElementById(`netTime_${index}`).innerText = minsToStr(row.netMins);
+  }
+
+  // Hàm phụ trợ: Đổi phút sang chữ HH:MM
+  function minsToStr(totalMins) {
+      if (totalMins <= 0) return "00:00";
+      let h = Math.floor(totalMins / 60);
+      let m = totalMins % 60;
+      return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+  }
+
+  // 6. CHỐT SỔ VÀ GỬI CHO BACKEND XUẤT FILE
+  function executeFinalExport(type) {
+      console.log(`BẮT ĐẦU XUẤT ${type} VỚI DATA ĐÃ KIỂM DUYỆT:`, previewDataArray);
+      showToast(`${type}の出力準備中...`, 'success');
+      // BƯỚC TIẾP THEO MÌNH SẼ GỌI BACKEND Ở ĐÂY NHÉ!
   }
 
 </script>
