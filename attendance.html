@@ -309,10 +309,10 @@
   </div>
 
   <!-- ========================================= -->
-  <!-- STEP 2: BẢNG REVIEW & ĐIỀN GIỜ NGHỈ -->
+  <!-- STEP 2: BẢNG REVIEW & ĐIỀN GIỜ NGHỈ (CLEAN UI) -->
   <!-- ========================================= -->
-  <div id="reviewBoardModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1001; align-items:center; justify-content:center; backdrop-filter:blur(3px);">
-    <div style="background:var(--surface); width:95%; max-width:900px; height:85vh; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.3); overflow:hidden; display:flex; flex-direction:column;">
+  <div id="reviewBoardModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1001; align-items:center; justify-content:center; backdrop-filter:blur(2px);">
+    <div style="background:var(--surface); width:95%; max-width:900px; height:85vh; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2); overflow:hidden; display:flex; flex-direction:column; animation: slideDown 0.3s ease;">
       
       <!-- HEADER -->
       <div style="background:var(--primary); color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center;">
@@ -324,25 +324,25 @@
       </div>
 
       <!-- BULK APPLY BAR -->
-      <div style="padding:15px 20px; background:#e8f0fe; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
-        <span style="font-size:13px; font-weight:700; color:var(--primary);">💡 一括適用 (Áp dụng hàng loạt):</span>
-        <input type="number" id="bulkBreakInput" placeholder="例: 60" style="width:80px; height:32px; padding:0 10px; border:1px solid var(--border); border-radius:4px; font-size:14px; text-align:center;">
-        <span style="font-size:13px; color:#555;">分を</span>
-        <button class="btn btn-primary" style="height:32px; padding:0 15px; font-size:12px;" onclick="applyBulkBreak()">全行に適用</button>
+      <div style="padding:12px 20px; background:#f4f7fc; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
+        <span style="font-size:13px; font-weight:700; color:var(--text);">💡 一括適用:</span>
+        <input type="number" id="bulkBreakInput" placeholder="例: 60" style="width:80px; height:32px; padding:0 10px; border:1px solid var(--border); border-radius:4px; font-size:14px; text-align:center; outline:none;">
+        <span style="font-size:13px; color:var(--text);">分を</span>
+        <button class="btn btn-secondary" style="height:32px; padding:0 15px; font-size:12px;" onclick="applyBulkBreak()">全行に適用</button>
         <span style="font-size:11px; color:#666; margin-left:10px;">※異なる日は下の表で直接数値を修正してください。</span>
       </div>
 
       <!-- BẢNG DATA PREVIEW -->
-      <div style="flex:1; overflow:auto; padding:0;">
+      <div style="flex:1; overflow:auto; padding:0; background:var(--surface);">
         <table style="width:100%; border-collapse:collapse; font-size:13px; margin:0;">
-          <thead style="position:sticky; top:0; z-index:1; background:#f4f7fc; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+          <thead style="position:sticky; top:0; z-index:1;">
             <tr>
-              <th style="padding:10px;">社員名</th>
-              <th style="padding:10px;">日付</th>
-              <th style="padding:10px;">出勤</th>
-              <th style="padding:10px;">退勤</th>
-              <th style="padding:10px; background:#fff3e0; color:#e65100; width:120px;">休憩 (分) ✏️</th>
-              <th style="padding:10px; color:#006E1C;">実働時間</th>
+              <th style="padding:12px 15px; background:#e8f0fe; color:var(--primary); font-weight:700; text-align:left; border-bottom:1px solid var(--border);">社員名</th>
+              <th style="padding:12px 15px; background:#e8f0fe; color:var(--primary); font-weight:700; text-align:left; border-bottom:1px solid var(--border);">日付</th>
+              <th style="padding:12px 15px; background:#e8f0fe; color:var(--primary); font-weight:700; text-align:left; border-bottom:1px solid var(--border);">出勤</th>
+              <th style="padding:12px 15px; background:#e8f0fe; color:var(--primary); font-weight:700; text-align:left; border-bottom:1px solid var(--border);">退勤</th>
+              <th style="padding:12px 15px; background:#e8f0fe; color:var(--primary); font-weight:700; text-align:center; border-bottom:1px solid var(--border);">休憩 (分)</th>
+              <th style="padding:12px 15px; background:#e8f0fe; color:var(--primary); font-weight:700; text-align:center; border-bottom:1px solid var(--border);">実働時間</th>
             </tr>
           </thead>
           <tbody id="reviewTableBody">
@@ -355,8 +355,8 @@
       <div style="padding:15px 25px; border-top:1px solid var(--border); background:#f8f9fa; display:flex; justify-content:space-between; align-items:center;">
         <button class="btn btn-secondary" onclick="document.getElementById('reviewBoardModal').style.display='none'">戻る</button>
         <div style="display:flex; gap:10px;">
-          <button id="btnExportCSV" class="btn" style="background:#107c41;" onclick="executeFinalExport('CSV')">📄 CSV 出力</button>
-          <button id="btnExportPDF" class="btn" style="background:#c62828;" onclick="executeFinalExport('PDF')">📕 PDF 出力</button>
+          <button id="btnExportCSV" class="btn" style="background:#5f6368;" onclick="executeFinalExport('CSV')">📄 CSV 出力</button>
+          <button id="btnExportPDF" class="btn btn-primary" onclick="executeFinalExport('PDF')">📕 PDF 出力</button>
         </div>
       </div>
 
@@ -856,19 +856,19 @@
           let trStyle = isYukyu ? 'background:#f9f9f9; color:#888;' : '';
           
           // Ô Input giờ nghỉ (Bị khóa nếu là ngày phép)
-          let breakInput = isYukyu ? '-' : `<input type="number" class="break-input" data-index="${index}" value="${row.breakMins}" oninput="recalculateRow(${index})" style="width:60px; height:28px; text-align:center; border:1px solid #ffb74d; border-radius:4px; font-weight:bold; color:#e65100; outline:none;">`;
+          let breakInput = isYukyu ? '-' : `<input type="number" class="break-input" data-index="${index}" value="${row.breakMins}" oninput="recalculateRow(${index})" style="width:60px; height:28px; text-align:center; border:1px solid var(--border); border-radius:4px; font-weight:bold; color:var(--text); outline:none;">`;
           
-          let netTimeStr = isYukyu ? '<span style="color:#c62828; font-weight:bold;">有給休暇</span>' : `<span id="netTime_${index}" style="font-weight:bold; font-size:15px;">${minsToStr(row.netMins)}</span>`;
+          let netTimeStr = isYukyu ? '<span style="color:#666; font-weight:bold;">有給休暇</span>' : `<span id="netTime_${index}" style="font-weight:bold; font-size:14px; color:var(--text);">${minsToStr(row.netMins)}</span>`;
 
           html += `
-          <tr style="border-bottom:1px solid #eee; ${trStyle}">
-              <td style="padding:10px;">${row.empName}<br><span style="font-size:10px; color:#888;">${row.empId}</span></td>
-              <td style="padding:10px; font-weight:500;">${row.date}</td>
-              <td style="padding:10px;">${isYukyu ? '-' : (row.checkIn || '')}</td>
-              <td style="padding:10px;">${isYukyu ? '-' : (row.checkOut || '未退勤')}</td>
-              <td style="padding:10px; background:#fffdf7;">${breakInput}</td>
-              <td style="padding:10px; color:#006E1C;">${netTimeStr}</td>
-          </tr>`;
+          <tr style="border-bottom:1px solid var(--border); ${trStyle}">
+              <td style="padding:10px 15px;"><strong>${row.empName}</strong><br><span style="font-size:11px; color:#888; font-family:monospace;">${row.empId}</span></td>
+              <td style="padding:10px 15px;">${row.date}</td>
+              <td style="padding:10px 15px;">${isYukyu ? '-' : (row.checkIn || '')}</td>
+              <td style="padding:10px 15px;">${isYukyu ? '-' : (row.checkOut || '<span style="color:#d32f2f;">未退勤</span>')}</td>
+              <td style="padding:10px 15px; text-align:center;">${breakInput}</td>
+              <td style="padding:10px 15px; text-align:center;">${netTimeStr}</td>
+          </tr>
       });
       tbody.innerHTML = html;
   }
