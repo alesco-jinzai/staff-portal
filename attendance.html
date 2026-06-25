@@ -909,9 +909,75 @@
 
   // 6. CHỐT SỔ VÀ GỬI CHO BACKEND XUẤT FILE
   function executeFinalExport(type) {
-      console.log(`BẮT ĐẦU XUẤT ${type} VỚI DATA ĐÃ KIỂM DUYỆT:`, previewDataArray);
-      showToast(`${type}の出力準備中...`, 'success');
-      // BƯỚC TIẾP THEO MÌNH SẼ GỌI BACKEND Ở ĐÂY NHÉ!
+      if (previewDataArray.length === 0) {
+          return showToast('出力するデータがありません。', 'warning');
+      }
+
+      const client = document.getElementById('exportClient').value;
+      const monthStr = document.getElementById('monthFilter').value;
+      const btnCSV = document.getElementById('btnExportCSV');
+      const btnPDF = document.getElementById('btnExportPDF');
+
+      if (type === 'CSV') {
+          btnCSV.disabled = true; btnCSV.innerText = "出力中...";
+          
+          // TỰ ĐỘNG TẠO CSV TRÊN TRÌNH DUYỆT (Nhanh, không cần gọi Server)
+          const headers = ['社員番号', '名前', '日付', '出勤時刻', '退勤時刻', '休憩', '実働時間', '勤務地', '交通費', '承認/ステータス', 'メモ'];
+          const rows = previewDataArray.map(r => {
+              let isYukyu = r.type === 'yukyu';
+              let finalMemo = (r.memo || '').replace(/#休憩\d+/g, '').trim(); // Xóa tag rác cho đẹp
+              
+              return [
+                  r.empId, r.empName, r.date,
+                  isYukyu ? '' : (r.checkIn || ''),
+                  isYukyu ? '' : (r.checkOut || ''),
+                  isYukyu ? '' : minsToStr(r.breakMins),       // Giờ nghỉ đã duyệt
+                  isYukyu ? '有給休暇' : minsToStr(r.netMins), // Giờ thực làm đã tính
+                  isYukyu ? '' : (r.location || ''),
+                  isYukyu ? '' : (r.fee || 0),
+                  r.isApproved ? (r.approverName || '承認済') : '未承認',
+                  finalMemo
+              ];
+          });
+
+          // Ép chuỗi CSV và tải về
+          let csvContent = '\uFEFF' + [headers, ...rows].map(e => e.join(",")).join("\n");
+          let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+          let link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = `勤怠データ_${monthStr}_${client}.csv`;
+          link.click();
+          
+          showToast('CSV出力が完了しました。', 'success');
+          btnCSV.disabled = false; btnCSV.innerText = "📄 CSV 出力";
+      } 
+      else if (type === 'PDF') {
+          btnPDF.disabled = true; btnPDF.innerText = "生成中...";
+          
+          // GỌI BACKEND VẼ PDF
+          fetch(GAS_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              // Gửi toàn bộ mảng dữ liệu ĐÃ TÍNH TOÁN XONG xuống cho GAS
+              body: JSON.stringify({ action: "generateSmartPdfServer", params: [monthStr, client, previewDataArray] }),
+              redirect: 'follow'
+          })
+          .then(r => r.json())
+          .then(res => {
+              if (res.result && res.result.success) {
+                  window.open(res.result.url, '_blank');
+                  showToast('PDFの生成が完了しました。', 'success');
+              } else {
+                  showToast("エラー: " + (res.error || res.result.message), "error");
+              }
+          })
+          .catch(err => {
+              showToast("通信エラーが発生しました。", "error");
+          })
+          .finally(() => {
+              btnPDF.disabled = false; btnPDF.innerText = "📕 PDF 出力";
+          });
+      }
   }
 
 </script>
