@@ -752,7 +752,7 @@
     
   }
 
-// ==========================================
+  // ==========================================
   // JAVASCRIPT: SMART EXPORT & REVIEW BOARD
   // ==========================================
   let exportActiveClientDataCache = {}; 
@@ -767,13 +767,36 @@
       document.getElementById('exportLocation').innerHTML = '<option value="">-- 先に顧客を選択 --</option>';
       document.getElementById('smartExportModal').style.display = 'flex';
 
-      // Gọi API lấy list Khách hàng
-      google.script.run.withSuccessHandler(data => {
+      // 👉 ĐÃ SỬA LỖI: Dùng fetch() gọi qua GAS_URL vì Web đang host trên Github Pages
+      fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: "getActiveClientsAndLocations", params: [currentMonth] }),
+          redirect: 'follow'
+      })
+      .then(r => r.json())
+      .then(res => {
+          // Backend doPost(e) của ông luôn bọc data trả về trong biến res.result
+          const data = res.result || {}; 
           exportActiveClientDataCache = data;
+          
           const clientSel = document.getElementById('exportClient');
           clientSel.innerHTML = '<option value="">-- 顧客を選択 --</option>';
-          Object.keys(data).sort().forEach(name => clientSel.innerHTML += `<option value="${name}">${name}</option>`);
-      }).getActiveClientsAndLocations(currentMonth); 
+          
+          const clientNames = Object.keys(data).sort();
+          if (clientNames.length === 0) {
+              clientSel.innerHTML = '<option value="">データなし</option>';
+          } else {
+              clientNames.forEach(name => {
+                  clientSel.innerHTML += `<option value="${name}">${name}</option>`;
+              });
+          }
+      })
+      .catch(err => {
+          console.error(err);
+          showToast("サーバー通信エラー", "error");
+          document.getElementById('exportClient').innerHTML = '<option value="">通信エラー</option>';
+      });
   }
 
   function updateExportLocationDropdown() {
