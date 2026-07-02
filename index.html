@@ -3195,7 +3195,7 @@
       setLoading(true, "シフト取得中...");
 
       // DÙNG FETCH API CHUẨN THAY CHO google.script.run
-      fetch(GAS_URL, {
+      fetch(GAS_WEB_APP_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: "getAggregatedShiftCalendarData", params: [currentUser.id, shiftYear, shiftMonth] }),
@@ -3390,7 +3390,7 @@
 
       setLoading(true, "提出中...");
 
-      fetch(GAS_URL, {
+      fetch(GAS_WEB_APP_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: "submitKiboShiftNew", params: [payload] }),
@@ -3429,7 +3429,7 @@
       container.innerHTML = '<p style="text-align:center;">読み込み中...</p>';
       setLoading(true, "取得中...");
 
-      fetch(GAS_URL, {
+      fetch(GAS_WEB_APP_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           // 👉 GỌI VÀO CÁI API MỚI VỪA VIẾT Ở TRÊN
