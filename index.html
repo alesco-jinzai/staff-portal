@@ -3191,22 +3191,45 @@
       document.getElementById('shiftMonthDisplay').innerText = `${shiftYear}年 ${shiftMonth}月`;
       const container = document.getElementById('shiftListContainer');
       container.innerHTML = '<p style="text-align:center;">読み込み中...</p>';
+      
       setLoading(true, "シフト取得中...");
-      google.script.run.withSuccessHandler(res => {
-        setLoading(false);
-        if (res.success) {
-          shiftData.templates = res.templates;
-          shiftData.kibo = new Set(res.kibo);
-          shiftData.kakutei = new Set(res.kakutei);
-          shiftData.shiftsAvailableByDay = res.shiftsAvailableByDay;
-          shiftData.deadline = res.deadline;
-          document.getElementById('contactNotes').value = res.contactNotes || '';
-          updateDeadlineUI();
-          renderShiftList();
-        } else {
-          container.innerHTML = `<p style="text-align:center; color:red;">${res.message}</p>`;
-        }
-      }).getAggregatedShiftCalendarData(currentUser.id, shiftYear, shiftMonth);
+
+      // DÙNG FETCH API CHUẨN THAY CHO google.script.run
+      fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: "getAggregatedShiftCalendarData", params: [currentUser.id, shiftYear, shiftMonth] }),
+          redirect: 'follow'
+      })
+      .then(r => r.json())
+      .then(res => {
+          setLoading(false);
+          if (res.result && res.result.success) {
+              const data = res.result; // Chứa Data chuẩn từ Trinity DB
+
+              // Đổ Data vào RAM của điện thoại
+              shiftData.templates = data.templates || [];
+              shiftData.kibo = new Set(data.kibo || []);
+              shiftData.kakutei = new Set(data.kakutei || []);
+              
+              // Mảng lịch trống do Admin tạo ở Waku Setting
+              shiftData.shiftsAvailableByDay = data.shiftsAvailableByDay || {};
+              shiftData.deadline = data.deadline;
+              
+              // Lấy lời nhắn cũ đổ vào Textarea
+              document.getElementById('contactNotes').value = data.contactNotes || '';
+              
+              // Chạy hàm vẽ Giao diện (2 hàm này ông giữ nguyên của bản cũ, không cần sửa)
+              updateDeadlineUI();
+              renderShiftList();
+          } else {
+              container.innerHTML = `<p style="text-align:center; color:red;">${res.error || res.result?.message || 'エラー'}</p>`;
+          }
+      })
+      .catch(err => {
+          setLoading(false);
+          container.innerHTML = `<p style="text-align:center; color:red;">通信エラーが発生しました。</p>`;
+      });
     }
 
     function updateDeadlineUI() {
