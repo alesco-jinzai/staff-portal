@@ -3356,68 +3356,98 @@
       document.getElementById('reviewCalendarContainer').innerHTML = html;
     }
 
+    // =========================================================
+    // NÂNG CẤP: GỬI KIBO LÊN HỆ THỐNG MỚI (SHIFT ENGINE V2.0)
+    // =========================================================
     function kiboConfirmSubmit() {
-      // 1. Chỉ lọc ra danh sách các Ca Kibo ĐƯỢC CHỌN THÊM MỚI (stagedAdditions) 
-      // (Trong bản V2, Backend sẽ tự động đè Data mới nhất lên, nên không cần quan tâm đến stagedDeletions)
-      
-      const reqAdd = Array.from(stagedAdditions).map(k => {
-        const [lId, dDate, tId] = k.split('|'); // Ví dụ k = "LOC_01|2026-06-15|TMP_01"
-        return { 
-           date: dDate,          // Gửi đúng "2026-06-15"
-           templateId: tId       // Gửi đúng "TMP_01"
+        // 1. CHỐNG SPAM NÚT (DOUBLE SUBMIT)
+        const btnSubmit = document.querySelector('button[onclick="kiboConfirmSubmit()"]');
+        if (btnSubmit && btnSubmit.disabled) return; // Nếu đang xử lý thì chặn không cho bấm tiếp
+        if (btnSubmit) btnSubmit.disabled = true;
+
+        // 2. TÍNH TOÁN "TRẠNG THÁI CUỐI CÙNG" CỦA LỊCH KIBO
+        // Lấy danh sách Kibo cũ đã có trên hệ thống
+        const finalKiboKeys = new Set(shiftData.kibo || []); 
+        
+        // Trừ đi những ca vừa bấm Hủy
+        stagedDeletions.forEach(k => finalKiboKeys.delete(k)); 
+        
+        // Cộng thêm những ca vừa bấm Thêm
+        stagedAdditions.forEach(k => finalKiboKeys.add(k)); 
+
+        // Rã mảng gửi cho Backend
+        const finalKiboArray = Array.from(finalKiboKeys).map(k => {
+            const [lId, dDate, tId] = k.split('|'); 
+            return { date: dDate, templateId: tId }; // Chỉ gửi Ngày và Mã Ca
+        });
+
+        // 3. XÁC ĐỊNH THÔNG TIN CHUNG
+        const notes = document.getElementById('contactNotes').value;
+        const currentMonthStr = `${shiftYear}-${String(shiftMonth).padStart(2, '0')}`;
+        
+        // Lấy Mã cửa hàng từ bộ lọc UI (An toàn hơn lấy từ mảng)
+        const locSelect = document.getElementById('shift-location-filter');
+        let locId = locSelect ? locSelect.value : null;
+
+        // Fallback: Nếu không tìm thấy từ UI, rà trong mảng Kibo để lấy mã Cửa hàng
+        if (!locId && finalKiboKeys.size > 0) {
+            locId = Array.from(finalKiboKeys)[0].split('|')[0];
+        }
+
+        // 4. KIỂM TRA XEM CÓ THAY ĐỔI THỰC SỰ KHÔNG (Tránh gửi API ảo)
+        const notesChanged = notes !== (shiftData.contactNotes || '');
+        if (stagedAdditions.size === 0 && stagedDeletions.size === 0 && !notesChanged) {
+            if (btnSubmit) btnSubmit.disabled = false;
+            return showCustomAlert("変更内容がありません。", true);
+        }
+
+        // 5. ĐÓNG GÓI JSON LẠNH LÙNG (TOÀN ID)
+        const payload = {
+            empId: currentUser.id,
+            locationId: locId,
+            monthStr: currentMonthStr,
+            kiboArray: finalKiboArray,
+            notes: notes
         };
-      });
 
-      const notes = document.getElementById('contactNotes').value;
-      const currentMonthStr = `${shiftYear}-${String(shiftMonth).padStart(2, '0')}`; // Gửi đúng "2026-06"
-      
-      // Ở bản NV, locationId đã được xác định trước, nên có thể lấy từ filter hoặc từ mảng đầu tiên
-      const firstKey = Array.from(stagedAdditions)[0];
-      const locId = firstKey ? firstKey.split('|')[0] : null;
+        setLoading(true, "提出中...");
 
-      if (reqAdd.length === 0 && (!notes || notes.trim() === '')) {
-         return showCustomAlert("変更内容がありません。", true);
-      }
-
-      // Đóng gói mảng cực kỳ Clean (Toàn ID)
-      const payload = {
-         empId: currentUser.id,          // Lấy ID người dùng đang login (EMP_123)
-         locationId: locId,              // LOC_01
-         monthStr: currentMonthStr,      // 2026-06
-         kiboArray: reqAdd,              // [{date: "2026-06-15", templateId: "TMP_01"}, ...]
-         notes: notes                    // "Đi trễ 15p nha"
-      };
-
-      setLoading(true, "提出中...");
-
-      fetch(GAS_WEB_APP_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: "submitKiboShiftNew", params: [payload] }),
-        redirect: 'follow'
-      })
-      .then(r => r.json())
-      .then(res => {
-          setLoading(false);
-          if (res.result && res.result.success) { 
-              showCustomAlert(res.result.message);
-              
-              stagedAdditions.clear();
-              stagedDeletions.clear();
-              updateSubmitButtonVisibility();
-              
-              showView('viewShift');
-              window.scrollTo(0,0);
-              loadAndRenderAllShifts(); 
-          } else { 
-              showCustomAlert("エラー: " + (res.error || res.result.message), true); 
-          }
-      })
-      .catch(err => {
-          setLoading(false);
-          showCustomAlert("通信エラーが発生しました。", true);
-      });
+        // 6. GỌI FETCH XUỐNG GAS
+        fetch(GAS_WEB_APP_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: "submitKiboShiftNew", params: [payload] }),
+            redirect: 'follow'
+        })
+        .then(r => r.json())
+        .then(res => {
+            setLoading(false);
+            if (res.result && res.result.success) { 
+                showCustomAlert(res.result.message);
+                
+                // Reset rổ nhớ tạm
+                stagedAdditions.clear();
+                stagedDeletions.clear();
+                updateSubmitButtonVisibility();
+                
+                // Quay lại màn hình lịch và tải lại Data mới nhất
+                showView('viewShift');
+                window.scrollTo(0,0);
+                loadAndRenderAllShifts(); 
+            } else { 
+                showCustomAlert("エラー: " + (res.error || res.result.message), true); 
+            }
+        })
+        .catch(err => {
+            setLoading(false);
+            showCustomAlert("通信エラーが発生しました。", true);
+        })
+        .finally(() => {
+            // Dù thành công hay thất bại cũng phải nhả cái nút ra
+            if (btnSubmit) btnSubmit.disabled = false;
+        });
     }
+
     function showKakuteiView() {
       const now = new Date(); shiftYear = now.getFullYear(); shiftMonth = now.getMonth() + 1;
       showView('viewKakutei'); loadAndRenderKakuteiList();
