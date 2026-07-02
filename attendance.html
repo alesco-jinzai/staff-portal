@@ -745,11 +745,38 @@
 
   function deleteRecord() {
     const rIndex = document.getElementById('editRowIndex').value;
-    if (!rIndex) return;
+    if (!rIndex) return showToast("エラー: 行番号が見つかりません。", "error");
+    
     if (!confirm("本当にこの記録を削除しますか？\n（この操作は元に戻せません）")) return;
 
-    document.getElementById('btnDeleteRecord').innerText = "削除中...";
-    
+    const btnDel = document.getElementById('btnDeleteRecord');
+    btnDel.innerText = "削除中...";
+    btnDel.disabled = true;
+
+    fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: "deleteAttendanceRecord", params: [rIndex] }),
+      redirect: 'follow'
+    })
+    .then(r => r.json())
+    .then(res => {
+      if(res.result && res.result.success) {
+        showToast("記録が削除されました。", "success");
+        document.getElementById('editModal').style.display = 'none';
+        loadData(); // Tải lại bảng sau khi xóa
+      } else { 
+        showToast("エラー: " + (res.error || res.result.message), "error"); 
+      }
+    })
+    .catch(err => {
+        console.error(err);
+        showToast("通信エラーが発生しました。", "error");
+    })
+    .finally(() => {
+        btnDel.innerText = "削除";
+        btnDel.disabled = false;
+    });
   }
 
   // ==========================================
