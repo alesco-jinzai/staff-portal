@@ -3257,37 +3257,58 @@
       if (!shiftData.templates || shiftData.templates.length === 0) {
         container.innerHTML = '<p style="text-align:center;">勤務可能な拠点がありません。</p>'; return;
       }
+
       const tempByLoc = shiftData.templates.reduce((acc, t) => {
         if (!acc[t.locationId]) acc[t.locationId] = { name: t.locationName, shifts: [] };
         acc[t.locationId].shifts.push(t); return acc;
       }, {});
+      
       let html = '';
       const days = new Date(shiftYear, shiftMonth, 0).getDate();
       const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+      
       for (let d = 1; d <= days; d++) {
-        const date = new Date(shiftYear, shiftMonth - 1, d);
+        // Ngày của UI (Sạch sẽ)
         const dateStr = `${shiftYear}-${String(shiftMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-        const dayOfWeek = dayNames[date.getDay()];
+        
+        // 👉 VÁ LỖI 1: Ngày dùng để quét trong mảng Kakutei (Do API trả về bị lố dấu /)
+        const dateSlashStr = `${shiftYear}/${String(shiftMonth).padStart(2,'0')}/${String(d).padStart(2,'0')}`;
+
+        const dayOfWeek = dayNames[new Date(shiftYear, shiftMonth - 1, d).getDay()];
         const availIds = new Set(shiftData.shiftsAvailableByDay[dateStr] || []);
+        
         if (availIds.size === 0) continue;
+        
         let dayHtml = Object.entries(tempByLoc).map(([locId, locData]) => {
           const validShifts = locData.shifts.filter(t => availIds.has(t.id));
           if (validShifts.length === 0) return '';
+          
           let shiftHtml = validShifts.map(t => {
+            // Key để UI bấm chọt chọt (VD: LOC_01|2026-06-15|TMP_01)
             const key = `${locId}|${dateStr}|${t.id}`;
-            const isKibo = shiftData.kibo.has(key);
-            const isKakutei = Array.from(shiftData.kakutei).some(k => k.startsWith(key));
+            
+            // 👉 VÁ LỖI 2: Key để check Kibo (Phải khớp với cái API nhả ra lúc nãy)
+            const checkKiboKey = `${locId}|${dateSlashStr}|${t.id}`;
+            const checkKakuteiKey = `${locId}|${dateSlashStr}|${t.id}`;
+
+            const isKibo = shiftData.kibo.has(checkKiboKey);
+            const isKakutei = Array.from(shiftData.kakutei).some(k => k.startsWith(checkKakuteiKey));
+            
             let cls = 'available';
             if (isKakutei) cls = 'confirmed';
             else if (stagedAdditions.has(key)) cls = 'staging';
             else if (stagedDeletions.has(key)) cls = 'available';
             else if (isKibo) cls = 'requested';
+            
             return `<div class="shift-slot ${cls}" onclick="handleShiftClick(this, '${key}', '${isKibo}', '${isKakutei}')">${t.name}</div>`;
           }).join('');
+          
           return `<div style="margin-bottom:12px;"><div class="location-header">${locData.name}</div><div class="shift-items-wrapper">${shiftHtml}</div></div>`;
         }).join('');
+        
         if (dayHtml) html += `<div class="shift-list-day"><div class="day-header">${shiftMonth}/${d} (${dayOfWeek})</div>${dayHtml}</div>`;
       }
+      
       container.innerHTML = html || '<p style="text-align:center;">募集中のシフトはありません。</p>';
     }
 
