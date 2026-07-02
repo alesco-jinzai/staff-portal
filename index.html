@@ -3334,31 +3334,66 @@
     }
 
     function kiboConfirmSubmit() {
-      const tMap = shiftData.templates.reduce((m, t) => { m[`${t.locationId}|${t.id}`] = t; return m; }, {});
+      // 1. Chỉ lọc ra danh sách các Ca Kibo ĐƯỢC CHỌN THÊM MỚI (stagedAdditions) 
+      // (Trong bản V2, Backend sẽ tự động đè Data mới nhất lên, nên không cần quan tâm đến stagedDeletions)
+      
       const reqAdd = Array.from(stagedAdditions).map(k => {
-        const [l, d, t] = k.split('|'); const obj = tMap[`${l}|${t}`];
-        return { locationId: l, date: d, templateId: t, locationName: obj.locationName, startTime: obj.startTime, endTime: obj.endTime };
+        const [lId, dDate, tId] = k.split('|'); // Ví dụ k = "LOC_01|2026-06-15|TMP_01"
+        return { 
+           date: dDate,          // Gửi đúng "2026-06-15"
+           templateId: tId       // Gửi đúng "TMP_01"
+        };
       });
-      const reqDel = Array.from(stagedDeletions).map(k => { const [l, d, t] = k.split('|'); return { locationId: l, date: d, templateId: t }; });
-      const notes = document.getElementById('contactNotes').value;
-      setLoading(true, "提出中...");
-      google.script.run.withSuccessHandler(res => {
-        setLoading(false);
-        if (res.success) { 
-          showCustomAlert(res.message);
 
-          // THÊM 3 DÒNG NÀY ĐỂ ĐỔ SẠCH GIỎ HÀNG VÀ ẨN NÚT NỘP
-          stagedAdditions.clear();
-          stagedDeletions.clear();
-          updateSubmitButtonVisibility();
-          
-          showView('viewShift');
-          window.scrollTo(0,0);
-          loadAndRenderAllShifts(); 
-        } else { 
-          showCustomAlert(res.message, true); 
-        }
-      }).submitShiftRequestsWithNotes(currentUser.id, safeCleanName(currentUser.name), reqAdd, reqDel, notes, shiftYear, shiftMonth);
+      const notes = document.getElementById('contactNotes').value;
+      const currentMonthStr = `${shiftYear}-${String(shiftMonth).padStart(2, '0')}`; // Gửi đúng "2026-06"
+      
+      // Ở bản NV, locationId đã được xác định trước, nên có thể lấy từ filter hoặc từ mảng đầu tiên
+      const firstKey = Array.from(stagedAdditions)[0];
+      const locId = firstKey ? firstKey.split('|')[0] : null;
+
+      if (reqAdd.length === 0 && (!notes || notes.trim() === '')) {
+         return showCustomAlert("変更内容がありません。", true);
+      }
+
+      // Đóng gói mảng cực kỳ Clean (Toàn ID)
+      const payload = {
+         empId: currentUser.id,          // Lấy ID người dùng đang login (EMP_123)
+         locationId: locId,              // LOC_01
+         monthStr: currentMonthStr,      // 2026-06
+         kiboArray: reqAdd,              // [{date: "2026-06-15", templateId: "TMP_01"}, ...]
+         notes: notes                    // "Đi trễ 15p nha"
+      };
+
+      setLoading(true, "提出中...");
+
+      fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: "submitKiboShiftNew", params: [payload] }),
+        redirect: 'follow'
+      })
+      .then(r => r.json())
+      .then(res => {
+          setLoading(false);
+          if (res.result && res.result.success) { 
+              showCustomAlert(res.result.message);
+              
+              stagedAdditions.clear();
+              stagedDeletions.clear();
+              updateSubmitButtonVisibility();
+              
+              showView('viewShift');
+              window.scrollTo(0,0);
+              loadAndRenderAllShifts(); 
+          } else { 
+              showCustomAlert("エラー: " + (res.error || res.result.message), true); 
+          }
+      })
+      .catch(err => {
+          setLoading(false);
+          showCustomAlert("通信エラーが発生しました。", true);
+      });
     }
     function showKakuteiView() {
       const now = new Date(); shiftYear = now.getFullYear(); shiftMonth = now.getMonth() + 1;
@@ -3370,30 +3405,66 @@
       const container = document.getElementById('kakuteiListContainer');
       container.innerHTML = '<p style="text-align:center;">読み込み中...</p>';
       setLoading(true, "取得中...");
-      google.script.run.withSuccessHandler(res => {
+
+      fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          // 👉 GỌI VÀO CÁI API MỚI VỪA VIẾT Ở TRÊN
+          body: JSON.stringify({ action: "getAggregatedShiftCalendarData", params: [currentUser.id, shiftYear, shiftMonth] }),
+          redirect: 'follow'
+      })
+      .then(r => r.json())
+      .then(res => {
         setLoading(false);
-        if (!res.success) return container.innerHTML = `<p style="text-align:center; color:red;">${res.message}</p>`;
-        const tMap = res.templates.reduce((m, t) => { m[`${t.locationId}|${t.id}`] = t; return m; }, {});
+        if (!res.result || !res.result.success) return container.innerHTML = `<p style="text-align:center; color:red;">${res.result?.message || 'エラー'}</p>`;
+        
+        // Tạo cái TỪ ĐIỂN Mẫu Ca: key là `LOC_01|TMP_01`, value là Object giờ giấc, màu sắc
+        const tMap = res.result.templates.reduce((m, t) => { m[`${t.locationId}|${t.id}`] = t; return m; }, {});
         const byDate = {};
-        res.kakutei.forEach(k => {
-          const p = k.split('|'); const lId = p[0], d = p[1], tId = p[2], rm = p.slice(3).join('|');
+
+        // Rã chuỗi Kakutei ("LOC_01|2026-06-15|TMP_01|Ghi chú") thành Object hiển thị được
+        res.result.kakutei.forEach(k => {
+          const p = k.split('|'); 
+          const lId = p[0]; 
+          const dDate = p[1].replace(/-/g, '/'); // Ép về YYYY/MM/DD cho hàm vẽ
+          const tId = p[2]; 
+          const rm = p.slice(3).join('|');
+
           const t = tMap[`${lId}|${tId}`];
-          if (t) (byDate[d] = byDate[d] || []).push({ ...t, remarks: rm });
+          if (t) {
+             if(!byDate[dDate]) byDate[dDate] = [];
+             byDate[dDate].push({ ...t, remarks: rm }); // Nhét luôn cái Ghi chú vào
+          }
         });
+
         const sortedDays = Object.keys(byDate).sort();
         if (sortedDays.length === 0) return container.innerHTML = '<p style="text-align:center;">確定シフトはありません。</p>';
+        
         const days = ['日', '月', '火', '水', '木', '金', '土'];
+        
+        // Vẽ Bảng Danh Sách Giống Bản Cũ
         let html = sortedDays.map(dStr => {
-          const dObj = new Date(dStr + 'T00:00:00');
+          const dObj = new Date(dStr);
           const byLoc = byDate[dStr].reduce((acc, s) => { (acc[s.locationName] = acc[s.locationName] || []).push(s); return acc; }, {});
+          
           const locHtml = Object.entries(byLoc).map(([lName, shifts]) => {
-            const sHtml = shifts.map(s => `<div class="confirmed-shift-item">${s.startTime} - ${s.endTime}${s.remarks ? `<div class="shift-remarks">備考: ${s.remarks}</div>` : ''}</div>`).join('');
+            const sHtml = shifts.map(s => `
+                <div class="confirmed-shift-item">
+                    ${s.startTime} - ${s.endTime}
+                    ${s.remarks ? `<div class="shift-remarks">備考: ${s.remarks}</div>` : ''}
+                </div>`).join('');
             return `<div style="margin-bottom:8px;"><div class="location-header">${lName}</div>${sHtml}</div>`;
           }).join('');
+          
           return `<div class="shift-list-day"><div class="day-header">${shiftMonth}/${dObj.getDate()} (${days[dObj.getDay()]})</div>${locHtml}</div>`;
         }).join('');
+        
         container.innerHTML = html;
-      }).getAggregatedShiftCalendarData(currentUser.id, shiftYear, shiftMonth);
+      })
+      .catch(err => {
+        setLoading(false);
+        container.innerHTML = `<p style="text-align:center; color:red;">通信エラーが発生しました。</p>`;
+      });
     }
 
     function finalizeAndMoveToAttendance() {
