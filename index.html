@@ -3195,7 +3195,7 @@
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
         if (res.success && res.user) {
-          currentUser = res.user; // Cập nhật bản Full Data an toàn 100%
+          currentUser = res.user;
           renderAttendanceView();
           showView('viewAttendance');
           showCustomAlert("ログインしました。");
