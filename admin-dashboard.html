@@ -7,11 +7,8 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    /* CSS CƠ BẢN */
     :root { --primary: #0061A4; --bg: #f4f7fc; --surface: #ffffff; --text: #1A1C1E; --border: #e1e3e1; }
     body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
-    
-    /* ✨ NAV BAR CHUẨN (CAO 56PX) ✨ */
     .top-navbar { 
       background: var(--surface); box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
       height: 56px; display: flex; align-items: center; padding: 0 20px; 
@@ -28,11 +25,7 @@
     .nav-btn:hover { color: var(--primary); background: #f8f9fa; }
     .nav-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: #f0f4f8; }
     .nav-btn svg { width: 18px; height: 18px; fill: currentColor; }
-
-    /* KHU VỰC NỘI DUNG */
-    .main-content { padding: 20px; } 
-
-    /* ✨ CỤM HEADER & FILTER CHUẨN ✨ */
+    .main-content { padding: 20px; }
     .header-container { 
       background: var(--surface); padding: 16px 20px; border-radius: 8px; 
       box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 16px; 
@@ -45,20 +38,16 @@
     .header-title-box h1 { margin: 0; font-size: 20px; color: var(--primary); } 
     .header-title-box p { margin: 0; font-size: 12px; color: #666; font-weight: bold; }
     .header-actions { display: flex; align-items: center; gap: 10px; }
-    
-    /* NÚT BẤM VÀ Ô NHẬP LIỆU CHỐT CỨNG CHIỀU CAO 36PX */
     .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; width: 100%; }
     .tab-group { display: flex; background: #e1e3e1; border-radius: 6px; overflow: hidden; margin: 0; height: 36px;}
     .tab-btn { border: none; padding: 0 15px; font-weight: bold; cursor: pointer; background: transparent; color: #444; transition: 0.2s; font-size: 13px; }
     .tab-btn.active { background: var(--primary); color: white; }
-    
     input[type="month"], input[type="text"], select { 
       padding: 0 12px; border: 1px solid var(--border); border-radius: 6px; 
       font-size: 13px; font-weight: bold; outline: none; color: #333; 
       height: 36px; box-sizing: border-box; /* Cố định chiều cao */
     }
     input[type="text"]:focus, select:focus { border-color: var(--primary); }
-    
     .btn { 
       background: var(--primary); color: white; border: none; 
       padding: 0 20px; height: 36px; border-radius: 6px; 
@@ -68,14 +57,10 @@
     .btn:hover { background: #004d82; }
     .btn-secondary { background: #5f6368; }
     .btn-secondary:hover { background: #3c4043; }
-    
-    /* BẢNG DATA */
     table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px;}
     th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }
     th { background: #e8f0fe; color: var(--primary); white-space: nowrap; font-weight: 700;}
     tr:hover { background: #f8f9fa; }
-    
-    /* CÁC NHÃN (BADGES) */
     .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; white-space: nowrap; display: inline-block;}
     .st-kari { background: #fff3e0; color: #b28900; border: 1px solid #ffe082; }
     .st-hon { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
@@ -87,14 +72,10 @@
     .bg-ok { background: #e8f5e9; color: #2e7d32; }
     .bg-ng { background: #ffebee; color: #c62828; }
     .bg-yukyu { background: #fff3e0; color: #e65100; }
-    
     .memo-input { width: 100%; box-sizing: border-box; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; height: 32px;}
-    
     #loading { text-align: center; padding: 40px; font-size: 15px; color: #666; font-weight: bold; }
     .spinner { border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
-    
-    /* MODAL CHI TIẾT (Trang Ứng viên) */
     #detailModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
     .modal-content { background: #f8f9fa; width: 90%; max-width: 750px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; position: relative;}
     .modal-header { background: var(--primary); color: white; padding: 20px 25px; display: flex; justify-content: space-between; align-items: flex-start; }
@@ -123,34 +104,26 @@
     .btn-nas:hover { background: #f9a825; transform: translateY(-1px); }
     .btn-nas svg { width: 16px; height: 16px; fill: currentColor; }
     #copyToast { position: absolute; top: 10px; right: 10px; background: #333; color: #fff; padding: 5px 12px; font-size: 12px; border-radius: 20px; opacity: 0; transition: 0.3s; pointer-events: none;}
-    
     .btn-edit { background: none; border: 1px solid #C4C7C5; border-radius: 4px; padding: 3px 6px; cursor: pointer; color: var(--primary); font-size: 11px; display: inline-flex; align-items: center; gap: 4px; font-weight: bold;}
     .btn-edit:hover { background: #e8f0fe; border-color: var(--primary);}
     #langEditArea input { height: 28px; padding: 5px 10px; font-size: 13px; font-weight: normal; margin-right: 5px; flex: 1; border-radius: 4px; border: 1px solid var(--border);}
   </style>
 </head>
 <body>
-
-  <!-- ✨ THANH MENU ĐIỀU HƯỚNG TỔNG -->
   <div class="top-navbar">
     <img src="logo.png" alt="ALESCO" class="nav-logo" onerror="this.src='https://alesco-v.co.jp/wp/wp-content/uploads/ALESCO-LOGO.png'">
-    
     <div class="nav-menu">
       <a href="admin-dashboard.html" class="nav-btn active">
         <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
         進捗管理
       </a>
-      
       <a href="attendance.html" class="nav-btn">
         <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/><path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
         勤怠管理
       </a>
     </div>
   </div>
-
-  <!-- ✨ BỌC NỘI DUNG CŨ BẰNG .main-content -->
   <div class="main-content">
-    
     <div class="header-container">
       <div class="header-top">
         <div class="header-title-box">
@@ -165,16 +138,13 @@
           <button class="btn" onclick="fetchData()">更新</button>
         </div>
       </div>
-
       <div class="controls">
         <input type="text" id="searchInput" placeholder="名前、カナ、電話番号、ID、言語、住所など (スペース区切りで複数検索可)" oninput="filterData()" style="flex: 2; min-width: 250px;">
-        
         <select id="statusFilter" onchange="filterData()" style="flex: 1; min-width: 120px;">
           <option value="ALL">すべてのステータス</option>
           <option value="仮登録">仮登録</option>
           <option value="本登録">本登録</option>
         </select>
-
         <select id="progressFilter" onchange="filterData()" style="flex: 1; min-width: 140px;">
           <option value="ALL">提出状況 (すべて)</option>
           <option value="DONE">100% 完了</option>
@@ -183,17 +153,14 @@
           <option value="MISSING_BANK">未提出：口座情報</option>
           <option value="MISSING_FUYO">未提出：扶養申告書</option>
         </select>
-
         <select id="natFilter" onchange="filterData()" style="flex: 1; min-width: 110px;">
           <option value="ALL">国籍 (すべて)</option>
           <option value="日本">日本</option>
           <option value="FOREIGN">外国籍 (すべて)</option>
         </select>
-
         <select id="langFilter" onchange="filterData()" style="flex: 1; min-width: 110px;">
           <option value="ALL">言語 (すべて)</option>
         </select>
-
         <select id="empTypeFilter" onchange="filterData()" style="flex: 1; min-width: 130px;">
           <option value="ALL">雇用形態 (すべて)</option>
           <option value="メイン">メイン</option>
@@ -203,12 +170,10 @@
         </select>
       </div>
     </div>
-
     <div id="loading">
       <div class="spinner"></div>
       データを読み込んでいます...
     </div>
-
     <div style="overflow-x: auto;">
       <table id="staffTable" style="display: none;">
         <thead>
@@ -231,7 +196,6 @@
         該当するスタッフが見つかりません。
       </div>
     </div>
-
     <div id="detailModal" onclick="closeModalOutside(event)">
       <div class="modal-content">
         <div id="copyToast">コピーしました</div>
@@ -250,7 +214,6 @@
           <div id="mNoFolderWarning" style="display:none; background:#ffebee; color:#c62828; padding:15px; border-radius:8px; border:1px solid #ffcdd2; margin-bottom:20px; font-size:13px; font-weight:bold;">
             ⚠️ スプレッドシートにフォルダ名が記録されていないため、個人フォルダを開けません。
           </div>
-          
           <div class="info-card">
             <div class="info-grid">
               <div class="info-item">
@@ -260,27 +223,22 @@
                   <button class="copy-btn" onclick="copyToClipboard('mId')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
                 </div>
               </div>
-              
               <div class="info-item">
                 <span class="info-label">雇用形態</span>
                 <div class="info-value" id="mEmpType"></div>
               </div>
-
               <div class="info-item">
                 <span class="info-label">国籍</span>
                 <div class="info-value" id="mNationality"></div>
               </div>
-
               <div class="info-item">
                 <span class="info-label">対応言語</span>
                 <div id="mLanguageContainer"></div>
               </div>
-              
               <div class="info-item">
                 <span class="info-label">電話番号</span>
                 <div id="mPhoneContainer" style="display: flex; flex-direction: column; gap: 8px;"></div>
               </div>
-
               <div class="info-item">
                 <span class="info-label">メールアドレス</span>
                 <div class="info-value">
@@ -288,12 +246,10 @@
                   <button class="copy-btn" id="btnCopyEmail" onclick="copyToClipboard('mEmail')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
                 </div>
               </div>
-              
               <div class="info-item">
                 <span class="info-label">生年月日・性別</span>
                 <div class="info-value" id="mDobGender"></div>
               </div>
-
               <div class="info-item" style="grid-column: 1 / -1;">
                 <span class="info-label">現住所</span>
                 <div class="info-value">
@@ -303,7 +259,6 @@
               </div>
             </div>
           </div>
-
           <div class="info-card">
             <div class="status-header">📄 提出書類ステータス</div>
             <div class="status-list">
@@ -321,24 +276,18 @@
         </div>
       </div>
     </div>
-  </div> <!-- Đóng thẻ main-content -->
-
+  </div>
 <script>
-    // ⚠️ ĐỔI LẠI URL NÀY
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxC71cAofv5QXr-pjKkmK8ehgNzo4M5wRMMjtG1enU-5w62j0slyK56XJtDvMimAlvE/exec";
-    
     const NAS_BASE_PATHS = [
       "\\\\landisk-9905cb\\disk1\\共有フォルダ（最新）\\★★CastingNavスタッフ個人情報※ﾌｫﾙﾀﾞ名変更禁止※\\★社員番号有り　※フォルダ名は絶対に変更しない！！※",
       "\\\\landisk-9905cb\\disk1\\共有フォルダ（最新）\\青戸\\★新規登録者個人情報（仮登録スタッフ）※ファイル名変更しない！！"
     ];
-
     let globalStaffData = [];
     let showArchive = false;
     let selectedFolderName = ""; 
-    let currentViewingIndex = -1; // Biến lưu index của nhân viên đang xem Modal
-
+    let currentViewingIndex = -1;
     window.onload = fetchData;
-
     function switchTab(isArchiveMode) {
       showArchive = isArchiveMode;
       document.getElementById('tabMain').className = isArchiveMode ? "tab-btn" : "tab-btn active";
@@ -356,7 +305,6 @@
       document.getElementById('loading').style.display = 'block';
       document.getElementById('staffTable').style.display = 'none';
       document.getElementById('noData').style.display = 'none';
-
       fetch(GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -373,7 +321,6 @@
           const now = new Date();
           const timeStr = String(now.getHours()).padStart(2,'0') + ":" + String(now.getMinutes()).padStart(2,'0') + ":" + String(now.getSeconds()).padStart(2,'0');
           document.getElementById('lastUpdate').innerText = "最終更新: " + timeStr;
-          
           buildDynamicDropdowns();
           filterData(); 
         } else {
@@ -440,11 +387,9 @@
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '';
       let count = 0;
-
       globalStaffData.forEach((staff, index) => {
         if (staff.isArchive !== showArchive) return;
         if (statusVal !== "ALL" && !staff.status.includes(statusVal)) return;
-
         let rawNat = staff.nationality || "";
         if (natFilter !== "ALL") {
           let cleanNat = rawNat.replace(/外国籍[（(]?/, "").replace(/[）)]?$/, "").trim();
@@ -452,14 +397,11 @@
           if (natFilter === "FOREIGN" && cleanNat === "日本") return;
           if (natFilter !== "日本" && natFilter !== "FOREIGN" && cleanNat !== natFilter) return;
         }
-
         let rawLang = staff.languages || "";
         if (langFilter !== "ALL") {
           if (!rawLang.includes(langFilter)) return;
         }
-
         if (empTypeFilter !== "ALL" && staff.empType !== empTypeFilter) return;
-
         if (progressFilter !== "ALL") {
           let fuyoStatus = staff.fuyo || "";
           if (progressFilter === "DONE" && !staff.progress.includes("完了")) return;
@@ -468,7 +410,6 @@
           if (progressFilter === "MISSING_BANK" && !(staff.bank || "").includes("未提出")) return;
           if (progressFilter === "MISSING_FUYO" && (!fuyoStatus.includes("未提出") || staff.empType !== 'メイン')) return;
         }
-
         if (searchKeywords.length > 0) {
           const cleanMobile = (staff.mobile || "").replace(/[\s-]/g, '');
           const cleanLandline = (staff.landline || "").replace(/[\s-]/g, '');
@@ -478,28 +419,21 @@
           const isMatch = searchKeywords.every(keyword => searchableText.includes(keyword));
           if (!isMatch) return; 
         }
-
         let statusBadge = '';
         if (staff.status.includes("仮登録")) statusBadge = `<span class="badge st-kari">${staff.status}</span>`;
         else if (staff.status.includes("本登録")) statusBadge = `<span class="badge st-hon">${staff.status}</span>`;
         else statusBadge = `<span class="badge st-leave">${staff.status}</span>`;
-
         let progBadge = '';
         if (staff.progress.includes("完了")) progBadge = `<span class="badge pr-done">${staff.progress}</span>`;
         else if (staff.progress.includes("一部")) progBadge = `<span class="badge pr-part">${staff.progress}</span>`;
         else if (staff.progress.includes("のみ")) progBadge = `<span class="badge pr-kari">${staff.progress}</span>`;
         else progBadge = `<span class="badge pr-none">${staff.progress}</span>`;
-
         let countryName = rawNat;
         if (countryName.includes("外国籍")) {
             countryName = countryName.replace(/外国籍[（(]?/, "").replace(/[）)]?$/, "").trim();
         }
-        
-        // 👉 TÁCH 2 CỘT QUỐC TỊCH & NGÔN NGỮ CHO BẢNG MÀN HÌNH CHÍNH
         let natBadge = `<strong style="color:var(--text);">${countryName || "-"}</strong>`;
         let langText = rawLang || "-";
-
-        // 👉 HIỂN THỊ ĐA SỐ ĐIỆN THOẠI TRÊN BẢNG
         let mobile = staff.mobile || "";
         let landline = staff.landline || "";
         let phoneHtml = "";
@@ -510,7 +444,6 @@
         } else {
           phoneHtml = landline || "-";
         }
-
         const tr = document.createElement('tr');
         tr.onclick = () => openModal(index); 
         tr.innerHTML = `
@@ -530,7 +463,6 @@
         tbody.appendChild(tr);
         count++;
       });
-
       if (count > 0) {
         document.getElementById('staffTable').style.display = 'table';
         document.getElementById('noData').style.display = 'none';
@@ -561,19 +493,15 @@
     }
 
     function openModal(index) {
-      currentViewingIndex = index; // Lưu vị trí nhân viên đang xem
+      currentViewingIndex = index;
       const staff = globalStaffData[index];
-      
       document.getElementById('mName').innerText = staff.name || "-";
       document.getElementById('mKana').innerText = staff.kana || "-";
       document.getElementById('mId').innerText = staff.id || "未採番";
       document.getElementById('mEmpType').innerText = staff.empType || "未設定";
-      
       let rawNat = staff.nationality || "";
       let natClean = rawNat.replace(/外国籍[（(]?/, "").replace(/[）)]?$/, "").trim();
       document.getElementById('mNationality').innerText = natClean || "-";
-      
-      // XÂY DỰNG GIAO DIỆN EDIT NGÔN NGỮ TRONG MODAL
       let langHtml = `
           <div id="langDisplayArea" class="info-value" style="display:flex; align-items:center; gap:8px;">
               <span id="mLangText">${staff.languages || "未設定"}</span>
@@ -588,12 +516,9 @@
           </div>
       `;
       document.getElementById('mLanguageContainer').innerHTML = langHtml;
-
-      // XÂY DỰNG GIAO DIỆN ĐA SỐ ĐIỆN THOẠI TRONG MODAL
       let mobile = staff.mobile;
       let landline = staff.landline;
       let phoneModalHtml = "";
-      
       if (mobile) {
           phoneModalHtml += `<div class="info-value" style="display:flex; align-items:center; gap:8px;">
               <span style="font-size:13px; color:#888;">📱携帯</span> <span id="mMobile">${mobile}</span>
@@ -607,9 +532,7 @@
           </div>`;
       }
       if (!mobile && !landline) phoneModalHtml = `<span class="info-value">-</span>`;
-      
       document.getElementById('mPhoneContainer').innerHTML = phoneModalHtml;
-
       document.getElementById('mEmail').innerText = staff.email || "-";
       document.getElementById('btnCopyEmail').style.display = staff.email ? 'flex' : 'none';
       document.getElementById('mDobGender').innerText = (staff.dob || "-") + "・" + (staff.gender || "-");
@@ -619,7 +542,6 @@
       document.getElementById('mMyNum').innerHTML = formatDocStatus(staff.myNum);
       document.getElementById('mBank').innerHTML = formatDocStatus(staff.bank);
       document.getElementById('mFuyo').innerHTML = formatDocStatus(staff.fuyo);
-
       const remarksBox = document.getElementById('mRemarksContainer');
       if (staff.remarks && staff.remarks.trim() !== "") {
         document.getElementById('mRemarks').innerText = staff.remarks;
@@ -627,11 +549,9 @@
       } else {
         remarksBox.style.display = 'none';
       }
-
       selectedFolderName = staff.folderName || "";
       const btnOpenNas = document.getElementById('btnOpenNas');
       const warningBox = document.getElementById('mNoFolderWarning');
-
       if (selectedFolderName) {
         btnOpenNas.style.display = 'inline-flex';
         warningBox.style.display = 'none';
@@ -639,13 +559,9 @@
         btnOpenNas.style.display = 'none';
         warningBox.style.display = 'block'; 
       }
-
       document.getElementById('detailModal').style.display = 'flex';
     }
 
-    // ==========================================
-    // LOGIC CẬP NHẬT NGÔN NGỮ (CRUD)
-    // ==========================================
     function editLanguage() {
         document.getElementById('langDisplayArea').style.display = 'none';
         document.getElementById('langEditArea').style.display = 'flex';
@@ -659,18 +575,13 @@
 
     function saveLanguage() {
         if(currentViewingIndex === -1) return;
-        
         const newLang = document.getElementById('langInput').value.trim();
         const staff = globalStaffData[currentViewingIndex];
-        
-        // Khóa các nút lại trong lúc đợi Server
         const btnSave = document.getElementById('btnSaveLang');
         const btnCancel = document.getElementById('btnCancelLang');
         const input = document.getElementById('langInput');
-        
         btnSave.disabled = true; btnSave.innerText = "保存中...";
         btnCancel.disabled = true; input.disabled = true;
-
         fetch(GAS_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -683,20 +594,14 @@
         .then(res => res.json())
         .then(data => {
             if (data.result && data.result.success) {
-                // Thành công: Cập nhật biến RAM, vẽ lại giao diện ẩn, thoát chế độ Edit
                 staff.languages = newLang;
                 document.getElementById('mLangText').innerText = newLang || "未設定";
-                
-                // Show Toast Notification trên Modal
                 const toast = document.getElementById('copyToast');
                 toast.innerText = "言語を更新しました";
                 toast.style.background = "#2e7d32"; // Màu xanh lá
                 toast.style.opacity = 1; toast.style.top = '25px';
                 setTimeout(() => { toast.style.opacity = 0; toast.style.top = '10px'; toast.style.background = "#333"; toast.innerText = "コピーしました";}, 2000);
-                
                 cancelEditLanguage();
-                
-                // Vẽ lại Dropdown Ngôn ngữ và Bảng Danh sách bên ngoài ngầm
                 buildDynamicDropdowns();
                 filterData();
             } else {
@@ -722,7 +627,7 @@
 
     function closeModal() {
       document.getElementById('detailModal').style.display = 'none';
-      cancelEditLanguage(); // Đóng modal thì reset trạng thái edit ngôn ngữ
+      cancelEditLanguage();
     }
 
     function closeModalOutside(e) {

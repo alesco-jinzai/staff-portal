@@ -7,10 +7,8 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    /* ... (GIỮ NGUYÊN TOÀN BỘ PHẦN CSS Ở ĐÂY, KHÔNG ĐỔI GÌ CẢ) ... */
     :root { --primary: #0061A4; --bg: #f4f7fc; --surface: #ffffff; --text: #1A1C1E; --border: #e1e3e1; }
     body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
-    
     .top-navbar { background: var(--surface); box-shadow: 0 2px 8px rgba(0,0,0,0.08); height: 56px; display: flex; align-items: center; padding: 0 20px; position: sticky; top: 0; z-index: 9999; }
     .nav-logo { height: 24px; margin-right: 30px; cursor: pointer; } 
     .nav-menu { display: flex; height: 100%; gap: 10px; }
@@ -18,47 +16,34 @@
     .nav-btn:hover { color: var(--primary); background: #f8f9fa; }
     .nav-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: #f0f4f8; }
     .nav-btn svg { width: 18px; height: 18px; fill: currentColor; }
-
     .main-content { padding: 20px; } 
-
     .header-container { background: var(--surface); padding: 16px 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 16px; }
     .header-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px; }
     .header-title-box { display: flex; align-items: baseline; gap: 15px; }
     .header-title-box h1 { margin: 0; font-size: 20px; color: var(--primary); } 
     .header-actions { display: flex; align-items: center; gap: 10px; }
-    
     .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; width: 100%; }
     input[type="month"], input[type="text"], select { padding: 0 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-weight: bold; outline: none; color: #333; height: 36px; box-sizing: border-box; }
     input[type="text"]:focus, select:focus { border-color: var(--primary); }
-    
     .btn { background: var(--primary); color: white; border: none; padding: 0 20px; height: 36px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: 6px;}
     .btn:hover { background: #004d82; }
     .btn-secondary { background: #5f6368; }
     .btn-secondary:hover { background: #3c4043; }
-    
     table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px;}
     th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }
     th { background: #e8f0fe; color: var(--primary); white-space: nowrap; font-weight: 700;}
     tr:hover { background: #f8f9fa; }
-    
     .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; white-space: nowrap; display: inline-block;}
     .bg-ok { background: #e8f5e9; color: #2e7d32; }
     .memo-input { width: 100%; box-sizing: border-box; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; height: 32px;}
     #loading { text-align: center; padding: 40px; font-size: 15px; color: #666; font-weight: bold; }
     .spinner { border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
-
-    /* TOAST CSS */
     #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
     .toast { background: #333; color: #fff; padding: 12px 20px; border-radius: 6px; font-size: 13px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transform: translateX(100%); transition: all 0.3s ease; }
     .toast.show { opacity: 1; transform: translateX(0); }
     .toast.success { background: #2e7d32; }
     .toast.error { background: #c62828; }
-
-      /* ========================================= */
-    /* ✨ LÀM ĐẸP POPUP MODAL (THÊM/SỬA CA LÀM) ✨ */
-    /* ========================================= */
-    
     #editModal { 
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
       background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(2px); 
@@ -69,8 +54,6 @@
       display: flex; flex-direction: column; animation: slideDown 0.3s ease;
     }
     @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Phần Tiêu đề (Header) của Popup */
     .modal-header { 
       background: var(--primary); color: white; padding: 18px 25px; 
       display: flex; justify-content: space-between; align-items: center; 
@@ -81,10 +64,7 @@
       cursor: pointer; line-height: 1; padding: 0; opacity: 0.8; transition: 0.2s; 
     }
     .btn-close:hover { opacity: 1; transform: scale(1.1); }
-
-    /* Phần Nhập liệu (Body) */
     .modal-body { padding: 25px; display: flex; flex-direction: column; gap: 15px; }
-    
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-group label { font-size: 12px; color: #5f6368; font-weight: 700; }
     .form-group input, .form-group select { 
@@ -92,18 +72,12 @@
       border-radius: 6px; font-size: 14px; font-weight: 600; color: var(--text); outline: none; transition: 0.2s;
     }
     .form-group input:focus, .form-group select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(0,97,164,0.1); }
-
-    /* Cụm 2 ô Thời gian đi liền nhau */
     .time-group { display: flex; gap: 15px; }
     .time-group .form-group { flex: 1; }
-
-    /* Phần Nút bấm (Footer) */
     .modal-footer { 
       padding: 15px 25px; border-top: 1px solid var(--border); background: #f8f9fa;
       display: flex; justify-content: space-between; align-items: center; 
     }
-    
-    /* Thiết kế Nút bấm */
     .modal-footer .btn { height: 40px; padding: 0 20px; font-size: 13px; margin: 0; }
     .btn-danger { 
       background: #dc3545; color: white; border: none; 
@@ -111,12 +85,7 @@
       font-weight: bold; font-size: 13px; transition: 0.2s; 
     }
     .btn-danger:hover { background: #c82333; }
-    
     .btn-group-right { display: flex; gap: 10px; }
-
-    /* ========================================= */
-    /* ✨ SMART DROPDOWN (LỌC TÌM KIẾM SIÊU TỐC) ✨ */
-    /* ========================================= */
     .dropdown-container { position: relative; width: 100%; }
     .dropdown-list {
       display: none; position: absolute; top: 100%; left: 0; width: 100%;
@@ -132,12 +101,9 @@
     .dropdown-item:last-child { border-bottom: none; }
     .dropdown-item:hover { background: #e8f0fe; color: var(--primary); }
     .dropdown-empty { padding: 10px 15px; font-size: 13px; color: #888; text-align: center; font-weight: 500; }
-
   </style>
 </head>
 <body>
-
-  <!-- NAV BAR -->
   <div class="top-navbar">
     <img src="logo.png" alt="ALESCO" class="nav-logo" onerror="this.src='https://alesco-v.co.jp/wp/wp-content/uploads/ALESCO-LOGO.png'">
     <div class="nav-menu">
@@ -151,7 +117,6 @@
       </a>
     </div>
   </div>
-
   <div class="main-content">
     <div class="header-container">
       <div class="header-top">
@@ -163,7 +128,6 @@
           <button class="btn btn-primary" onclick="openSmartExportModal()">📥 データ出力</button>
         </div>
       </div>
-
       <div class="controls">
         <input type="month" id="monthFilter" onchange="loadData()">
         <select id="employeeFilter" onchange="renderTable()"><option value="">すべての社員</option></select>
@@ -171,9 +135,7 @@
         <input type="text" id="searchInput" placeholder="検索 (名前, ID...)" oninput="renderTable()" style="flex:1;">
       </div>
     </div>
-
     <div id="loading"><div class="spinner"></div>データを読み込んでいます...</div>
-
     <div style="overflow-x: auto;">
       <table id="dataTable" style="display: none;">
         <thead>
@@ -206,35 +168,22 @@
       </table>
     </div>
   </div>
-
-  <!-- DIV HỨNG TOAST -->
   <div id="toast-container"></div>
-
-  <!-- MODAL THÊM/SỬA CA LÀM -->
   <div id="editModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(2px);" onclick="if(event.target.id==='editModal') document.getElementById('editModal').style.display='none'">
     <div style="background:var(--surface); width:90%; max-width:450px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2); overflow:hidden; display:flex; flex-direction:column; animation: slideDown 0.3s ease;">
-      
-      <!-- HEADER -->
       <div style="background:var(--primary); color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center;">
         <h2 id="modalTitle" style="margin:0; font-size:18px; font-weight:700;">勤務記録の修正</h2>
         <button style="background:transparent; border:none; color:white; font-size:26px; cursor:pointer; line-height:1; padding:0; transition:0.2s;" onclick="document.getElementById('editModal').style.display='none'">×</button>
       </div>
-
-      <!-- BODY -->
       <div style="padding:25px; display:flex; flex-direction:column; gap:15px;">
         <input type="hidden" id="editRowIndex">
-        
-        <!-- CHỖ CHỌN NHÂN VIÊN -->
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">社員 (ID - 名前)</label>
           <div class="dropdown-container">
-            <!-- ĐÃ THÊM: autocomplete="nope" role="presentation" để vô hiệu hóa trình duyệt -->
             <input type="text" id="editEmpInput" style="width:100%; height:40px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none; box-sizing:border-box;" placeholder="名前またはIDで検索..." autocomplete="nope" role="presentation">
             <div id="empSmartList" class="dropdown-list"></div>
           </div>
         </div>
-        
-        <!-- CHỖ CHỌN CỬA HÀNG -->
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">勤務地</label>
           <div class="dropdown-container">
@@ -242,12 +191,10 @@
             <div id="locSmartList" class="dropdown-list"></div>
           </div>
         </div>
-        
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">日付</label>
           <input type="date" id="editDate" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
         </div>
-        
         <div style="display:flex; gap:15px;">
           <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
             <label style="font-size:12px; color:#5f6368; font-weight:700;">出勤時刻 (実際)</label>
@@ -258,14 +205,11 @@
             <input type="time" id="editCheckOut" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
           </div>
         </div>
-        
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">交通費 (半角数字)</label>
           <input type="number" id="editFee" placeholder="例: 500" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
         </div>
       </div>
-
-      <!-- FOOTER -->
       <div style="padding:15px 25px; border-top:1px solid var(--border); background:#f8f9fa; display:flex; justify-content:space-between; align-items:center;">
         <button id="btnDeleteRecord" style="background:#dc3545; color:white; border:none; height:36px; padding:0 20px; border-radius:6px; font-weight:bold; cursor:pointer; display:none;" onclick="deleteRecord()">削除</button>
         <div style="flex:1"></div>
@@ -274,13 +218,8 @@
           <button id="btnSaveRecord" class="btn btn-primary" onclick="saveRecord()">保存する</button>
         </div>
       </div>
-
     </div>
   </div>
-
-  <!-- ========================================= -->
-  <!-- STEP 1: MODAL CHỌN KHÁCH HÀNG ĐỂ XUẤT -->
-  <!-- ========================================= -->
   <div id="smartExportModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(2px);">
     <div style="background:var(--surface); width:90%; max-width:400px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2); overflow:hidden; display:flex; flex-direction:column;">
       <div style="background:var(--primary); color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center;">
@@ -307,14 +246,8 @@
       </div>
     </div>
   </div>
-
-  <!-- ========================================= -->
-  <!-- STEP 2: BẢNG REVIEW & ĐIỀN GIỜ NGHỈ (CLEAN UI) -->
-  <!-- ========================================= -->
   <div id="reviewBoardModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1001; align-items:center; justify-content:center; backdrop-filter:blur(2px);">
     <div style="background:var(--surface); width:95%; max-width:900px; height:85vh; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2); overflow:hidden; display:flex; flex-direction:column; animation: slideDown 0.3s ease;">
-      
-      <!-- HEADER -->
       <div style="background:var(--primary); color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center;">
         <div>
             <h2 style="margin:0; font-size:18px; font-weight:700;">休憩時間の確認・編集 (STEP 2/2)</h2>
@@ -322,8 +255,6 @@
         </div>
         <button style="background:transparent; border:none; color:white; font-size:26px; cursor:pointer;" onclick="document.getElementById('reviewBoardModal').style.display='none'">×</button>
       </div>
-
-      <!-- BULK APPLY BAR -->
       <div style="padding:12px 20px; background:#f4f7fc; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
         <span style="font-size:13px; font-weight:700; color:var(--text);">💡 一括適用:</span>
         <input type="number" id="bulkBreakInput" placeholder="例: 60" style="width:80px; height:32px; padding:0 10px; border:1px solid var(--border); border-radius:4px; font-size:14px; text-align:center; outline:none;">
@@ -331,8 +262,6 @@
         <button class="btn btn-secondary" style="height:32px; padding:0 15px; font-size:12px;" onclick="applyBulkBreak()">全行に適用</button>
         <span style="font-size:11px; color:#666; margin-left:10px;">※異なる日は下の表で直接数値を修正してください。</span>
       </div>
-
-      <!-- BẢNG DATA PREVIEW -->
       <div style="flex:1; overflow:auto; padding:0; background:var(--surface);">
         <table style="width:100%; border-collapse:collapse; font-size:13px; margin:0;">
           <thead style="position:sticky; top:0; z-index:1;">
@@ -346,12 +275,9 @@
             </tr>
           </thead>
           <tbody id="reviewTableBody">
-            <!-- Render bằng JS -->
           </tbody>
         </table>
       </div>
-
-      <!-- FOOTER: NÚT XUẤT FILE -->
       <div style="padding:15px 25px; border-top:1px solid var(--border); background:#f8f9fa; display:flex; justify-content:space-between; align-items:center;">
         <button class="btn btn-secondary" onclick="document.getElementById('reviewBoardModal').style.display='none'">戻る</button>
         <div style="display:flex; gap:10px;">
@@ -359,15 +285,11 @@
           <button id="btnExportPDF" class="btn btn-primary" onclick="executeFinalExport('PDF')">📕 PDF 出力</button>
         </div>
       </div>
-
     </div>
   </div>
-
 <script>
-  // ⚠️ SỬA LINK APP SCRIPT CỦA ÔNG VÀO ĐÂY
   const GAS_URL = "https://script.google.com/macros/s/AKfycbxC71cAofv5QXr-pjKkmK8ehgNzo4M5wRMMjtG1enU-5w62j0slyK56XJtDvMimAlvE/exec"; 
   let globalData = [];
-
   window.onload = () => {
     const d = new Date();
     document.getElementById('monthFilter').value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
@@ -378,7 +300,6 @@
     document.getElementById('loading').style.display = 'block';
     document.getElementById('dataTable').style.display = 'none';
     const monthStr = document.getElementById('monthFilter').value;
-
     fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -405,10 +326,8 @@
   function updateDropdowns() {
     const empSel = document.getElementById('employeeFilter');
     const locSel = document.getElementById('locationFilter');
-    
     const emps = [...new Set(globalData.map(d => d.empId))].sort();
     const locs = [...new Set(globalData.map(d => d.location))].sort();
-
     empSel.innerHTML = '<option value="">すべての社員</option>' + emps.map(e => `<option value="${e}">${e}</option>`).join('');
     locSel.innerHTML = '<option value="">すべての勤務地</option>' + locs.map(l => `<option value="${l}">${l}</option>`).join('');
   }
@@ -418,26 +337,21 @@
     const empF = document.getElementById('employeeFilter').value;
     const locF = document.getElementById('locationFilter').value;
     const search = document.getElementById('searchInput').value.toLowerCase();
-
     tbody.innerHTML = '';
     let totalMs = 0, totalCost = 0;
-
     let filtered = globalData.filter(r => {
       if (empF && r.empId != empF) return false;
       if (locF && r.location != locF) return false;
       if (search && !Object.values(r).join(' ').toLowerCase().includes(search)) return false;
       return true;
     });
-
     filtered.forEach(row => {
       totalCost += Number(row.fee) || 0;
       if(row.duration && row.duration.includes(':')) {
          let p = row.duration.split(':');
          totalMs += (parseInt(p[0])*60 + parseInt(p[1])) * 60000;
       }
-
       let approvalHtml = row.isApproved ? `<span class="badge bg-ok">${row.approverName}</span>` : `<span class="badge" style="background:#eee;color:#666;">未承認</span>`;
-
       let tr = document.createElement('tr');
       tr.innerHTML = `
         <td style="font-family:monospace;">${row.empId}</td>
@@ -460,16 +374,12 @@
       `;
       tbody.appendChild(tr);
     });
-
     document.getElementById('totalFee').innerText = '¥' + totalCost.toLocaleString();
     let th = Math.floor(totalMs / 3600000);
     let tm = Math.floor((totalMs % 3600000) / 60000);
     document.getElementById('totalHours').innerText = `${String(th).padStart(2,'0')}:${String(tm).padStart(2,'0')}`;
   }
 
-  // ==========================================
-  // HỆ THỐNG THÔNG BÁO BONG BÓNG (TOAST)
-  // ==========================================
   function showToast(message, type = 'success') {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
@@ -483,9 +393,6 @@
     }, 3000);
   }
 
-  // ==========================================
-  // HÀM LƯU MEMO TRỰC TIẾP
-  // ==========================================
   function saveMemo(inputEl, rowIndex) {
     inputEl.style.backgroundColor = "#fff3e0"; 
     fetch(GAS_URL, {
@@ -511,16 +418,11 @@
     });
   }
 
-  // ==========================================
-  // HÀM XUẤT CSV 
-  // ==========================================
   function exportCSV() {
     const rows = document.querySelectorAll("#tableBody tr");
     if(rows.length === 0) return showToast("出力するデータがありません。", "error");
-
     showToast("CSVをダウンロードしています...", "success");
     let csv = "\uFEFF社員番号,名前,日付,出勤(実),出勤(丸),退勤(実),退勤(丸),実働時間,勤務地,交通費,承認状態,メモ\n";
-    
     rows.forEach(tr => {
       let cols = tr.querySelectorAll("td");
       let rowData = [];
@@ -530,26 +432,19 @@
       }
       csv += rowData.join(",") + "\n";
     });
-
     const monthVal = document.getElementById('monthFilter').value;
     const link = document.createElement("a");
     link.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
     link.download = `勤怠データ_${monthVal}.csv`;
     link.click();
   }
-
-  // ==========================================
-  // HỆ THỐNG POPUP THÊM / SỬA CA LÀM (BẢN SMART DROPDOWN & FIX AUTOFILL)
-  // ==========================================
   
   let masterEmployees = [];
   let masterLocations = [];
 
   function fetchMasterDataForForm() {
     if (masterEmployees.length > 0) return Promise.resolve();
-    
     document.getElementById('modalTitle').innerText = "データを読み込んでいます...";
-    
     return fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -570,27 +465,20 @@
     });
   }
 
-  // 👉 HÀM THÊM MỚI (Mở khóa ô Tên và Cửa hàng)
   function openAddModal() {
     document.getElementById('modalTitle').innerText = "勤務記録の新規登録";
     document.getElementById('editRowIndex').value = "";
-    
     const empInput = document.getElementById('editEmpInput');
     const locInput = document.getElementById('editLocInput');
-    
     empInput.value = ""; empInput.readOnly = false; empInput.style.backgroundColor = "#fff";
     locInput.value = ""; locInput.readOnly = false; locInput.style.backgroundColor = "#fff";
-    
     document.getElementById('editDate').value = "";
     document.getElementById('editCheckIn').value = "";
     document.getElementById('editCheckOut').value = "";
     document.getElementById('editFee').value = "";
-    
     document.getElementById('btnSaveRecord').disabled = false;
     document.getElementById('btnDeleteRecord').style.display = "none";
-    document.getElementById('locSmartList').innerHTML = ""; 
-    
-    // Nếu chưa có Data Master thì phải chờ 1 nhịp, có rồi thì gọi hàm vẽ Dropdown luôn
+    document.getElementById('locSmartList').innerHTML = "";
     if (masterEmployees.length === 0) {
       document.getElementById('btnSaveRecord').innerText = "読み込み中...";
       document.getElementById('btnSaveRecord').disabled = true;
@@ -602,54 +490,41 @@
     } else {
       setupSmartDropdown('editEmpInput', 'empSmartList', masterEmployees.map(e => `${e.id} | ${e.name.replace(/\//g, ' ')}`));
     }
-    
     document.getElementById('editModal').style.display = 'flex';
   }
 
-  // 👉 HÀM SỬA (Khóa cứng ô Tên và Cửa hàng)
   function openEditModal(rowObj) {
     document.getElementById('modalTitle').innerText = "勤務記録の修正";
     document.getElementById('editRowIndex').value = rowObj.rowIndex;
-    
     const empInput = document.getElementById('editEmpInput');
     const locInput = document.getElementById('editLocInput');
-    
     empInput.value = `${rowObj.empId} | ${rowObj.empName.replace(/\//g, ' ')}`;
     empInput.readOnly = true; 
     empInput.style.backgroundColor = "#f1f3f4";
     empInput.onfocus = null; empInput.onkeyup = null; 
-    
     locInput.value = rowObj.location || "";
     locInput.readOnly = true;
     locInput.style.backgroundColor = "#f1f3f4";
     locInput.onfocus = null; locInput.onkeyup = null;
-    
     document.getElementById('editDate').value = rowObj.date.replace(/\//g, '-');
     document.getElementById('editCheckIn').value = rowObj.checkInActual || "";
     document.getElementById('editCheckOut').value = rowObj.checkOutActual || "";
     document.getElementById('editFee').value = rowObj.fee || "";
-    
     document.getElementById('btnSaveRecord').disabled = false;
     document.getElementById('btnDeleteRecord').style.display = "block";
-    
     document.getElementById('editModal').style.display = 'flex';
   }
 
   function populateEmpList() {
-    // Không dùng Datalist nữa vì ta đang dùng Smart Dropdown Custom
+    // Không dùng Datalist nữa vì đang dùng Smart Dropdown Custom
   }
 
-  // 👉 TÍNH NĂNG SMART DROPDOWN (Lọc như Google Search)
   function setupSmartDropdown(inputId, listId, dataArray) {
     const input = document.getElementById(inputId);
     const list = document.getElementById(listId);
-    
-    // 👉 YÊU CẦU 2: Tắt tính năng Autofill của Google Chrome (Chặn cái bảng trắng đè lên)
     input.setAttribute("autocomplete", "new-password");
-
     input.onkeyup = function() {
-      if (input.readOnly) return; // Nếu đang bị khóa (Chế độ Sửa) thì không làm gì cả
-      
+      if (input.readOnly) return;
       const filter = input.value.toLowerCase();
       let html = '';
       dataArray.forEach(item => {
@@ -660,11 +535,9 @@
       list.innerHTML = html || '<div class="dropdown-empty">結果がありません</div>';
       list.classList.add('show');
     };
-    
     input.onfocus = function() {
       if (!input.readOnly) input.onkeyup();
     };
-    
     input.onblur = function() {
       setTimeout(() => list.classList.remove('show'), 150); 
     };
@@ -673,7 +546,6 @@
   function selectDropdownItem(inputId, listId, value) {
     document.getElementById(inputId).value = value;
     document.getElementById(listId).classList.remove('show');
-    
     if (inputId === 'editEmpInput') {
       handleEmpSelection();
     }
@@ -683,14 +555,12 @@
     const empData = document.getElementById('editEmpInput').value;
     const empId = empData.split('|')[0].trim();
     const selectedEmp = masterEmployees.find(e => e.id === empId);
-    
     let locArray = [];
     if (selectedEmp && selectedEmp.allowedLocations.length > 0) {
       locArray = selectedEmp.allowedLocations; 
     } else {
       locArray = masterLocations.map(l => l.name); 
     }
-    
     setupSmartDropdown('editLocInput', 'locSmartList', locArray);
     document.getElementById('editLocInput').value = ""; 
   }
@@ -703,26 +573,20 @@
     const cIn = document.getElementById('editCheckIn').value;
     const cOut = document.getElementById('editCheckOut').value;
     const cFee = document.getElementById('editFee').value;
-
     if (!empData || !loc || !dDate || !cIn) {
       return showToast("エラー：社員、勤務地、日付、出勤時刻は必須です。", "error");
     }
-
     let empId = empData, empName = "";
     if (empData.includes('|')) {
       const parts = empData.split('|');
       empId = parts[0].trim();
-      empName = parts[1].trim(); // Tên đã được xóa dấu gạch chéo
+      empName = parts[1].trim();
     }
-
     const record = { employeeId: empId, employeeName: empName, date: dDate, location: loc, checkIn: cIn, checkOut: cOut, transportCost: cFee };
-
     document.getElementById('btnSaveRecord').innerText = "保存中...";
     document.getElementById('btnSaveRecord').disabled = true;
-
     const actionName = rIndex ? "updateAttendanceRecord" : "addManualAttendanceRecord";
     const params = rIndex ? [record, rIndex] : [record];
-
     fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -746,13 +610,10 @@
   function deleteRecord() {
     const rIndex = document.getElementById('editRowIndex').value;
     if (!rIndex) return showToast("エラー: 行番号が見つかりません。", "error");
-    
     if (!confirm("本当にこの記録を削除しますか？\n（この操作は元に戻せません）")) return;
-
     const btnDel = document.getElementById('btnDeleteRecord');
     btnDel.innerText = "削除中...";
     btnDel.disabled = true;
-
     fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -779,22 +640,15 @@
     });
   }
 
-  // ==========================================
-  // JAVASCRIPT: SMART EXPORT & REVIEW BOARD
-  // ==========================================
   let exportActiveClientDataCache = {}; 
-  let previewDataArray = []; // Mảng chứa data đang được preview
+  let previewDataArray = [];
 
-  // 1. MỞ MODAL CHỌN KHÁCH HÀNG (Thay thế 2 nút cũ trên Dashboard)
   function openSmartExportModal() {
       const currentMonth = document.getElementById('monthFilter').value;
       if (!currentMonth) return showToast('ダッシュボードで月を選択してください。', 'error');
-      
       document.getElementById('exportClient').innerHTML = '<option value="">-- 読み込み中... --</option>';
       document.getElementById('exportLocation').innerHTML = '<option value="">-- 先に顧客を選択 --</option>';
       document.getElementById('smartExportModal').style.display = 'flex';
-
-      // 👉 ĐÃ SỬA LỖI: Dùng fetch() gọi qua GAS_URL vì Web đang host trên Github Pages
       fetch(GAS_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -803,13 +657,10 @@
       })
       .then(r => r.json())
       .then(res => {
-          // Backend doPost(e) của ông luôn bọc data trả về trong biến res.result
           const data = res.result || {}; 
           exportActiveClientDataCache = data;
-          
           const clientSel = document.getElementById('exportClient');
           clientSel.innerHTML = '<option value="">-- 顧客を選択 --</option>';
-          
           const clientNames = Object.keys(data).sort();
           if (clientNames.length === 0) {
               clientSel.innerHTML = '<option value="">データなし</option>';
@@ -836,27 +687,19 @@
       exportActiveClientDataCache[client].sort().forEach(loc => locSel.innerHTML += `<option value="${loc}">${loc}</option>`);
   }
 
-  // 2. CHUYỂN SANG BẢNG REVIEW GIỜ NGHỈ
   function openReviewBoard() {
       const client = document.getElementById('exportClient').value;
       const location = document.getElementById('exportLocation').value;
       if (!client) return showToast('顧客を選択してください。', 'warning');
-
-      // Tắt modal 1, bật modal 2
       document.getElementById('smartExportModal').style.display = 'none';
       document.getElementById('reviewBoardModal').style.display = 'flex';
-      
       const monthStr = document.getElementById('monthFilter').value;
       document.getElementById('reviewBoardDesc').innerText = `対象: ${monthStr} | 顧客: ${client} ${location ? '| 拠点: '+location : ''}`;
-
-      // Lọc dữ liệu từ globalData (cache trên màn hình)
       const allowedLocs = exportActiveClientDataCache[client] || [];
       previewDataArray = globalData.filter(r => {
           if (location) return r.location === location;
           return allowedLocs.includes(r.location) || r.type === 'yukyu';
       });
-
-      // Lắp data vào mảng Preview và vẽ Bảng
       previewDataArray = previewDataArray.map(r => {
           let grossMins = 0;
           if (r.duration && r.duration.includes(':')) {
@@ -865,28 +708,21 @@
           }
           return { ...r, grossMins: grossMins, breakMins: 0, netMins: grossMins }; // Mặc định giờ nghỉ = 0
       });
-
       renderReviewTable();
   }
 
-  // 3. VẼ BẢNG DATA & TÍNH TOÁN
   function renderReviewTable() {
       const tbody = document.getElementById('reviewTableBody');
       tbody.innerHTML = '';
       if(previewDataArray.length === 0) {
           tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">データがありません</td></tr>'; return;
       }
-
       let html = '';
       previewDataArray.forEach((row, index) => {
           let isYukyu = (row.type === 'yukyu');
           let trStyle = isYukyu ? 'background:#f9f9f9; color:#888;' : '';
-          
-          // Ô Input giờ nghỉ (Bị khóa nếu là ngày phép)
           let breakInput = isYukyu ? '-' : `<input type="number" class="break-input" data-index="${index}" value="${row.breakMins}" oninput="recalculateRow(${index})" style="width:60px; height:28px; text-align:center; border:1px solid var(--border); border-radius:4px; font-weight:bold; color:var(--text); outline:none;">`;
-          
           let netTimeStr = isYukyu ? '<span style="color:#666; font-weight:bold;">有給休暇</span>' : `<span id="netTime_${index}" style="font-weight:bold; font-size:14px; color:var(--text);">${minsToStr(row.netMins)}</span>`;
-
           html += `
           <tr style="border-bottom:1px solid var(--border); ${trStyle}">
               <td style="padding:10px 15px;"><strong>${row.empName}</strong><br><span style="font-size:11px; color:#888; font-family:monospace;">${row.empId}</span></td>
@@ -901,33 +737,27 @@
       tbody.innerHTML = html;
   }
 
-  // 4. ÁP DỤNG 60 PHÚT HÀNG LOẠT
   function applyBulkBreak() {
       const bulkVal = parseInt(document.getElementById('bulkBreakInput').value) || 0;
       previewDataArray.forEach((row, index) => {
-          if (row.type !== 'yukyu' && row.grossMins > 0) { // Đã đi làm là trừ
+          if (row.type !== 'yukyu' && row.grossMins > 0) {
               row.breakMins = bulkVal;
               row.netMins = Math.max(0, row.grossMins - bulkVal);
           }
       });
-      renderReviewTable(); // Vẽ lại toàn bộ bảng cho nhanh
+      renderReviewTable();
       showToast(`${bulkVal}分を一括適用しました。`, 'success');
   }
 
-  // 5. TỰ ĐỘNG TÍNH LẠI KHI ADMIN GÕ TAY VÀO 1 DÒNG
   function recalculateRow(index) {
       const row = previewDataArray[index];
       const inputEl = document.querySelector(`.break-input[data-index="${index}"]`);
       let breakVal = parseInt(inputEl.value) || 0;
-      
       row.breakMins = breakVal;
-      row.netMins = Math.max(0, row.grossMins - breakVal); // Tránh âm giờ
-      
-      // Cập nhật ngay lập tức text Giờ Thực Làm trên màn hình
+      row.netMins = Math.max(0, row.grossMins - breakVal);
       document.getElementById(`netTime_${index}`).innerText = minsToStr(row.netMins);
   }
 
-  // Hàm phụ trợ: Đổi phút sang chữ HH:MM
   function minsToStr(totalMins) {
       if (totalMins <= 0) return "00:00";
       let h = Math.floor(totalMins / 60);
@@ -935,58 +765,46 @@
       return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
   }
 
-  // 6. CHỐT SỔ VÀ GỬI CHO BACKEND XUẤT FILE
   function executeFinalExport(type) {
       if (previewDataArray.length === 0) {
           return showToast('出力するデータがありません。', 'warning');
       }
-
       const client = document.getElementById('exportClient').value;
       const monthStr = document.getElementById('monthFilter').value;
       const btnCSV = document.getElementById('btnExportCSV');
       const btnPDF = document.getElementById('btnExportPDF');
-
       if (type === 'CSV') {
           btnCSV.disabled = true; btnCSV.innerText = "出力中...";
-          
-          // TỰ ĐỘNG TẠO CSV TRÊN TRÌNH DUYỆT (Nhanh, không cần gọi Server)
           const headers = ['社員番号', '名前', '日付', '出勤時刻', '退勤時刻', '休憩', '実働時間', '勤務地', '交通費', '承認/ステータス', 'メモ'];
           const rows = previewDataArray.map(r => {
               let isYukyu = r.type === 'yukyu';
-              let finalMemo = (r.memo || '').replace(/#休憩\d+/g, '').trim(); // Xóa tag rác cho đẹp
-              
+              let finalMemo = (r.memo || '').replace(/#休憩\d+/g, '').trim();
               return [
                   r.empId, r.empName, r.date,
                   isYukyu ? '' : (r.checkIn || ''),
                   isYukyu ? '' : (r.checkOut || ''),
-                  isYukyu ? '' : minsToStr(r.breakMins),       // Giờ nghỉ đã duyệt
-                  isYukyu ? '有給休暇' : minsToStr(r.netMins), // Giờ thực làm đã tính
+                  isYukyu ? '' : minsToStr(r.breakMins),
+                  isYukyu ? '有給休暇' : minsToStr(r.netMins),
                   isYukyu ? '' : (r.location || ''),
                   isYukyu ? '' : (r.fee || 0),
                   r.isApproved ? (r.approverName || '承認済') : '未承認',
                   finalMemo
               ];
           });
-
-          // Ép chuỗi CSV và tải về
           let csvContent = '\uFEFF' + [headers, ...rows].map(e => e.join(",")).join("\n");
           let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
           let link = document.createElement("a");
           link.href = URL.createObjectURL(blob);
           link.download = `勤怠データ_${monthStr}_${client}.csv`;
           link.click();
-          
           showToast('CSV出力が完了しました。', 'success');
           btnCSV.disabled = false; btnCSV.innerText = "📄 CSV 出力";
       } 
       else if (type === 'PDF') {
           btnPDF.disabled = true; btnPDF.innerText = "生成中...";
-          
-          // GỌI BACKEND VẼ PDF
           fetch(GAS_URL, {
               method: 'POST',
               headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-              // Gửi toàn bộ mảng dữ liệu ĐÃ TÍNH TOÁN XONG xuống cho GAS
               body: JSON.stringify({ action: "generateSmartPdfServer", params: [monthStr, client, previewDataArray] }),
               redirect: 'follow'
           })
@@ -1007,7 +825,6 @@
           });
       }
   }
-
 </script>
 </body>
 </html>
