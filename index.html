@@ -1054,12 +1054,8 @@
       dobInput.classList.remove('input-error');
       errorEl.style.display = 'none';
 
-      // ===============================================
-      // 👉 LUẬT THÉP KIỂM TRA SĐT NGAY CỬA LOGIN
-      // ===============================================
-      const phoneVal = phoneInput.value.replace(/\D/g, ""); // Chỉ lấy số
-
-      // Hàm kiểm tra: Có dữ liệu + dài 10~11 số + bắt đầu bằng 0
+      // Lọc lấy số
+      const phoneVal = phoneInput.value.replace(/\D/g, ""); 
       const isValidPhone = (val) => val.length >= 10 && val.length <= 11 && val.startsWith("0");
 
       if (!phoneVal || !dobInput.value || !isValidPhone(phoneVal)) {
@@ -1068,54 +1064,59 @@
           errorEl.innerText = "電話番号を入力してください。";
         } else if (!isValidPhone(phoneVal)) {
           phoneInput.classList.add('input-error');
-          errorEl.innerText = "電話番号は0から始まる10〜11桁の数字で入力してください。"; // Lỗi nhập bậy
+          errorEl.innerText = "電話番号は0から始まる10〜11桁の数字で入力してください。"; 
         } else if (!dobInput.value) {
           dobInput.classList.add('input-error');
           errorEl.innerText = "生年月日を入力してください。";
         }
         errorEl.style.display = 'block';
-        return; // LẬP TỨC KHÓA CỬA, KHÔNG GỌI BACKEND!
+        return; 
       }
-      // ===============================================
 
       setLoading(true);
-      google.script.run.withSuccessHandler(res => {
+
+      // 👉 ĐÃ SỬA: Đổi từ google.script.run sang fetch()
+      fetch(GAS_WEB_APP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: "smartLogin", params: [phoneVal, dobInput.value] }),
+        redirect: 'follow'
+      })
+      .then(r => r.json())
+      .then(resData => {
         setLoading(false);
-        if (!res.success) {
-          // Lỗi (Vd: Nhân viên đã nghỉ việc)
-          errorEl.innerText = res.message;
+        const res = resData.result;
+
+        if (!res || !res.success) {
+          errorEl.innerText = (res ? res.message : "サーバーエラー");
           errorEl.style.display = 'block';
           phoneInput.classList.add('input-error');
           dobInput.classList.add('input-error');
           return;
         }
 
-        // 👉 ĐÃ THÊM: Lưu thông tin đăng nhập thành công vào bộ nhớ máy
+        // Lưu thông tin đăng nhập thành công vào bộ nhớ máy
         localStorage.setItem('alescoPhone', phoneVal);
         localStorage.setItem('alescoDob', dobInput.value);
+        if (res.user) {
+            localStorage.setItem('alescoUserObj', JSON.stringify(res.user));
+        }
 
+        // ĐIỀU HƯỚNG THEO ROUTE TỪ BACKEND
         if (res.route === "step1") {
-          // Người mới: Chuyển sang form CV, điền sẵn SĐT và Ngày sinh cho họ
           resetKariForm();
-
-          // 👉 THÊM LOGIC NHẬN DIỆN THÔNG MINH Ở ĐÂY
           let cleanPhoneForDetect = phoneInput.value.replace(/\D/g, "");
           if (cleanPhoneForDetect.startsWith("090") || cleanPhoneForDetect.startsWith("080") || cleanPhoneForDetect.startsWith("070")) {
-            // Nếu là đầu số di động -> Bỏ vào ô Di động
             document.getElementById('kariPhone').value = phoneInput.value;
           } else {
-            // Nếu là đầu số khác (Máy bàn) -> Bỏ vào ô Máy bàn và tự động mở khung máy bàn ra
             document.getElementById('kariLandline').value = phoneInput.value;
             showLandlineField(); 
           }
-          // ==========================================
-
           document.getElementById('kariDob').value = dobInput.value;
           showView('viewKari');
           showCustomAlert("初めての登録ですね。\nプロフィールを入力してください。", "info");
 
         } else if (res.route === "step2") {
-          // Được duyệt đỗ: Chuyển sang form Ký hợp đồng
           pendingKariData = res.kariData;
           pendingKariRowIndex = res.kariRowIndex;
           document.getElementById('honConfirmName').innerText = safeCleanName(pendingKariData.nameKanji) + " 様";
@@ -1124,24 +1125,23 @@
           showCustomAlert("入社手続きへ進みます。", "info");
 
         } else if (res.route === "mypage") {
-          // Thiếu giấy tờ: Khóa ở My Page
           currentUser = res.user;
           renderMyPage();
           showCustomAlert("未提出の書類があります。\n提出を完了させてください。", true);
-          prefetchData(); // Tải ngầm data chấm công để sẵn đó
+          prefetchData(); 
 
         } else if (res.route === "attendance") {
-          // Xong 100%: Chuyển thẳng vào Đồng hồ Chấm công
           currentUser = res.user;
-          renderMyPage(); // Render chìm ở dưới để có data
+          renderMyPage(); 
           renderAttendanceView();
           showCustomAlert("ログインしました。");
         }
-      }).withFailureHandler(err => {
+      })
+      .catch(err => {
         setLoading(false);
-        errorEl.innerText = "通信エラーが発生しました。";
+        errorEl.innerText = "通信エラーが発生しました。ネットワークを確認してください。";
         errorEl.style.display = 'block';
-      }).smartLogin(phoneInput.value, dobInput.value);
+      });
     }
 
     function renderMyPage() {
@@ -1953,28 +1953,23 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // 1. ÉP CHẶT INPUT SỐ ĐIỆN THOẠI (Chỉ cho gõ số, tối đa 11 số)
+      
       const phoneInputs = ['authPhone', 'kariPhone', 'kariLandline'];
-
       phoneInputs.forEach(id => {
         const input = document.getElementById(id);
         if (input) {
-          // Ép thuộc tính maxlength để không cho gõ lố
           input.setAttribute('maxlength', '11');
-
           input.addEventListener('input', function (e) {
-            // Xóa ngay lập tức mọi ký tự không phải số (kể cả dấu -)
             e.target.value = e.target.value.replace(/\D/g, '');
           });
         }
       });
 
-      // 2. TỰ ĐỘNG THÊM GẠCH NGANG CHO MÃ BƯU ĐIỆN (ZIPCODE 3-4)
       const zipInputs = ['kariZip'];
       zipInputs.forEach(id => {
         const input = document.getElementById(id);
         if (input) {
-          input.setAttribute('maxlength', '8'); // 7 số + 1 dấu gạch
+          input.setAttribute('maxlength', '8'); 
           input.addEventListener('input', function (e) {
             var cleaned = e.target.value.replace(/\D/g, '');
             var match = cleaned.match(/(\d{0,3})(\d{0,4})/);
@@ -1985,60 +1980,55 @@
         }
       });
 
-      // 👉 ĐÃ THÊM: TÍNH NĂNG AUTO-LOGIN KHI VỪA MỞ APP
+      // 👉 KÍCH HOẠT OPTIMISTIC LOGIN (TIN TƯỞNG LOCAL STORAGE)
       const savedPhone = localStorage.getItem('alescoPhone');
       const savedDob = localStorage.getItem('alescoDob');
+      const savedUserObj = localStorage.getItem('alescoUserObj');
 
-      if (savedPhone && savedDob) {
-        // Điền tạm vào form cho có dữ liệu (đề phòng auto-login thất bại)
-        document.getElementById('authPhone').value = savedPhone;
-        document.getElementById('authDob').value = savedDob;
+      if (savedPhone && savedDob && savedUserObj) {
+          try {
+              // 1. MỞ CỬA NGAY TỨC THÌ (Trong vòng 0.1 giây)
+              currentUser = JSON.parse(savedUserObj);
+              
+              const isFullyOnboarded = currentUser.progress && currentUser.progress.indexOf("完了") > -1;
+              if (isFullyOnboarded) {
+                  renderMyPage(); 
+                  renderAttendanceView();
+              } else {
+                  renderMyPage();
+                  showCustomAlert("未提出の書類があります。\n提出を完了させてください。", true);
+              }
+              prefetchData(); 
 
-        // Hiện vòng xoay Loading ngay lập tức để người dùng không bấm lung tung
-        setLoading(true, "自動ログイン中...", "アカウント状態を確認しています");
+              // 2. CHO FETCH() CHẠY NGẦM ĐỂ CẬP NHẬT TRẠNG THÁI MỚI NHẤT
+              fetch(GAS_WEB_APP_URL, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                  body: JSON.stringify({ action: "smartLogin", params: [savedPhone, savedDob] })
+              })
+              .then(r => r.json())
+              .then(resData => {
+                  const res = resData.result;
+                  if (res && !res.success) {
+                      // Nếu lúc check ngầm phát hiện NV bị đuổi việc/xóa acc -> Văng ra Login
+                      localStorage.clear();
+                      location.reload(); 
+                      return;
+                  }
+                  if (res && res.user) {
+                      // Nếu có giấy tờ mới được duyệt -> Tự động chép đè vào ổ cứng
+                      currentUser = res.user;
+                      localStorage.setItem('alescoUserObj', JSON.stringify(currentUser));
+                  }
+              }).catch(e => {
+                  // Mạng lỡ có rớt lúc check ngầm cũng chả sao, im lặng bỏ qua, NV vẫn chấm công tiếp được!
+                  console.log("Check ngầm thất bại (Do mạng):", e);
+              });
 
-        // Gọi thẳng API SmartLogin
-        google.script.run.withSuccessHandler(res => {
-          setLoading(false);
-
-          if (!res.success) {
-            // Nếu API từ chối (VD: Nhân viên vừa bị đuổi, hoặc đổi ngày sinh)
-            localStorage.removeItem('alescoPhone');
-            localStorage.removeItem('alescoDob');
-            document.getElementById('authError').innerText = "セッションが切れました。再度ログインしてください。";
-            document.getElementById('authError').style.display = 'block';
-            return;
+          } catch (e) {
+              // File lưu bị lỗi định dạng thì tự động dọn ổ cứng và bắt login lại
+              localStorage.clear();
           }
-
-          // NẾU THÀNH CÔNG: Chạy y hệt logic điều hướng của nút Đăng nhập!
-          if (res.route === "step1") {
-            resetKariForm();
-            document.getElementById('kariPhone').value = savedPhone;
-            document.getElementById('kariDob').value = savedDob;
-            showView('viewKari');
-            showCustomAlert("初めての登録ですね。\nプロフィールを入力してください。", "info");
-          } else if (res.route === "step2") {
-            pendingKariData = res.kariData;
-            pendingKariRowIndex = res.kariRowIndex;
-            document.getElementById('honConfirmName').innerText = pendingKariData.nameKanji.replace(/\//g, ' ') + " 様";
-            showView('viewHonRegister');
-            nextHonStep(1); 
-            showCustomAlert("入社手続きへ進みます。", "info");
-          } else if (res.route === "mypage") {
-            currentUser = res.user;
-            renderMyPage();
-            showCustomAlert("未提出の書類があります。\n提出を完了させてください。", true);
-            prefetchData(); 
-          } else if (res.route === "attendance") {
-            currentUser = res.user;
-            renderMyPage(); 
-            renderAttendanceView();
-            showCustomAlert("自動ログインしました。");
-          }
-        }).withFailureHandler(err => {
-          setLoading(false);
-          // Lỗi mạng thì im lặng ở lại màn hình Login
-        }).smartLogin(savedPhone, savedDob);
       }
     });
 
