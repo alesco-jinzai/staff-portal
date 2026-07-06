@@ -2986,8 +2986,8 @@
           if (validShifts.length === 0) return '';
           let shiftHtml = validShifts.map(t => {
             const key = `${locId}|${dateStr}|${t.id}`;
-            const checkKiboKey = `${locId}|${dateSlashStr}|${t.id}`;
-            const checkKakuteiKey = `${locId}|${dateSlashStr}|${t.id}`;
+            const checkKiboKey = `${locId}|${dateStr}|${t.id}`;
+            const checkKakuteiKey = `${locId}|${dateStr}|${t.id}`;
             const isKibo = shiftData.kibo.has(checkKiboKey);
             const isKakutei = Array.from(shiftData.kakutei).some(k => k.startsWith(checkKakuteiKey));
             let cls = 'available';
