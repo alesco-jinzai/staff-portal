@@ -2783,6 +2783,18 @@
       document.getElementById('manualModal').style.display = 'flex';
       google.script.run.withSuccessHandler(locations => {
         let options = '<option value="" disabled selected>選択してください</option>';
+        
+        // --- THÊM ĐOẠN NÀY VÀO ---
+        let isLocInList = false;
+        if (locations && locations.length > 0) {
+          isLocInList = locations.some(l => l.name === loc);
+        }
+        // Nếu cửa hàng cũ không có trong list hiện tại, nhét ép nó vào
+        if (loc && !isLocInList) {
+          options += `<option value="${loc}" selected>${loc} (過去の勤務地)</option>`;
+        }
+        // --------------------------
+
         if (locations && locations.length > 0) {
           locations.forEach(l => {
             const isSelected = (l.name === loc) ? 'selected' : '';
