@@ -104,6 +104,24 @@
   </style>
 </head>
 <body>
+
+  <div id="adminAuthOverlay" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:var(--bg, #f4f7fc); z-index:999999; display:none; justify-content:center; align-items:center;">
+    <div style="background:#fff; padding:40px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.1); width:90%; max-width:350px; text-align:center;">
+      <h2 style="color:var(--primary); margin-top:0;">管理者ログイン</h2>
+      <p style="font-size: 12px; color: #666; margin-bottom: 20px;">勤怠管理システム</p>
+      <input type="text" id="adminUser" placeholder="ID (例: admin)" style="width:100%; height:45px; margin-bottom:15px; padding:0 15px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;">
+      <input type="password" id="adminPass" placeholder="パスワード" style="width:100%; height:45px; margin-bottom:20px; padding:0 15px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;">
+      <button onclick="handleAdminLogin()" id="btnAdminLogin" style="width:100%; height:45px; background:var(--primary); color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size: 15px;">ログイン</button>
+      <p id="adminLoginError" style="color:#d32f2f; font-size:13px; font-weight:bold; margin-top:15px; display:none;"></p>
+    </div>
+  </div>
+
+  <!-- MÀN HÌNH LOADING TOÀN TRANG -->
+  <div id="fullPageLoading" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:var(--bg, #f4f7fc); z-index:999998; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+    <div class="spinner"></div>
+    <div style="font-size: 14px; font-weight: bold; color: #666;">システム認証中...</div>
+  </div>
+
   <div class="top-navbar">
     <img src="logo.png" alt="ALESCO" class="nav-logo" onerror="this.src='https://alesco-v.co.jp/wp/wp-content/uploads/ALESCO-LOGO.png'">
     <div class="nav-menu">
@@ -303,18 +321,30 @@
     fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: "getNewAttendanceData", params: [monthStr] }),
+      // 👉 THÊM TOKEN
+      body: JSON.stringify({ action: "getNewAttendanceData", params: [monthStr], token: sessionStorage.getItem('alescoAdminToken') }),
       redirect: 'follow' 
     })
     .then(r => r.json())
     .then(res => {
+      // 👉 TẮT LOADING TOÀN TRANG
+      document.getElementById('fullPageLoading').style.display = 'none';
+
+      // 👉 BẮT LỖI TỪ BÁC BẢO VỆ
+      if (res.error === "AUTH_FAILED" || res.error === "AUTH_FAILED") {
+          document.getElementById('adminAuthOverlay').style.display = 'flex'; 
+          sessionStorage.removeItem('alescoAdminToken'); 
+          document.getElementById('loading').style.display = 'none';
+          return; 
+      }
+
       if(res.result && res.result.success) {
         globalData = res.result.data;
         updateDropdowns();
         renderTable();
         fetchMasterDataForForm();
       } else {
-        alert("エラー: " + (res.error || res.result.message));
+        alert("エラー: " + (res.error || (res.result && res.result.message)));
       }
     })
     .finally(() => {
@@ -398,7 +428,7 @@
     fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: "updateAttendanceMemo", params: [rowIndex, inputEl.value] }),
+      body: JSON.stringify({ action: "updateAttendanceMemo", params: [rowIndex, inputEl.value], token: sessionStorage.getItem('alescoAdminToken') }),
       redirect: 'follow'
     })
     .then(r => r.json())
@@ -448,7 +478,7 @@
     return fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: "getMasterDataForForm", params: [] }),
+      body: JSON.stringify({ action: "getMasterDataForForm", params: [], token: sessionStorage.getItem('alescoAdminToken') }),
       redirect: 'follow' 
     })
     .then(r => r.json())
@@ -590,7 +620,7 @@
     fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: actionName, params: params }),
+      body: JSON.stringify({ action: actionName, params: params, token: sessionStorage.getItem('alescoAdminToken') }),
       redirect: 'follow'
     })
     .then(r => r.json())
@@ -617,7 +647,7 @@
     fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: "deleteAttendanceRecord", params: [rIndex] }),
+      body: JSON.stringify({ action: "deleteAttendanceRecord", params: [rIndex], token: sessionStorage.getItem('alescoAdminToken') }),
       redirect: 'follow'
     })
     .then(r => r.json())
@@ -652,7 +682,7 @@
       fetch(GAS_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: "getActiveClientsAndLocations", params: [currentMonth] }),
+          body: JSON.stringify({ action: "getActiveClientsAndLocations", params: [currentMonth], token: sessionStorage.getItem('alescoAdminToken') }),
           redirect: 'follow'
       })
       .then(r => r.json())
@@ -805,7 +835,7 @@
           fetch(GAS_URL, {
               method: 'POST',
               headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-              body: JSON.stringify({ action: "generateSmartPdfServer", params: [monthStr, client, previewDataArray] }),
+              body: JSON.stringify({ action: "generateSmartPdfServer", params: [monthStr, client, previewDataArray], token: sessionStorage.getItem('alescoAdminToken') }),
               redirect: 'follow'
           })
           .then(r => r.json())
@@ -825,6 +855,42 @@
           });
       }
   }
+
+  // ==========================================
+  // HÀM XỬ LÝ ĐĂNG NHẬP DÀNH RIÊNG CHO QUẢN LÝ
+  // ==========================================
+  function handleAdminLogin() {
+    const user = document.getElementById('adminUser').value.trim();
+    const pass = document.getElementById('adminPass').value.trim();
+    const btn = document.getElementById('btnAdminLogin');
+    const err = document.getElementById('adminLoginError');
+
+    if(!user || !pass) { err.innerText = "IDとパスワードを入力してください"; err.style.display="block"; return; }
+
+    btn.disabled = true; btn.innerText = "認証中..."; err.style.display="none";
+
+    fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: "adminLogin", params: [user, pass] }), // Không cần Token
+      redirect: 'follow'
+    })
+    .then(r => r.json())
+    .then(res => {
+      if(res.result && res.result.success) {
+        sessionStorage.setItem('alescoAdminToken', res.result.token);
+        document.getElementById('adminAuthOverlay').style.display = 'none';
+        document.getElementById('fullPageLoading').style.display = 'flex'; // Bật loading trang lại
+        loadData(); // GỌI LẠI HÀM LOAD DATA BẢNG CHẤM CÔNG
+      } else {
+        err.innerText = res.result.message || "エラー";
+        err.style.display="block";
+      }
+    })
+    .catch(e => { err.innerText = "通信エラー"; err.style.display="block"; })
+    .finally(() => { btn.disabled = false; btn.innerText = "ログイン"; });
+  }
+
 </script>
 </body>
 </html>
