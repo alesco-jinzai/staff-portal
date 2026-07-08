@@ -115,7 +115,7 @@
     <div style="background:#fff; padding:40px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.1); width:90%; max-width:350px; text-align:center;">
       <h2 style="color:var(--primary); margin-top:0;">管理者ログイン</h2>
       <p style="font-size: 12px; color: #666; margin-bottom: 20px;">進捗管理システム</p>
-      <input type="text" id="adminUser" placeholder="ID (例: admin)" style="width:100%; height:45px; margin-bottom:15px; padding:0 15px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;">
+      <input type="text" id="adminUser" placeholder="ID" style="width:100%; height:45px; margin-bottom:15px; padding:0 15px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;">
       <input type="password" id="adminPass" placeholder="パスワード" style="width:100%; height:45px; margin-bottom:20px; padding:0 15px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;">
       <button onclick="handleAdminLogin()" id="btnAdminLogin" style="width:100%; height:45px; background:var(--primary); color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size: 15px;">ログイン</button>
       <p id="adminLoginError" style="color:#d32f2f; font-size:13px; font-weight:bold; margin-top:15px; display:none;"></p>
@@ -320,22 +320,21 @@
       fetch(GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        // 👉 1. NHÉT THÊM TOKEN VÀO ĐÂY
         body: JSON.stringify({ action: "getManagerDashboardData", params: [], token: sessionStorage.getItem('alescoAdminToken') }),
         redirect: 'follow' 
       })
       .then(res => res.json())
       .then(data => {
-        // 👉 2. BẮT LỖI BÁC BẢO VỆ ĐÁ VĂNG
+        // Nếu Token bị từ chối
         if (data.error === "AUTH_FAILED") {
-            document.getElementById('adminAuthOverlay').style.display = 'flex'; // Bật lại màn hình Login
-            sessionStorage.removeItem('alescoAdminToken'); // Xóa token cũ
+            document.getElementById('adminAuthOverlay').style.display = 'flex'; // Bật form Login
+            sessionStorage.removeItem('alescoAdminToken'); 
             document.getElementById('loading').style.display = 'none';
-            return; // Dừng chạy tiếp
+            return; 
         }
 
         if (data.result && data.result.success) {
-          // Bắt đầu che màn hình Login đi (vì Token hợp lệ)
+          // 👉 THÊM DÒNG NÀY ĐỂ GIẤU FORM ĐĂNG NHẬP NẾU AUTO-LOGIN THÀNH CÔNG
           document.getElementById('adminAuthOverlay').style.display = 'none';
 
           globalStaffData = data.result.data;
