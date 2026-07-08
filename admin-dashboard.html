@@ -110,6 +110,18 @@
   </style>
 </head>
 <body>
+
+  <div id="adminAuthOverlay" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:var(--bg); z-index:999999; display:flex; justify-content:center; align-items:center;">
+    <div style="background:#fff; padding:40px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.1); width:90%; max-width:350px; text-align:center;">
+      <h2 style="color:var(--primary); margin-top:0;">管理者ログイン</h2>
+      <p style="font-size: 12px; color: #666; margin-bottom: 20px;">進捗管理システム</p>
+      <input type="text" id="adminUser" placeholder="ID (例: admin)" style="width:100%; height:45px; margin-bottom:15px; padding:0 15px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;">
+      <input type="password" id="adminPass" placeholder="パスワード" style="width:100%; height:45px; margin-bottom:20px; padding:0 15px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;">
+      <button onclick="handleAdminLogin()" id="btnAdminLogin" style="width:100%; height:45px; background:var(--primary); color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size: 15px;">ログイン</button>
+      <p id="adminLoginError" style="color:#d32f2f; font-size:13px; font-weight:bold; margin-top:15px; display:none;"></p>
+    </div>
+  </div>
+
   <div class="top-navbar">
     <img src="logo.png" alt="ALESCO" class="nav-logo" onerror="this.src='https://alesco-v.co.jp/wp/wp-content/uploads/ALESCO-LOGO.png'">
     <div class="nav-menu">
@@ -308,15 +320,24 @@
       fetch(GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: "getManagerDashboardData", params: [] }),
+        // 👉 1. NHÉT THÊM TOKEN VÀO ĐÂY
+        body: JSON.stringify({ action: "getManagerDashboardData", params: [], token: sessionStorage.getItem('alescoAdminToken') }),
         redirect: 'follow' 
       })
-      .then(res => {
-        if (!res.ok) throw new Error("サーバーエラーが発生しました (HTTP " + res.status + ")");
-        return res.json();
-      })
+      .then(res => res.json())
       .then(data => {
+        // 👉 2. BẮT LỖI BÁC BẢO VỆ ĐÁ VĂNG
+        if (data.error === "AUTH_FAILED") {
+            document.getElementById('adminAuthOverlay').style.display = 'flex'; // Bật lại màn hình Login
+            sessionStorage.removeItem('alescoAdminToken'); // Xóa token cũ
+            document.getElementById('loading').style.display = 'none';
+            return; // Dừng chạy tiếp
+        }
+
         if (data.result && data.result.success) {
+          // Bắt đầu che màn hình Login đi (vì Token hợp lệ)
+          document.getElementById('adminAuthOverlay').style.display = 'none';
+
           globalStaffData = data.result.data;
           const now = new Date();
           const timeStr = String(now.getHours()).padStart(2,'0') + ":" + String(now.getMinutes()).padStart(2,'0') + ":" + String(now.getSeconds()).padStart(2,'0');
@@ -585,20 +606,29 @@
         fetch(GAS_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            // 👉 1. NHÉT THÊM TOKEN VÀO ĐÂY
             body: JSON.stringify({ 
                 action: "updateStaffLanguage", 
-                params: [staff.id, staff.isArchive, newLang] 
+                params: [staff.id, staff.isArchive, newLang],
+                token: sessionStorage.getItem('alescoAdminToken')
             }),
             redirect: 'follow'
         })
         .then(res => res.json())
         .then(data => {
+            // 👉 2. BẮT LỖI BÁC BẢO VỆ
+            if (data.error === "AUTH_FAILED") {
+                alert("セッションが切れました。再度ログインしてください。(Hết phiên đăng nhập)");
+                location.reload(); // F5 trang để hiện lại form Login
+                return;
+            }
+
             if (data.result && data.result.success) {
                 staff.languages = newLang;
                 document.getElementById('mLangText').innerText = newLang || "未設定";
                 const toast = document.getElementById('copyToast');
                 toast.innerText = "言語を更新しました";
-                toast.style.background = "#2e7d32"; // Màu xanh lá
+                toast.style.background = "#2e7d32"; 
                 toast.style.opacity = 1; toast.style.top = '25px';
                 setTimeout(() => { toast.style.opacity = 0; toast.style.top = '10px'; toast.style.background = "#333"; toast.innerText = "コピーしました";}, 2000);
                 cancelEditLanguage();
@@ -633,6 +663,46 @@
     function closeModalOutside(e) {
       if (e.target.id === 'detailModal') closeModal();
     }
+
+    // ==========================================
+    // HÀM XỬ LÝ ĐĂNG NHẬP DÀNH RIÊNG CHO QUẢN LÝ
+    // ==========================================
+    function handleAdminLogin() {
+      const user = document.getElementById('adminUser').value.trim();
+      const pass = document.getElementById('adminPass').value.trim();
+      const btn = document.getElementById('btnAdminLogin');
+      const err = document.getElementById('adminLoginError');
+
+      if(!user || !pass) { err.innerText = "IDとパスワードを入力してください"; err.style.display="block"; return; }
+
+      btn.disabled = true; btn.innerText = "認証中..."; err.style.display="none";
+
+      fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        // GỌI HÀM adminLogin (Hàm này không cần Token)
+        body: JSON.stringify({ action: "adminLogin", params: [user, pass] }),
+        redirect: 'follow'
+      })
+      .then(r => r.json())
+      .then(res => {
+        if(res.result && res.result.success) {
+          // THÀNH CÔNG: Lưu Token vào trình duyệt
+          sessionStorage.setItem('alescoAdminToken', res.result.token);
+          // Ẩn Form đi
+          document.getElementById('adminAuthOverlay').style.display = 'none';
+          // Gọi lại hàm lấy Data để hiển thị danh sách
+          fetchData(); 
+        } else {
+          // THẤT BẠI: Sai pass
+          err.innerText = res.result.message || "エラー";
+          err.style.display="block";
+        }
+      })
+      .catch(e => { err.innerText = "通信エラー"; err.style.display="block"; })
+      .finally(() => { btn.disabled = false; btn.innerText = "ログイン"; });
+    }
+
   </script>
 </body>
 </html>
