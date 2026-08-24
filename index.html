@@ -886,7 +886,54 @@
           あとで提出する (キャンセル)
         </button>
       </div>
+
+      <!-- MÀN HÌNH UPLOAD GIẤY TỜ KHÁC -->
+      <div id="viewMiscUpload" class="view">
+        <h3 style="color:var(--md-primary); border-bottom:2px solid var(--primary); padding-bottom:10px;">その他の書類 (追加提出)</h3>
+        <p style="font-size:13px; color:#5f6368; margin-bottom:15px; line-height: 1.5;">
+          学生証、診断書、資格証など、追加で提出が必要な書類はこちらからアップロードしてください。
+        </p>
+        
+        <div id="miscUploadZone">
+          <!-- Box Upload 1 (Mặc định) -->
+          <div class="upload-box dynamic-misc-upload" id="miscBox_1">
+            <div class="form-group" style="width:100%; text-align:left; margin-bottom:12px; position:relative;">
+              <label>書類名を入力・選択 <span class="error-message" id="miscNameError_1">（必須）</span></label>
+              <input type="text" id="miscName_1" placeholder="例: 学生証、診断書..." autocomplete="off" 
+                      onfocus="showMiscDropdown(1)" onkeyup="filterMiscDropdown(1)" style="height:45px;">
+              <div id="miscList_1" class="dropdown-list" style="position:absolute; top:100%; left:0; width:100%; background:#fff; border:1px solid #ccc; border-radius:6px; box-shadow:0 4px 12px rgba(0,0,0,0.1); z-index:100; display:none; max-height:150px; overflow-y:auto;">
+                <!-- Droplist sinh bằng JS -->
+              </div>
+            </div>
+            
+            <label>ファイル <span class="error-message" id="miscFileError_1" style="display:none;">（ファイルを選択してください）</span></label>
+            <div class="file-input-wrapper">
+              <input type="file" id="miscFile_1" accept="image/*,.pdf,.doc,.docx" onchange="previewMiscImg(this, 1)">
+            </div>
+            <div class="preview-container" id="miscPreviewContainer_1">
+              <button type="button" class="btn-remove-img" onclick="clearMiscImg(1)">✕</button>
+              <img id="miscPreview_1" class="preview-img">
+              <p id="miscPdf_1" class="pdf-label"></p>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align:center; margin-bottom: 25px;">
+          <button type="button" class="btn btn-outline" style="width:auto; display:inline-block; padding:10px 20px; font-size:14px; margin:0;" onclick="addMiscUploadBox()">
+            ＋ ファイルを追加する
+          </button>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="submitMiscDocuments()">送信する</button>
+          <button class="btn btn-gray" onclick="renderMyPage()">戻る</button>
+        </div>
+      </div>
+
     </div>
+
+
+
   </div>
 
   <script>
@@ -1120,11 +1167,12 @@
         { id: 'consent',   title: '告知書兼同意書', status: currentUser.statusConsent, desc: "個人情報の取扱いに関する同意" },
         { id: 'agreement', title: '承諾書', status: currentUser.statusAgreement, desc: "労働条件の電子明示に関する承諾" },
         { id: 'nda',       title: '秘密保持契約書', status: currentUser.statusNDA, desc: "機密情報の取扱いに関する契約" },
-        { id: 'edu',       title: '個人情報保護教育', status: currentUser.statusEdu, desc: "Pマーク教育資料の確認とテスト" }
+        { id: 'edu',       title: '個人情報保護教育', status: currentUser.statusEdu, desc: "Pマーク教育資料の確認とテスト" },
+        { id: 'misc',      title: 'その他の書類 (追加提出)', status: '', desc: "学生証・診断書・資格証・領収書など" }
       );
       const sortedTasks = [
-          ...allPossibleTasks.filter(t => ['mynumber', 'id', 'bank', 'fuyo'].includes(t.id)),
-          ...allPossibleTasks.filter(t => !['mynumber', 'id', 'bank', 'fuyo'].includes(t.id))
+          ...allPossibleTasks.filter(t => ['mynumber', 'id', 'bank', 'fuyo', 'misc'].includes(t.id)),
+          ...allPossibleTasks.filter(t => !['mynumber', 'id', 'bank', 'fuyo', 'misc'].includes(t.id))
       ];
       let html = extraNoticeHtml; // Nhét cái thông báo đó lên đầu tiên
       sortedTasks.forEach(t => {
@@ -1134,6 +1182,18 @@
         let isDone = statusText.includes('同意済') || statusText.includes('完了') || statusText.includes('提出済');
         let badgeClass = 'status-wait';
         let badgeText = '未提出';
+
+        // 👇 THÊM ĐOẠN IF DÀNH RIÊNG CHO TASK MISC 👇
+        if (t.id === 'misc') {
+            badgeClass = 'status-done'; // Màu xanh lá cho thân thiện
+            badgeText = '追加提出';     // Text nộp thêm
+            isDone = false;             // Luôn luôn cho phép click
+        } else {
+            if (isSkipped) { badgeClass = 'status-skip'; badgeText = '提出不要'; } 
+            else if (isRefused) { badgeClass = 'status-refuse'; badgeText = '提供拒否'; } 
+            else if (isDone) { badgeClass = 'status-done'; badgeText = '完了'; }
+        }
+
         if (isSkipped) { badgeClass = 'status-skip'; badgeText = '提出不要'; } 
         else if (isRefused) { badgeClass = 'status-refuse'; badgeText = '提供拒否'; } 
         else if (isDone) { badgeClass = 'status-done'; badgeText = '完了'; }
@@ -3239,6 +3299,208 @@
           showView('viewAuth');
         }
       }).getUserStatusById(currentUser.id);
+    }
+
+    // =========================================================
+    // LOGIC DÀNH RIÊNG CHO MỤC "CÁC LOẠI GIẤY TỜ KHÁC" (MISC_DOCS)
+    // =========================================================
+    
+    // Gắn luồng mở View
+    const originalOpenTask = window.openTask;
+    window.openTask = function(id) {
+        if (id === 'misc') {
+            resetMiscUploadForm();
+            showView('viewMiscUpload');
+            return;
+        }
+        originalOpenTask(id);
+    };
+
+    let miscBoxCount = 1;
+    const MISC_SUGGESTIONS = ["学生証", "診断書", "運転免許証", "資格証明書", "領収書（交通費等）", "指定書"];
+
+    function resetMiscUploadForm() {
+        document.getElementById('miscUploadZone').innerHTML = '';
+        miscBoxCount = 0;
+        addMiscUploadBox(); // Sinh lại Box 1
+    }
+
+    function addMiscUploadBox() {
+      miscBoxCount++;
+      const boxId = miscBoxCount;
+      const html = `
+        <div class="upload-box dynamic-misc-upload" id="miscBox_${boxId}">
+          ${boxId > 1 ? `<button type="button" class="btn-remove-img" onclick="removeMiscBox(${boxId})" style="top:-15px; right:-15px;">✕</button>` : ''}
+          <div class="form-group" style="width:100%; text-align:left; margin-bottom:12px; position:relative;">
+            <label>書類名を入力・選択 <span class="error-message" id="miscNameError_${boxId}">（必須）</span></label>
+            <input type="text" id="miscName_${boxId}" placeholder="例: 学生証、診断書..." autocomplete="off" 
+                   onfocus="showMiscDropdown(${boxId})" onkeyup="filterMiscDropdown(${boxId})" style="height:45px;">
+            <div id="miscList_${boxId}" class="dropdown-list" style="position:absolute; top:100%; left:0; width:100%; background:#fff; border:1px solid #ccc; border-radius:6px; box-shadow:0 4px 12px rgba(0,0,0,0.1); z-index:100; display:none; max-height:150px; overflow-y:auto;">
+            </div>
+          </div>
+          <label>ファイル <span class="error-message" id="miscFileError_${boxId}" style="display:none;">（ファイルを選択してください）</span></label>
+          <div class="file-input-wrapper">
+            <!-- ĐÃ SỬA ONCHANGE Ở DÒNG DƯỚI ĐÂY -->
+            <input type="file" id="miscFile_${boxId}" accept="image/*,.pdf,.doc,.docx" onchange="previewMiscImg(this, ${boxId})">
+          </div>
+          <div class="preview-container" id="miscPreviewContainer_${boxId}">
+            <button type="button" class="btn-remove-img" onclick="clearMiscImg(${boxId})">✕</button>
+            <img id="miscPreview_${boxId}" class="preview-img">
+            <p id="miscPdf_${boxId}" class="pdf-label"></p>
+          </div>
+        </div>
+      `;
+      document.getElementById('miscUploadZone').insertAdjacentHTML('beforeend', html);
+    }
+
+    function previewMiscImg(input, id) {
+        const f = input.files[0];
+        const container = document.getElementById(`miscPreviewContainer_${id}`);
+        const imgEl = document.getElementById(`miscPreview_${id}`);
+        const pdfText = document.getElementById(`miscPdf_${id}`);
+        if(f) {
+            container.style.display = 'block';
+            if (f.type.startsWith('image/')) {
+                const r = new FileReader();
+                r.onload = e => { imgEl.src = e.target.result; imgEl.style.display = 'block'; pdfText.style.display = 'none'; };
+                r.readAsDataURL(f);
+            } 
+            else {
+                imgEl.style.display = 'none';
+                pdfText.innerText = "📄 " + f.name;
+                pdfText.style.display = 'block';
+            }
+        }
+    }
+
+    function removeMiscBox(id) { document.getElementById(`miscBox_${id}`).remove(); }
+    
+    function clearMiscImg(id) {
+      document.getElementById(`miscFile_${id}`).value = '';
+      document.getElementById(`miscPreviewContainer_${id}`).style.display = 'none';
+    }
+
+    // --- Smart Dropdown Logic ---
+    function showMiscDropdown(id) {
+        filterMiscDropdown(id);
+        document.getElementById(`miscList_${id}`).style.display = 'block';
+    }
+
+    function filterMiscDropdown(id) {
+        const inputVal = document.getElementById(`miscName_${id}`).value.toLowerCase();
+        const listDiv = document.getElementById(`miscList_${id}`);
+        const filtered = MISC_SUGGESTIONS.filter(item => item.toLowerCase().includes(inputVal));
+        if (filtered.length === 0) {
+            listDiv.innerHTML = `<div style="padding:10px; font-size:13px; color:#888;">(自由に入力できます)</div>`;
+            return;
+        }
+        let html = '';
+        filtered.forEach(item => {
+            html += `<div style="padding:10px 15px; font-size:14px; cursor:pointer; border-bottom:1px solid #eee;" onmousedown="selectMiscItem(${id}, '${item}')">${item}</div>`;
+        });
+        listDiv.innerHTML = html;
+    }
+
+    function selectMiscItem(id, val) {
+        document.getElementById(`miscName_${id}`).value = val;
+        document.getElementById(`miscList_${id}`).style.display = 'none';
+    }
+
+    // Ẩn dropdown khi bấm ra ngoài
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dynamic-misc-upload')) {
+            document.querySelectorAll('.dropdown-list').forEach(el => el.style.display = 'none');
+        }
+    });
+
+    // --- Submit Logic ---
+    async function submitMiscDocuments() {
+        const boxes = document.querySelectorAll('.dynamic-misc-upload');
+        let hasError = false;
+        let filesPayload = [];
+
+        boxes.forEach(box => {
+            const idMatch = box.id.match(/\d+/);
+            if (!idMatch) return;
+            const id = idMatch[0];
+            
+            const nameInput = document.getElementById(`miscName_${id}`);
+            const nameError = document.getElementById(`miscNameError_${id}`);
+            const fileInput = document.getElementById(`miscFile_${id}`);
+            const fileError = document.getElementById(`miscFileError_${id}`);
+            
+            nameInput.classList.remove('input-error'); nameError.style.display = 'none';
+            box.classList.remove('input-error'); fileError.style.display = 'none';
+
+            // Box hợp lệ khi: Hoặc trống hoàn toàn (bỏ qua), hoặc điền đủ cả 2
+            const isNameEmpty = !nameInput.value.trim();
+            const isFileEmpty = !fileInput.files || fileInput.files.length === 0;
+
+            if (isNameEmpty && isFileEmpty) return; // Box rỗng -> Bỏ qua
+
+            if (isNameEmpty) {
+                nameInput.classList.add('input-error'); nameError.style.display = 'inline'; hasError = true;
+            }
+            if (isFileEmpty) {
+                box.classList.add('input-error'); fileError.style.display = 'block'; hasError = true;
+            }
+            if (!isNameEmpty && !isFileEmpty) {
+                filesPayload.push({
+                    file: fileInput.files[0],
+                    docName: nameInput.value.trim()
+                });
+            }
+        });
+
+        if (hasError) return;
+        if (filesPayload.length === 0) {
+            showCustomAlert("⚠️ 提出するファイルがありません。", true);
+            return;
+        }
+
+        setLoading(true, "送信中...", "ファイルを処理しています");
+        
+        try {
+            // Nén ảnh / Đọc Base64 cho tất cả file
+            let finalDataArray = [];
+            for (let i = 0; i < filesPayload.length; i++) {
+                const fInfo = filesPayload[i];
+                const isImage = fInfo.file.type.startsWith("image/");
+                let base64Data = "";
+                if (isImage) {
+                    base64Data = await processImg(fInfo.file, true); // True = Gắn Watermark
+                } else {
+                    base64Data = await new Promise(resolve => {
+                        const reader = new FileReader();
+                        reader.onload = e => resolve(e.target.result);
+                        reader.readAsDataURL(fInfo.file);
+                    });
+                }
+                finalDataArray.push({
+                    docName: fInfo.docName,
+                    base64: base64Data
+                });
+            }
+
+            // Gọi Backend GAS (Hàm mới)
+            google.script.run.withSuccessHandler(res => {
+                setLoading(false);
+                if (res.success) {
+                    showCustomAlert("追加書類を提出しました。");
+                    renderMyPage(); 
+                    // Chú ý: Không kiểm tra Progress, không nhảy màn hình pháo hoa!
+                } else {
+                    showCustomAlert("エラー: " + (res.message || "送信に失敗しました"), true);
+                }
+            }).withFailureHandler(err => {
+                setLoading(false);
+                showCustomAlert("通信エラー: 接続を確認してください。", true);
+            }).uploadMiscDocuments(currentUser.id, finalDataArray);
+
+        } catch (e) {
+            setLoading(false);
+            showCustomAlert("ファイル処理エラー: " + e.message, true);
+        }
     }
   </script>
 </body>
