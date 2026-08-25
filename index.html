@@ -718,7 +718,7 @@
         <div id="taskList"></div>
         <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
           <button id="mpBtnBack" class="btn btn-gray" onclick="renderAttendanceView()">戻る</button>
-          <button class="btn btn-gray" onclick="localStorage.removeItem('alescoPhone'); localStorage.removeItem('alescoDob'); currentUser = null; resetHonForm(); resetKariForm(); showView('viewAuth');">ログアウト</button>
+          <button class="btn btn-gray" onclick="localStorage.clear(); currentUser = null; resetHonForm(); resetKariForm(); showView('viewAuth');">ログアウト</button>
         </div>
       </div>
       <div id="viewRegSuccess" class="view">
@@ -823,7 +823,7 @@
         </div>
         <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
           <button class="btn btn-gray" onclick="renderMyPage()">登録情報・書類</button>
-          <button class="btn btn-gray" onclick="localStorage.removeItem('alescoPhone'); localStorage.removeItem('alescoDob'); currentUser = null; resetHonForm(); resetKariForm(); showView('viewAuth');">ログアウト</button>
+          <button class="btn btn-gray" onclick="localStorage.clear(); currentUser = null; resetHonForm(); resetKariForm(); showView('viewAuth');">ログアウト</button>
         </div>
       </div>
       <div id="viewShift" class="view">
@@ -1092,6 +1092,7 @@
             showLandlineField(); 
           }
           document.getElementById('kariDob').value = dobInput.value;
+          loadKariDraft(); 
           showView('viewKari');
           showCustomAlert("初めての登録ですね。\nプロフィールを入力してください。", "info");
         } else if (res.route === "step2") {
@@ -3517,41 +3518,48 @@
         }
     }
 
-    // Hàm lưu nháp (Gọi mỗi khi người dùng gõ phím)
+    // ==========================================
+    // AUTO-SAVE DRAFT LOGIC (KARI FORM)
+    // ==========================================
     function saveKariDraft() {
         const draftData = {
             lastName: document.getElementById('kariLastName').value,
             firstName: document.getElementById('kariFirstName').value,
             lastKana: document.getElementById('kariLastKana').value,
             firstKana: document.getElementById('kariFirstKana').value,
-            dob: document.getElementById('kariDob').value,
-            phone: document.getElementById('kariPhone').value,
             email: document.getElementById('kariEmail').value,
             zip: document.getElementById('kariZip').value,
             addr1: document.getElementById('kariAddr1').value,
             addr2: document.getElementById('kariAddr2').value
         };
-        // Lưu vào bộ nhớ trình duyệt điện thoại
         localStorage.setItem('alescoKariDraft', JSON.stringify(draftData));
     }
 
-    // Hàm phục hồi nháp (Gọi khi vừa mở App lên)
     function loadKariDraft() {
         const saved = localStorage.getItem('alescoKariDraft');
         if (saved) {
-            const draftData = JSON.parse(saved);
-            if(document.getElementById('kariLastName')) document.getElementById('kariLastName').value = draftData.lastName || '';
-            if(document.getElementById('kariFirstName')) document.getElementById('kariFirstName').value = draftData.firstName || '';
-            if(document.getElementById('kariLastKana')) document.getElementById('kariLastKana').value = draftData.lastKana || '';
-            if(document.getElementById('kariFirstKana')) document.getElementById('kariFirstKana').value = draftData.firstKana || '';
-            if(document.getElementById('kariDob')) document.getElementById('kariDob').value = draftData.dob || '';
-            if(document.getElementById('kariPhone')) document.getElementById('kariPhone').value = draftData.phone || '';
-            if(document.getElementById('kariEmail')) document.getElementById('kariEmail').value = draftData.email || '';
-            if(document.getElementById('kariZip')) document.getElementById('kariZip').value = draftData.zip || '';
-            if(document.getElementById('kariAddr1')) document.getElementById('kariAddr1').value = draftData.addr1 || '';
-            if(document.getElementById('kariAddr2')) document.getElementById('kariAddr2').value = draftData.addr2 || '';
+            try {
+                const draftData = JSON.parse(saved);
+                if(draftData.lastName) document.getElementById('kariLastName').value = draftData.lastName;
+                if(draftData.firstName) document.getElementById('kariFirstName').value = draftData.firstName;
+                if(draftData.lastKana) document.getElementById('kariLastKana').value = draftData.lastKana;
+                if(draftData.firstKana) document.getElementById('kariFirstKana').value = draftData.firstKana;
+                if(draftData.email) document.getElementById('kariEmail').value = draftData.email;
+                if(draftData.zip) document.getElementById('kariZip').value = draftData.zip;
+                if(draftData.addr1) document.getElementById('kariAddr1').value = draftData.addr1;
+                if(draftData.addr2) document.getElementById('kariAddr2').value = draftData.addr2;
+            } catch(e){}
         }
     }
+
+    // Gắn "máy nghe lén" vào các ô nhập. Cứ gõ phím là tự lưu.
+    document.addEventListener('DOMContentLoaded', () => {
+        const kariInputs = ['kariLastName', 'kariFirstName', 'kariLastKana', 'kariFirstKana', 'kariEmail', 'kariZip', 'kariAddr1', 'kariAddr2'];
+        kariInputs.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', saveKariDraft);
+        });
+    });
 
   </script>
 </body>
