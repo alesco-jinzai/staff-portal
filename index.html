@@ -1079,8 +1079,12 @@
         }
         localStorage.setItem('alescoPhone', phoneVal);
         localStorage.setItem('alescoDob', dobInput.value);
+        
         if (res.user) {
             localStorage.setItem('alescoUserObj', JSON.stringify(res.user));
+        } else {
+            // 👇 THÊM ĐOẠN NÀY ĐỂ GIẾT CHẾT ACCOUNT CŨ NẾU LÀ NGƯỜI MỚI 👇
+            localStorage.removeItem('alescoUserObj');
         }
         if (res.route === "step1") {
           resetKariForm();
