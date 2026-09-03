@@ -2821,9 +2821,9 @@
 
             totalFee += Number(item.fee) || 0;
             
-            // 👉 HIỂN THỊ GIỜ NGHỈ (Cục màu đỏ, chỉ hiện nếu có nghỉ)
+            // Giao diện hiển thị Giờ Nghỉ (Text thường, mượt mà)
             let breakHtml = item.breakMins > 0 
-                ? `<span style="font-size:12px; color:var(--md-error); background:var(--md-error-container); padding:2px 6px; border-radius:4px; font-weight:bold; margin-left:8px;">休: ${item.breakMins}分</span>` 
+                ? `<span style="margin-left:8px;"> (休: ${item.breakMins}分)</span>` 
                 : '';
             
             const editBtn = item.isApproved ? '' : `<button style="background:none; border:2px solid var(--md-primary); color:var(--md-primary); border-radius:8px; padding:8px 24px; font-size:14px; font-weight:bold; cursor:pointer;" onclick="openManualModal('${item.dateFull}', '${item.location}', '${item.checkIn}', '${item.checkOut}', '${item.fee}', '${item.rowIndex}')">修正</button>`;
