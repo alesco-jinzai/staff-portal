@@ -3209,7 +3209,7 @@
         
         // 👉 ĐÃ SỬA: Thêm Giờ nghỉ vào Calendar Review
         const sHtml = (byDate[dStr] || []).map(s => {
-          let bText = (s.breakMins && s.breakMins > 0) ? `<br><span style="font-size:9px; color:#ffeb3b;">(休${s.breakMins}分)</span>` : '';
+          let bText = (s.breakMins && s.breakMins > 0) ? ` (休: ${s.breakMins}分)` : '';
           return `<div class="shift-entry">${s.startTime}<br>${s.locationName}${bText}</div>`;
         }).join('');
         
