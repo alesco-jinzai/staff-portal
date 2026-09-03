@@ -2808,12 +2808,25 @@
               ? `<span style="background:var(--md-surface-variant); color:var(--md-on-surface-variant); padding:4px 10px; border-radius:6px; font-size:13px; font-weight:bold;">承認済</span>`
               : `<span style="background:var(--md-error-container); color:var(--md-error); padding:4px 10px; border-radius:6px; font-size:13px; font-weight:bold;">未承認</span>`;
             
-            const timeParts = item.totalDuration.split(':');
-            if (timeParts.length === 2) {
-              totalMinutes += (parseInt(timeParts[0],10)*60) + parseInt(timeParts[1],10);
+            // 👉 ĐỔI FORMAT TỔNG GIỜ LÀM (Từ số thập phân sang Giờ:Phút)
+            let hoursStr = "00:00";
+            if (item.totalDuration && Number(item.totalDuration) > 0) {
+                let h = Math.floor(Number(item.totalDuration));
+                let m = Math.round((Number(item.totalDuration) - h) * 60);
+                hoursStr = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+                
+                // Cộng dồn vào Total chung của cả tháng
+                totalMinutes += (h * 60) + m;
             }
+
             totalFee += Number(item.fee) || 0;
             
+            // 👉 HIỂN THỊ GIỜ NGHỈ (Cục màu đỏ, chỉ hiện nếu có nghỉ)
+            let breakHtml = (item.breakMins && item.breakMins > 0)
+                ? `<span style="font-size:13px; color:var(--md-error); background:var(--md-error-container); padding:2px 6px; border-radius:4px; font-weight:bold;">休: ${item.breakMins}分</span>` 
+                : '';
+            
+            // Nút bấm Sửa và Duyệt (Chỉ hiện khi chưa duyệt)
             const editBtn = item.isApproved ? '' : `<button style="background:none; border:2px solid var(--md-primary); color:var(--md-primary); border-radius:8px; padding:8px 24px; font-size:14px; font-weight:bold; cursor:pointer;" onclick="openManualModal('${item.dateFull}', '${item.location}', '${item.checkIn}', '${item.checkOut}', '${item.fee}', '${item.rowIndex}')">修正</button>`;
             const shoninBtn = item.isApproved ? '' : `<button style="background:var(--md-secondary); border:none; color:#fff; border-radius:8px; padding:8px 24px; font-size:14px; font-weight:bold; cursor:pointer;" onclick="openShoninModal('single', '${item.dateFull}', '${item.location}')">承認する</button>`;
             
@@ -2824,10 +2837,17 @@
                   ${statusBadge}
                 </div>
                 <div style="font-size:16px; color:var(--md-on-surface); font-weight:700;">${item.location}</div>
+                
                 <div style="display:flex; justify-content:space-between; align-items:center; font-size:15px; color:var(--md-on-surface-variant);">
                   <span>出: ${item.checkIn || '--:--'} ~ 退: ${item.checkOut || '--:--'}</span>
+                  ${breakHtml}
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:15px; color:var(--md-on-surface-variant); margin-top:5px; border-top:1px dashed var(--md-outline-variant); padding-top:10px;">
+                  <span style="font-size:14px; font-weight:bold;">実働: <span style="color:var(--md-primary); font-size:16px;">${hoursStr}</span></span>
                   <span style="color:var(--md-secondary); font-weight:700; font-size:16px;">¥${item.fee}</span>
                 </div>
+
                 <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
                   ${editBtn}
                   ${shoninBtn}
@@ -2836,7 +2856,7 @@
             `;
             
             // 2. GOM ĐẾM NHỮNG CA CHƯA DUYỆT CÓ ĐỦ GIỜ IN/OUT
-            if (!item.isApproved && item.checkIn && item.checkOut && item.location) {
+            if (!item.isApproved && item.checkIn !== "---" && item.checkOut !== "---" && item.location) {
               if (!unapprovedCounts[item.location]) unapprovedCounts[item.location] = 0;
               unapprovedCounts[item.location]++;
             }
@@ -2868,7 +2888,7 @@
         
       }).getEmployeeAttendanceHistory(currentUser.id, parseInt(year, 10), parseInt(month, 10));
     }
-
+    
     function openManualModal(date='', loc='', inTime='', outTime='', fee='', rowIndex='') {
       document.getElementById('manualModalTitle').innerText = date ? "勤務記録の修正" : "勤務記録の追加";
       document.getElementById('manualDate').value = date;
