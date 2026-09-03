@@ -165,6 +165,7 @@
             <th>出勤(丸)</th>
             <th>退勤(実)</th>
             <th>退勤(丸)</th>
+            <th>休憩</th>
             <th>実働時間</th>
             <th>勤務地</th>
             <th>交通費</th>
@@ -222,6 +223,10 @@
             <label style="font-size:12px; color:#5f6368; font-weight:700;">退勤時刻 (実際)</label>
             <input type="time" id="editCheckOut" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
           </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="font-size:12px; color:#5f6368; font-weight:700;">休憩 (分)</label>
+          <input type="number" id="editBreakMins" placeholder="例: 60" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
         </div>
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">交通費 (半角数字)</label>
@@ -391,6 +396,7 @@
         <td><strong>${row.checkIn}</strong></td>
         <td style="color:#888">${row.checkOutActual}</td>
         <td><strong style="${!row.checkOut ? 'color:red;' : ''}">${row.checkOut || '未退勤'}</strong></td>
+        <td style="color:var(--primary); font-weight:bold;">${row.breakMins || 0}分</td>
         <td><strong>${row.duration}</strong></td>
         <td>${row.location}</td>
         <td>¥${(Number(row.fee)||0).toLocaleString()}</td>
@@ -452,7 +458,7 @@
     const rows = document.querySelectorAll("#tableBody tr");
     if(rows.length === 0) return showToast("出力するデータがありません。", "error");
     showToast("CSVをダウンロードしています...", "success");
-    let csv = "\uFEFF社員番号,名前,日付,出勤(実),出勤(丸),退勤(実),退勤(丸),実働時間,勤務地,交通費,承認状態,メモ\n";
+    let csv = "\uFEFF社員番号,名前,日付,出勤(実),出勤(丸),退勤(実),退勤(丸),休憩(分),実働時間,勤務地,交通費,承認状態,メモ\n";
     rows.forEach(tr => {
       let cols = tr.querySelectorAll("td");
       let rowData = [];
@@ -526,20 +532,28 @@
   function openEditModal(rowObj) {
     document.getElementById('modalTitle').innerText = "勤務記録の修正";
     document.getElementById('editRowIndex').value = rowObj.rowIndex;
+    
     const empInput = document.getElementById('editEmpInput');
     const locInput = document.getElementById('editLocInput');
+    
     empInput.value = `${rowObj.empId} | ${rowObj.empName.replace(/\//g, ' ')}`;
     empInput.readOnly = true; 
     empInput.style.backgroundColor = "#f1f3f4";
     empInput.onfocus = null; empInput.onkeyup = null; 
+    
     locInput.value = rowObj.location || "";
     locInput.readOnly = true;
     locInput.style.backgroundColor = "#f1f3f4";
     locInput.onfocus = null; locInput.onkeyup = null;
+    
     document.getElementById('editDate').value = rowObj.date.replace(/\//g, '-');
     document.getElementById('editCheckIn').value = rowObj.checkInActual || "";
     document.getElementById('editCheckOut').value = rowObj.checkOutActual || "";
     document.getElementById('editFee').value = rowObj.fee || "";
+
+    // 👉 THÊM DÒNG NÀY VÀO: Đổ số phút nghỉ vào ô input
+    document.getElementById('editBreakMins').value = rowObj.breakMins || "";
+
     document.getElementById('btnSaveRecord').disabled = false;
     document.getElementById('btnDeleteRecord').style.display = "block";
     document.getElementById('editModal').style.display = 'flex';
@@ -603,20 +617,38 @@
     const cIn = document.getElementById('editCheckIn').value;
     const cOut = document.getElementById('editCheckOut').value;
     const cFee = document.getElementById('editFee').value;
+    
+    // 👉 THÊM 1 DÒNG NÀY: Lấy giá trị Giờ nghỉ (số phút)
+    const cBreakMins = document.getElementById('editBreakMins').value;
+
     if (!empData || !loc || !dDate || !cIn) {
       return showToast("エラー：社員、勤務地、日付、出勤時刻は必須です。", "error");
     }
+    
     let empId = empData, empName = "";
     if (empData.includes('|')) {
       const parts = empData.split('|');
       empId = parts[0].trim();
       empName = parts[1].trim();
     }
-    const record = { employeeId: empId, employeeName: empName, date: dDate, location: loc, checkIn: cIn, checkOut: cOut, transportCost: cFee };
+
+    // 👉 SỬA DÒNG NÀY: Bổ sung breakMins vào trong record
+    const record = { 
+      employeeId: empId, 
+      employeeName: empName, 
+      date: dDate, 
+      location: loc, 
+      checkIn: cIn, 
+      checkOut: cOut, 
+      breakMins: cBreakMins, // <-- Nhét cái này vào
+      transportCost: cFee 
+    };
+
     document.getElementById('btnSaveRecord').innerText = "保存中...";
     document.getElementById('btnSaveRecord').disabled = true;
     const actionName = rIndex ? "updateAttendanceRecord" : "addManualAttendanceRecord";
     const params = rIndex ? [record, rIndex] : [record];
+    
     fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
