@@ -458,12 +458,16 @@
     const rows = document.querySelectorAll("#tableBody tr");
     if(rows.length === 0) return showToast("出力するデータがありません。", "error");
     showToast("CSVをダウンロードしています...", "success");
+    
+    // Header 13 cột
     let csv = "\uFEFF社員番号,名前,日付,出勤(実),出勤(丸),退勤(実),退勤(丸),休憩(分),実働時間,勤務地,交通費,承認状態,メモ\n";
+    
     rows.forEach(tr => {
       let cols = tr.querySelectorAll("td");
       let rowData = [];
-      for(let i = 0; i <= 11; i++) { 
-        let text = (i === 11) ? cols[i].querySelector('input').value : cols[i].innerText;
+      for(let i = 0; i <= 12; i++) { // 👉 Chạy tới cột thứ 13 (index 12)
+        // 👉 SỬA SỐ 11 THÀNH SỐ 12 Ở ĐÂY LÀ XONG:
+        let text = (i === 12) ? cols[i].querySelector('input').value : cols[i].innerText;
         rowData.push(`"${text.replace(/"/g, '""')}"`);
       }
       csv += rowData.join(",") + "\n";
@@ -512,6 +516,7 @@
     document.getElementById('editCheckIn').value = "";
     document.getElementById('editCheckOut').value = "";
     document.getElementById('editFee').value = "";
+    document.getElementById('editBreakMins').value = "";
     document.getElementById('btnSaveRecord').disabled = false;
     document.getElementById('btnDeleteRecord').style.display = "none";
     document.getElementById('locSmartList').innerHTML = "";
