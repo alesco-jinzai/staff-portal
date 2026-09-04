@@ -773,7 +773,12 @@
               let [h, m] = r.duration.split(':');
               grossMins = (parseInt(h) * 60) + parseInt(m);
           }
-          return { ...r, grossMins: grossMins, breakMins: 0, netMins: grossMins }; // Mặc định giờ nghỉ = 0
+          
+          // 👉 FIX LỖI: Lấy breakMins từ Database truyền xuống (thay vì ép bằng 0)
+          let bMins = r.breakMins || 0; 
+          let net = Math.max(0, grossMins - bMins); // Trừ đi để ra giờ thực tế
+          
+          return { ...r, grossMins: grossMins, breakMins: bMins, netMins: net };
       });
       renderReviewTable();
   }
