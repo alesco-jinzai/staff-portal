@@ -278,13 +278,6 @@
         </div>
         <button style="background:transparent; border:none; color:white; font-size:26px; cursor:pointer;" onclick="document.getElementById('reviewBoardModal').style.display='none'">×</button>
       </div>
-      <div style="padding:12px 20px; background:#f4f7fc; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
-        <span style="font-size:13px; font-weight:700; color:var(--text);">💡 一括適用:</span>
-        <input type="number" id="bulkBreakInput" placeholder="例: 60" style="width:80px; height:32px; padding:0 10px; border:1px solid var(--border); border-radius:4px; font-size:14px; text-align:center; outline:none;">
-        <span style="font-size:13px; color:var(--text);">分を</span>
-        <button class="btn btn-secondary" style="height:32px; padding:0 15px; font-size:12px;" onclick="applyBulkBreak()">全行に適用</button>
-        <span style="font-size:11px; color:#666; margin-left:10px;">※異なる日は下の表で直接数値を修正してください。</span>
-      </div>
       <div style="flex:1; overflow:auto; padding:0; background:var(--surface);">
         <table style="width:100%; border-collapse:collapse; font-size:13px; margin:0;">
           <thead style="position:sticky; top:0; z-index:1;">
@@ -768,17 +761,13 @@
           return allowedLocs.includes(r.location) || r.type === 'yukyu';
       });
       previewDataArray = previewDataArray.map(r => {
-          let grossMins = 0;
+          // Lấy thẳng thời gian đã trừ nghỉ từ cột Thực làm (VD: "08:30") đổi ra số phút cho file PDF
+          let netMins = 0;
           if (r.duration && r.duration.includes(':')) {
-              let [h, m] = r.duration.split(':');
-              grossMins = (parseInt(h) * 60) + parseInt(m);
+              let [h, m] = r.duration.split(':').map(Number);
+              netMins = h * 60 + m; 
           }
-          
-          // 👉 FIX LỖI: Lấy breakMins từ Database truyền xuống (thay vì ép bằng 0)
-          let bMins = r.breakMins || 0; 
-          let net = Math.max(0, grossMins - bMins); // Trừ đi để ra giờ thực tế
-          
-          return { ...r, grossMins: grossMins, breakMins: bMins, netMins: net };
+          return { ...r, breakMins: parseInt(r.breakMins) || 0, netMins: netMins };
       });
       renderReviewTable();
   }
@@ -793,41 +782,25 @@
       previewDataArray.forEach((row, index) => {
           let isYukyu = (row.type === 'yukyu');
           let trStyle = isYukyu ? 'background:#f9f9f9; color:#888;' : '';
-          let breakInput = isYukyu ? '-' : `<input type="number" class="break-input" data-index="${index}" value="${row.breakMins}" oninput="recalculateRow(${index})" style="width:60px; height:28px; text-align:center; border:1px solid var(--border); border-radius:4px; font-weight:bold; color:var(--text); outline:none;">`;
-          let netTimeStr = isYukyu ? '<span style="color:#666; font-weight:bold;">有給休暇</span>' : `<span id="netTime_${index}" style="font-weight:bold; font-size:14px; color:var(--text);">${minsToStr(row.netMins)}</span>`;
+          
+          // 👉 SỬA LẠI THÀNH TEXT TĨNH (Không dùng input nữa)
+          let breakStr = isYukyu ? '-' : `<span style="font-weight:bold; color:var(--primary);">${row.breakMins}</span>`;
+          let netTimeStr = isYukyu ? '<span style="color:#666; font-weight:bold;">有給休暇</span>' : `<span style="font-weight:bold; font-size:14px; color:var(--text);">${row.duration}</span>`;
+          
           html += `
           <tr style="border-bottom:1px solid var(--border); ${trStyle}">
               <td style="padding:10px 15px;"><strong>${row.empName}</strong><br><span style="font-size:11px; color:#888; font-family:monospace;">${row.empId}</span></td>
               <td style="padding:10px 15px;">${row.date}</td>
               <td style="padding:10px 15px;">${isYukyu ? '-' : (row.checkIn || '')}</td>
               <td style="padding:10px 15px;">${isYukyu ? '-' : (row.checkOut || '<span style="color:#d32f2f;">未退勤</span>')}</td>
-              <td style="padding:10px 15px; text-align:center;">${breakInput}</td>
+              
+              <!-- In ra màn hình -->
+              <td style="padding:10px 15px; text-align:center;">${breakStr}</td>
               <td style="padding:10px 15px; text-align:center;">${netTimeStr}</td>
           </tr>
           `;
       });
       tbody.innerHTML = html;
-  }
-
-  function applyBulkBreak() {
-      const bulkVal = parseInt(document.getElementById('bulkBreakInput').value) || 0;
-      previewDataArray.forEach((row, index) => {
-          if (row.type !== 'yukyu' && row.grossMins > 0) {
-              row.breakMins = bulkVal;
-              row.netMins = Math.max(0, row.grossMins - bulkVal);
-          }
-      });
-      renderReviewTable();
-      showToast(`${bulkVal}分を一括適用しました。`, 'success');
-  }
-
-  function recalculateRow(index) {
-      const row = previewDataArray[index];
-      const inputEl = document.querySelector(`.break-input[data-index="${index}"]`);
-      let breakVal = parseInt(inputEl.value) || 0;
-      row.breakMins = breakVal;
-      row.netMins = Math.max(0, row.grossMins - breakVal);
-      document.getElementById(`netTime_${index}`).innerText = minsToStr(row.netMins);
   }
 
   function minsToStr(totalMins) {
@@ -856,7 +829,10 @@
                   isYukyu ? '' : (r.checkIn || ''),
                   isYukyu ? '' : (r.checkOut || ''),
                   isYukyu ? '' : minsToStr(r.breakMins),
-                  isYukyu ? '有給休暇' : minsToStr(r.netMins),
+                  
+                  // 👉 SỬA DÒNG NÀY (Lấy thẳng duration):
+                  isYukyu ? '有給休暇' : r.duration, 
+                  
                   isYukyu ? '' : (r.location || ''),
                   isYukyu ? '' : (r.fee || 0),
                   r.isApproved ? (r.approverName || '承認済') : '未承認',
