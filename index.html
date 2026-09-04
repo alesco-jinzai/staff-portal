@@ -3330,7 +3330,7 @@
           // 👉 ĐÃ SỬA: Thêm Giờ nghỉ vào Danh sách Ca Đã Chốt
           const locHtml = Object.entries(byLoc).map(([lName, shifts]) => {
             const sHtml = shifts.map(s => {
-                let bText = (s.breakMins && s.breakMins > 0) ? `<span style="font-size:12px; color:#ffeb3b; margin-left:8px; font-weight:normal;">(休: ${s.breakMins}分)</span>` : '';
+                let bText = (s.breakMins && s.breakMins > 0) ? `<span style="font-size:12px; margin-left:8px; font-weight:normal; opacity:0.8;">(休: ${s.breakMins}分)</span>` : '';
                 return `
                 <div class="confirmed-shift-item">
                     ${s.startTime} - ${s.endTime} ${bText}
