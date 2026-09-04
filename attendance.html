@@ -354,10 +354,22 @@
   function updateDropdowns() {
     const empSel = document.getElementById('employeeFilter');
     const locSel = document.getElementById('locationFilter');
+    
+    // 👉 BƯỚC 1: LƯU LẠI LỰA CHỌN HIỆN TẠI CỦA ADMIN TRƯỚC KHI VẼ LẠI
+    const currentEmp = empSel.value;
+    const currentLoc = locSel.value;
+
+    // Lọc data mới
     const emps = [...new Set(globalData.map(d => d.empId))].sort();
     const locs = [...new Set(globalData.map(d => d.location))].sort();
+    
+    // Vẽ lại menu Dropdown
     empSel.innerHTML = '<option value="">すべての社員</option>' + emps.map(e => `<option value="${e}">${e}</option>`).join('');
     locSel.innerHTML = '<option value="">すべての勤務地</option>' + locs.map(l => `<option value="${l}">${l}</option>`).join('');
+    
+    // 👉 BƯỚC 2: PHỤC HỒI LẠI LỰA CHỌN CŨ (Nếu nó vẫn tồn tại trong list)
+    if (currentEmp) empSel.value = currentEmp;
+    if (currentLoc) locSel.value = currentLoc;
   }
 
   function renderTable() {
