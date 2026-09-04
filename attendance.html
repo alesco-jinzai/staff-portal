@@ -784,7 +784,7 @@
           let trStyle = isYukyu ? 'background:#f9f9f9; color:#888;' : '';
           
           // 👉 SỬA LẠI THÀNH TEXT TĨNH (Không dùng input nữa)
-          let breakStr = isYukyu ? '-' : `<span style="font-weight:bold; color:var(--primary);">${row.breakMins}</span>`;
+          let breakStr = isYukyu ? '-' : `${row.breakMins}`;
           let netTimeStr = isYukyu ? '<span style="color:#666; font-weight:bold;">有給休暇</span>' : `<span style="font-weight:bold; font-size:14px; color:var(--text);">${row.duration}</span>`;
           
           html += `
