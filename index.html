@@ -770,6 +770,8 @@
               <input type="time" id="manualOut" style="height: 48px;">
             </div>
           </div>
+          <label style="margin-bottom: 4px;">休憩時間 (分)</label>
+          <input type="number" id="manualBreak" placeholder="例: 60" style="margin-bottom: 12px; height: 48px;">          
           <label style="margin-bottom: 4px;">交通費</label>
           <input type="tel" id="manualFee" inputmode="numeric" style="margin-bottom: 20px; height: 48px;">
           <input type="hidden" id="manualRowIndex">
@@ -2826,7 +2828,7 @@
                 ? `<span style="margin-left:8px;"> (休: ${item.breakMins}分)</span>` 
                 : '';
             
-            const editBtn = item.isApproved ? '' : `<button style="background:none; border:2px solid var(--md-primary); color:var(--md-primary); border-radius:8px; padding:8px 24px; font-size:14px; font-weight:bold; cursor:pointer;" onclick="openManualModal('${item.dateFull}', '${item.location}', '${item.checkIn}', '${item.checkOut}', '${item.fee}', '${item.rowIndex}')">修正</button>`;
+            const editBtn = item.isApproved ? '' : `<button style="background:none; border:2px solid var(--md-primary); color:var(--md-primary); border-radius:8px; padding:8px 24px; font-size:14px; font-weight:bold; cursor:pointer;" onclick="openManualModal('${item.dateFull}', '${item.location}', '${item.checkIn}', '${item.checkOut}', '${item.breakMins}', '${item.fee}', '${item.rowIndex}')">修正</button>`;
             const shoninBtn = item.isApproved ? '' : `<button style="background:var(--md-secondary); border:none; color:#fff; border-radius:8px; padding:8px 24px; font-size:14px; font-weight:bold; cursor:pointer;" onclick="openShoninModal('single', '${item.dateFull}', '${item.location}')">承認する</button>`;
             
             html += `
@@ -2888,11 +2890,12 @@
       }).getEmployeeAttendanceHistory(currentUser.id, parseInt(year, 10), parseInt(month, 10));
     }
     
-    function openManualModal(date='', loc='', inTime='', outTime='', fee='', rowIndex='') {
+    function openManualModal(date='', loc='', inTime='', outTime='', breakMins='', fee='', rowIndex='') {
       document.getElementById('manualModalTitle').innerText = date ? "勤務記録の修正" : "勤務記録の追加";
       document.getElementById('manualDate').value = date;
       document.getElementById('manualIn').value = inTime;
       document.getElementById('manualOut').value = outTime;
+      document.getElementById('manualBreak').value = breakMins; 
       document.getElementById('manualFee').value = fee;
       document.getElementById('manualRowIndex').value = rowIndex;
       const locSelect = document.getElementById('manualLocation');
@@ -2930,6 +2933,7 @@
         location: document.getElementById('manualLocation').value,
         checkIn: document.getElementById('manualIn').value,
         checkOut: document.getElementById('manualOut').value,
+        breakMins: document.getElementById('manualBreak').value, 
         fee: document.getElementById('manualFee').value,
         rowIndex: document.getElementById('manualRowIndex').value
       };
