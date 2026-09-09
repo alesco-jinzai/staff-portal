@@ -756,25 +756,37 @@
       <div id="manualModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(3px);">
         <div style="background: var(--md-surface-container); padding: 24px 20px; border-radius: var(--shape-large); width: 90%; max-width: 400px; max-height: 90vh; overflow-y: auto; box-shadow: var(--elevation-2);">
           <h3 id="manualModalTitle" style="text-align:center; margin: 0 0 16px 0; color: var(--md-primary); font-size: 18px;">勤務記録の修正</h3>
-          <label style="margin-bottom: 4px;">日付</label>
-          <input type="date" id="manualDate" style="margin-bottom: 12px; height: 48px;">
-          <label style="margin-bottom: 4px;">勤務地</label>
-          <select id="manualLocation" style="margin-bottom: 12px; height: 48px;"></select>
+          
+          <label style="margin-bottom: 4px; display:block; font-size: 13px; font-weight: 500; color: var(--md-on-surface-variant);">日付</label>
+          <input type="date" id="manualDate" style="width: 100%; margin-bottom: 12px; height: 48px; border: 1px solid var(--md-outline); border-radius: var(--shape-medium); padding: 0 16px; box-sizing: border-box; font-size: 16px;">
+          
+          <label style="margin-bottom: 4px; display:block; font-size: 13px; font-weight: 500; color: var(--md-on-surface-variant);">勤務地</label>
+          <select id="manualLocation" style="width: 100%; margin-bottom: 12px; height: 48px; border: 1px solid var(--md-outline); border-radius: var(--shape-medium); padding: 0 16px; box-sizing: border-box; font-size: 16px;"></select>
+          
           <div style="display:flex; gap:10px; margin-bottom: 12px;">
             <div style="flex:1;">
-              <label style="margin-bottom: 4px;">出勤時間</label>
-              <input type="time" id="manualIn" style="height: 48px;">
+              <label style="margin-bottom: 4px; display:block; font-size: 13px; font-weight: 500; color: var(--md-on-surface-variant);">出勤時間</label>
+              <input type="time" id="manualIn" style="width: 100%; height: 48px; border: 1px solid var(--md-outline); border-radius: var(--shape-medium); padding: 0 16px; box-sizing: border-box; font-size: 16px;">
             </div>
             <div style="flex:1;">
-              <label style="margin-bottom: 4px;">退勤時間</label>
-              <input type="time" id="manualOut" style="height: 48px;">
+              <label style="margin-bottom: 4px; display:block; font-size: 13px; font-weight: 500; color: var(--md-on-surface-variant);">退勤時間</label>
+              <input type="time" id="manualOut" style="width: 100%; height: 48px; border: 1px solid var(--md-outline); border-radius: var(--shape-medium); padding: 0 16px; box-sizing: border-box; font-size: 16px;">
             </div>
           </div>
-          <label style="margin-bottom: 4px;">休憩時間 (分)</label>
-          <input type="number" id="manualBreak" placeholder="例: 60" style="margin-bottom: 12px; height: 48px;">          
-          <label style="margin-bottom: 4px;">交通費</label>
-          <input type="tel" id="manualFee" inputmode="numeric" style="margin-bottom: 20px; height: 48px;">
+          
+          <div style="display:flex; gap:10px; margin-bottom: 20px;">
+            <div style="flex:1;">
+              <label style="margin-bottom: 4px; display:block; font-size: 13px; font-weight: 500; color: var(--md-on-surface-variant);">休憩時間 (分)</label>
+              <input type="number" id="manualBreak" placeholder="例: 60" style="width: 100%; height: 48px; border: 1px solid var(--md-outline); border-radius: var(--shape-medium); padding: 0 16px; box-sizing: border-box; font-size: 16px;">
+            </div>
+            <div style="flex:1;">
+              <label style="margin-bottom: 4px; display:block; font-size: 13px; font-weight: 500; color: var(--md-on-surface-variant);">交通費 (円)</label>
+              <input type="tel" id="manualFee" inputmode="numeric" placeholder="例: 500" style="width: 100%; height: 48px; border: 1px solid var(--md-outline); border-radius: var(--shape-medium); padding: 0 16px; box-sizing: border-box; font-size: 16px;">
+            </div>
+          </div>
+          
           <input type="hidden" id="manualRowIndex">
+          
           <div style="display:flex; gap:10px;">
             <button class="btn btn-gray" style="flex:1; margin:0; height: 48px;" onclick="document.getElementById('manualModal').style.display='none'">キャンセル</button>
             <button class="btn btn-primary" style="flex:1; margin:0; height: 48px;" onclick="saveManualData()">保存</button>
