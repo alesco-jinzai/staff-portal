@@ -1142,92 +1142,90 @@
     function renderMyPage() {
       showView('viewMyPage');
       document.getElementById('mpUserName').innerText = safeCleanName(currentUser.name) + " 様";
-      document.getElementById('mpUserType').innerText = currentUser.employmentType;
+      
+      // Hiển thị loại hình, nếu trống thì báo "Chưa cài đặt" để nó biết đường liên hệ HR
+      document.getElementById('mpUserType').innerText = currentUser.employmentType || "未設定 (会社にご連絡ください)"; 
+      
       const isFullyOnboarded = currentUser.progress && currentUser.progress.indexOf("完了") > -1;
       const btnBack = document.getElementById('mpBtnBack');
       if (btnBack) {
           btnBack.style.display = isFullyOnboarded ? 'flex' : 'none';
       }
+
       let fuyoStatus = currentUser.statusFuyo || "";
       let isMainEmployee = (currentUser.employmentType === 'メイン');
+      
+      // Nếu là "メイン" mà chưa nộp Fuyo thì mới hiện cảnh báo đỏ
       let needsFuyo = (isMainEmployee && fuyoStatus.indexOf('提出済') === -1);
       document.getElementById('shinkokushoAlert').style.display = needsFuyo ? 'block' : 'none';
+      
       let extraNoticeHtml = '';
       if (isFullyOnboarded) {
          extraNoticeHtml = `
             <div style="background:#F4F9FD; border:1px solid #D1E4FF; border-radius:12px; padding:12px 16px; margin-bottom:20px;">
                <p style="margin:0; font-size:12px; color:#004577; line-height:1.5;">
                  <strong>💡 各種書類の更新・追加提出について</strong><br>
-                 「完了」となっている項目でも、タップすると再度ファイルをアップロードできます。在留カードの更新や振込先の変更がある場合は、該当項目を選択して最新の書類をご提出ください。
+                 「完了」となっている項目でも、タップすると再度ファイルをアップロードできます。
                </p>
             </div>
          `;
       }
+
       const isForeigner = (currentUser.nationality !== '日本');
       const idTitle = isForeigner ? '在留カード' : '本人確認書類';
-      let myNumDesc = "マイナンバーカード、通知カード、またはマイナンバー入り住民票を提出してください。";
-      let idDesc = isForeigner ? "必ず『表面』と『裏面』の両方を提出してください。" : "免許証（表・裏）、または個人番号を隠したマイナンバーカードの表面を提出してください。";
-      let bankDesc = "給与振込先となる通帳の口座情報ページ、またはキャッシュカードの表面を提出してください。";
+      
+      // DANH SÁCH 8 NHIỆM VỤ (Bao gồm cả Ảnh và Hợp đồng điện tử)
       const allPossibleTasks = [
-        { id: 'mynumber',  title: 'マイナンバー', status: currentUser.statusMyNumber, desc: myNumDesc },
-        { id: 'id',        title: idTitle, status: currentUser.statusID, desc: idDesc },
-        { id: 'bank',      title: '銀行口座情報', status: currentUser.statusBank, desc: bankDesc }
-      ];
-      if (isMainEmployee) {
-        allPossibleTasks.push({ 
-          id: 'fuyo', 
-          title: '扶養控除等申告書', 
-          status: fuyoStatus, 
-          desc: "税務署へ提出する給与所得者の扶養控除申告書", 
-          action: openFuyoForm 
-        });
-      }
-      allPossibleTasks.push(
+        { id: 'mynumber',  title: 'マイナンバー', status: currentUser.statusMyNumber, desc: "マイナンバーカード、通知カード等" },
+        { id: 'id',        title: idTitle, status: currentUser.statusID, desc: "身分証明書・在留カード等" },
+        { id: 'bank',      title: '銀行口座情報', status: currentUser.statusBank, desc: "給与振込先となる通帳の口座情報ページ等" },
         { id: 'consent',   title: '告知書兼同意書', status: currentUser.statusConsent, desc: "個人情報の取扱いに関する同意" },
         { id: 'agreement', title: '承諾書', status: currentUser.statusAgreement, desc: "労働条件の電子明示に関する承諾" },
         { id: 'nda',       title: '秘密保持契約書', status: currentUser.statusNDA, desc: "機密情報の取扱いに関する契約" },
-        { id: 'edu',       title: '個人情報保護教育', status: currentUser.statusEdu, desc: "Pマーク教育資料の確認とテスト" },
-        { id: 'misc',      title: 'その他の書類 (追加提出)', status: '', desc: "学生証・診断書・資格証・領収書など" }
-      );
-      const sortedTasks = [
-          ...allPossibleTasks.filter(t => ['mynumber', 'id', 'bank', 'fuyo', 'misc'].includes(t.id)),
-          ...allPossibleTasks.filter(t => !['mynumber', 'id', 'bank', 'fuyo', 'misc'].includes(t.id))
+        { id: 'edu',       title: '個人情報保護教育', status: currentUser.statusEdu, desc: "Pマーク教育資料の確認とテスト" }
       ];
-      let html = extraNoticeHtml; // Nhét cái thông báo đó lên đầu tiên
-      sortedTasks.forEach(t => {
-        let statusText = t.status || "";
-        let isSkipped = statusText.includes('提出不要');
-        let isRefused = statusText.includes('提供拒否');
-        let isDone = statusText.includes('同意済') || statusText.includes('完了') || statusText.includes('提出済');
-        let badgeClass = 'status-wait';
-        let badgeText = '未提出';
 
-        // 👇 THÊM ĐOẠN IF DÀNH RIÊNG CHO TASK MISC 👇
+      // Fuyo chỉ hiện ra nếu là Main
+      if (isMainEmployee) {
+        allPossibleTasks.push({ 
+          id: 'fuyo', title: '扶養控除等申告書', status: fuyoStatus, desc: "給与所得者の扶養控除申告書" 
+        });
+      }
+      
+      // Misc luôn nằm cuối cùng
+      allPossibleTasks.push({ id: 'misc', title: 'その他の書類 (追加提出)', status: '', desc: "学生証・診断書・資格証・領収書など" });
+
+      let html = extraNoticeHtml; 
+
+      allPossibleTasks.forEach(t => {
+        let statusText = t.status || "";
+        let isSkipped = statusText.includes('提出不要') || statusText.includes('提供拒否'); // Gom chung 不要 và 拒否 để khóa
+        let isDone = statusText.includes('同意済') || statusText.includes('完了') || statusText.includes('提出済');
+        
+        let badgeClass = 'status-wait';
+        let badgeText = '未対応'; // Chưa làm
+
         if (t.id === 'misc') {
-            badgeClass = 'status-done'; // Màu xanh lá cho thân thiện
-            badgeText = '追加提出';     // Text nộp thêm
-            isDone = false;             // Luôn luôn cho phép click
+            badgeClass = 'status-done'; badgeText = '追加提出'; isDone = false;
         } else {
-            if (isSkipped) { badgeClass = 'status-skip'; badgeText = '提出不要'; } 
-            else if (isRefused) { badgeClass = 'status-refuse'; badgeText = '提供拒否'; } 
+            if (statusText.includes('提出不要')) { badgeClass = 'status-skip'; badgeText = '不要'; } 
+            else if (statusText.includes('提供拒否')) { badgeClass = 'status-refuse'; badgeText = '拒否'; } 
             else if (isDone) { badgeClass = 'status-done'; badgeText = '完了'; }
         }
 
-        if (isSkipped) { badgeClass = 'status-skip'; badgeText = '提出不要'; } 
-        else if (isRefused) { badgeClass = 'status-refuse'; badgeText = '提供拒否'; } 
-        else if (isDone) { badgeClass = 'status-done'; badgeText = '完了'; }
+        // Khóa không cho click nếu đã bị Skip, Refuse, hoặc ĐÃ LÀM XONG HỢP ĐỒNG
         let canClick = true;
-        if (isSkipped || isRefused) canClick = false;
-        if (['consent', 'agreement', 'nda', 'edu'].includes(t.id) && isDone) canClick = false;
+        if (isSkipped) canClick = false;
+        if (['consent', 'agreement', 'nda', 'edu'].includes(t.id) && isDone) canClick = false; // Hợp đồng ký 1 lần là khóa
+
         let clickAction = "";
         if (canClick) {
-          if (t.id === 'fuyo') {
-            clickAction = `onclick="openFuyoForm()"`;
-          } else {
-            clickAction = `onclick="openTask('${t.id}')"`;
-          }
+          if (t.id === 'fuyo') clickAction = `onclick="openFuyoForm()"`;
+          else clickAction = `onclick="openTask('${t.id}')"`;
         }
+        
         let cardClass = !canClick ? "task-card is-done" : "task-card";
+        
         html += `
           <div class="${cardClass}" ${clickAction}>
             <div style="flex:1; padding-right:15px;">
