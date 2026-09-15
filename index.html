@@ -1637,6 +1637,13 @@
             if(type === 'consent') currentUser.statusConsent = res.newVal;
             if (res.user) currentUser = res.user;
             else if (res.progress) currentUser.progress = res.progress;
+
+            // 👉 THÊM ĐÚNG ĐOẠN NÀY VÀO ĐÂY:
+            // Nhận tín hiệu từ Backend -> Bắn lệnh đẻ PDF chạy ngầm trên mây!
+            if (res.shouldTriggerPdf) {
+              google.script.run.generateHonPdfBackground(currentUser.id);
+            }
+
             if (currentUser.progress && currentUser.progress.includes("完了")) {
                 document.getElementById('finalSuccessPopup').style.display = 'flex';
             } else {
@@ -1702,6 +1709,12 @@
             if (res.user) currentUser = res.user;
             else if (res.progress) currentUser.progress = res.progress;
             
+            // 👉 THÊM ĐÚNG ĐOẠN NÀY VÀO ĐÂY:
+            // Nhận tín hiệu từ Backend -> Bắn lệnh đẻ PDF chạy ngầm trên mây!
+            if (res.shouldTriggerPdf) {
+              google.script.run.generateHonPdfBackground(currentUser.id);
+            }
+
             showCustomAlert("テスト結果を送信しました。");
             routeUser(); 
         } else {
