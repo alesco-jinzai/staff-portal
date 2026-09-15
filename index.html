@@ -2419,6 +2419,8 @@
         setTimeout(() => checkInitialVisibility('honNdaBox', 'honNdaCheck', 'honNdaHint'), 100);
       }
       if(step === 5) {
+        const ta = document.getElementById('testArea');
+        if (ta) ta.style.display = 'none';
         document.getElementById('honEduBox').innerHTML = getDocContent('edu');
         document.getElementById('honEduTestArea').innerHTML = renderTestQuestions('hon_q'); 
         setTimeout(() => checkInitialVisibility('honEduBox', 'honEduCheck', 'honEduHint'), 100);
@@ -2537,6 +2539,8 @@
         if(cb) { cb.checked = false; cb.disabled = true; if(cb.parentElement) cb.parentElement.classList.remove('active-box'); }
       });
       const testArea = document.getElementById('honEduTestArea');
+      const mainTestArea = document.getElementById('testArea');
+      if(mainTestArea) mainTestArea.style.display = 'none';
       if(testArea) testArea.innerHTML = '';
       pendingKariData = null;
       pendingKariRowIndex = -1;
