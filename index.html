@@ -1317,13 +1317,16 @@
             <p class="scroll-hint" id="hintText">※一番下までスクロールしてください</p>
           </div>
           <div class="checkbox-item" id="checkGroup" onclick="toggleCheckboxFromBox('taskCheck')">
-            <input type="checkbox" id="taskCheck" disabled onchange="toggleEduTest(this)"> 
+            <!-- 👉 ĐỔI HÀM ONCHANGE THÀNH toggleTaskEduTest -->
+            <input type="checkbox" id="taskCheck" disabled onchange="toggleTaskEduTest(this)"> 
             <label for="taskCheck">内容を確認しました</label>
           </div>
           <p class="error-message" id="eduCheckError">「内容を確認しました」にチェックを入れてください。</p>
-          <div id="testArea" style="display:none;">
+          
+          <!-- 👉 ĐỔI ID THÀNH taskTestArea ĐỂ KHÔNG BỊ ĐÁ NHAU -->
+          <div id="taskTestArea" style="display:none;">
             <h4 style="font-size:14px; color:var(--primary); margin: 20px 0 10px;">【理解度テスト】正しい方にチェック</h4>
-            ${renderTestQuestions()}
+            ${renderTestQuestions('task_q')}
           </div>
         `;
         actions.innerHTML = `<button class="btn btn-primary" onclick="submitEdu()">完了する</button>`;
@@ -1407,6 +1410,12 @@
 
     function toggleEduTest(cb) { toggleAgreeStyle(cb); document.getElementById('testArea').style.display = cb.checked ? 'block' : 'none'; }
 
+    function toggleTaskEduTest(cb) { 
+      toggleAgreeStyle(cb); 
+      const area = document.getElementById('taskTestArea');
+      if (area) area.style.display = cb.checked ? 'block' : 'none'; 
+    }
+    
     function toggleCheckboxFromBox(checkId) {
       const cb = document.getElementById(checkId);
       if(cb && !cb.disabled) {
@@ -1646,43 +1655,55 @@
     function submitEdu() {
       const checkInput = document.getElementById('taskCheck');
       const errorMsg = document.getElementById('eduCheckError');
-      errorMsg.style.display = 'none';
-      if(!checkInput.checked) {
-        errorMsg.style.display = 'block';
-        document.getElementById('checkGroup').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (errorMsg) errorMsg.style.display = 'none';
+      
+      if(!checkInput || !checkInput.checked) {
+        if (errorMsg) errorMsg.style.display = 'block';
+        const grp = document.getElementById('checkGroup');
+        if (grp) grp.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
+      
       let results = [];
       let firstMissingQ = null;
+      
+      // Tìm đúng cái bảng thi của MyPage
+      const testContainer = document.getElementById('taskTestArea') || document.getElementById('testArea');
+      const qBoxes = testContainer.querySelectorAll('.test-q-box');
+      
       for (let i = 0; i < 10; i++) {
-        const qBox = document.querySelectorAll('#testArea .test-q-box')[i];
-        const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
-        qBox.classList.remove('error');
+        const qBox = qBoxes[i];
+        // Quét đáp án
+        const selectedOption = testContainer.querySelector(`input[name="task_q${i}"]:checked`) || testContainer.querySelector(`input[name="q${i}"]:checked`);
+        if (qBox) qBox.classList.remove('error');
+        
         if (!selectedOption) {
-          qBox.classList.add('error');
-          if (!firstMissingQ) firstMissingQ = qBox;
+          if (qBox) { 
+            qBox.classList.add('error'); 
+            if (!firstMissingQ) firstMissingQ = qBox; 
+          }
         } else {
           results.push(`Q${i+1}:${selectedOption.value}`);
         }
       }
+      
       if (firstMissingQ) {
         firstMissingQ.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
+      
       const resultString = results.join(', ');
       setLoading(true, "送信中...", "テスト結果を判定しています");
+      
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
         if (res.success) {
             currentUser.statusEdu = res.newVal;
             if (res.user) currentUser = res.user;
             else if (res.progress) currentUser.progress = res.progress;
-            if (currentUser.progress && currentUser.progress.includes("完了")) {
-                document.getElementById('finalSuccessPopup').style.display = 'flex';
-            } else {
-                showCustomAlert("テスト結果を送信しました。");
-                routeUser(); 
-            }
+            
+            showCustomAlert("テスト結果を送信しました。");
+            routeUser(); 
         } else {
             showCustomAlert("エラーが発生しました。", true);
         }
