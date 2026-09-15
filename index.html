@@ -1149,7 +1149,8 @@
       const isFullyOnboarded = currentUser.progress && currentUser.progress.indexOf("完了") > -1;
       const btnBack = document.getElementById('mpBtnBack');
       if (btnBack) {
-          btnBack.style.display = isFullyOnboarded ? 'flex' : 'none';
+          // Luôn luôn hiện nút Back cho bọn 本登録 (Bất kể nợ giấy tờ hay không)
+          btnBack.style.display = 'flex';
       }
 
       let fuyoStatus = currentUser.statusFuyo || "";
