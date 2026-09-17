@@ -1415,31 +1415,56 @@
         `;
         actions.innerHTML = `<button class="btn btn-primary" onclick="submitMyNumber()">送信する</button>`;
       }
-      // NHÁNH 4: UPLOAD ẢNH CƠ BẢN (ID, Bank, Resume)
-      else {
-        // 👉 ĐÃ FIX CHUẨN XÁC: Phân định tiêu đề cho cả 3 loại
-        let docTitle = '銀行口座情報';
-        if (id === 'id') docTitle = '身分証 / 在留カード';
-        else if (id === 'resume') docTitle = '履歴書・職務経歴書';
+      // NHÁNH 4: NỘP HỒ SƠ KHÔNG GIỚI HẠN FILE (DÀNH CHO CV)
+      else if (id === 'resume') {
+        title.innerText = '履歴書・職務経歴書';
         
+        let html = historyHtml + `
+          <p style="font-size:13px; color:#5f6368; margin-bottom:15px; line-height: 1.5;">
+            お手持ちの履歴書・職務経歴書の画像またはPDFファイルをアップロードしてください。（複数枚ある場合は「＋ファイルを追加」を押してください）
+          </p>
+          
+          <div id="cvUploadZone">
+            <!-- Box Upload 1 (Mặc định) -->
+            <div class="upload-box dynamic-cv-upload" id="cvBox_1">
+              <label>1枚目のファイル <span class="error-message" id="cvFileError_1" style="display:none;">（ファイルを選択してください）</span></label>
+              <div class="file-input-wrapper">
+                <input type="file" id="cvFile_1" accept="image/*,.pdf,.doc,.docx" onchange="previewCVImg(this, 1)">
+              </div>
+              <div class="preview-container" id="cvPreviewContainer_1">
+                <button type="button" class="btn-remove-img" onclick="clearCVImg(1)">✕</button>
+                <img id="cvPreview_1" class="preview-img">
+                <p id="cvPdf_1" class="pdf-label"></p>
+              </div>
+            </div>
+          </div>
+
+          <div style="text-align:center; margin-bottom: 25px;">
+            <button type="button" class="btn btn-outline" style="width:auto; display:inline-block; padding:10px 20px; font-size:14px; margin:0;" onclick="addCVUploadBox()">
+              ＋ ファイルを追加する
+            </button>
+          </div>
+        `;
+        content.innerHTML = html;
+        actions.innerHTML = `<button class="btn btn-primary" onclick="submitCVDocuments()">提出する</button>`;
+      }
+      // NHÁNH 5: UPLOAD ẢNH CƠ BẢN (CHỈ CÓ ID VÀ BANK - Gắn cứng 1 hoặc 2 file)
+      else {
+        let docTitle = (id === 'id') ? '身分証 / 在留カード' : '銀行口座情報';
         title.innerText = docTitle;
         
         let html = historyHtml + `
           <div class="upload-box" id="box_f1">
-            <label>1枚目のファイル <span class="error-message" id="error_f1" style="display:none; color:var(--error);">(選択してください)</span></label>
+            <label>1枚目の画像 <span class="error-message" id="error_f1" style="display:none; color:var(--error);">(画像を選択してください)</span></label>
             <div class="file-input-wrapper"><input type="file" accept="image/jpeg, image/png, image/heic, application/pdf" onchange="previewImg(this, 'p1')"></div>
             <div class="preview-container" id="p1-c"><img id="p1" class="preview-img"></div>
           </div>
         `;
         
-        // Thẻ ID thì luôn bắt buộc có khung up mặt sau. CV (resume) cũng cho 2 khung lỡ họ có Rirekisho + Shokumukeirekisho
-        if(id === 'id' || id === 'resume') {
-          let label2 = (id === 'id') ? '2枚目の画像 (裏面等)' : '2枚目のファイル (職務経歴書等・任意)';
-          let reqSpan = (id === 'id') ? `<span class="error-message" id="error_f2" style="display:none; color:var(--error);">(裏面も必須です)</span>` : '';
-          
+        if(id === 'id') {
           html += `
             <div class="upload-box" id="box_f2">
-              <label>${label2} ${reqSpan}</label>
+              <label>2枚目の画像 (裏面等) <span class="error-message" id="error_f2" style="display:none; color:var(--error);">(裏面も必須です)</span></label>
               <div class="file-input-wrapper"><input type="file" accept="image/jpeg, image/png, image/heic, application/pdf" onchange="previewImg(this, 'p2')"></div>
               <div class="preview-container" id="p2-c"><img id="p2" class="preview-img"></div>
             </div>
@@ -3747,6 +3772,145 @@
         }
     }
 
+    // =========================================================
+    // LOGIC DÀNH RIÊNG CHO MỤC NỘP CV (RESUME) Ở MYPAGE
+    // =========================================================
+    let cvBoxCount = 1;
+
+    function addCVUploadBox() {
+      cvBoxCount++;
+      const boxId = cvBoxCount;
+      const html = `
+        <div class="upload-box dynamic-cv-upload" id="cvBox_${boxId}">
+          <button type="button" class="btn-remove-img" onclick="document.getElementById('cvBox_${boxId}').remove()" style="top:-15px; right:-15px;">✕</button>
+          <label>${boxId}枚目のファイル <span class="error-message" id="cvFileError_${boxId}" style="display:none;">（ファイルを選択してください）</span></label>
+          <div class="file-input-wrapper">
+            <input type="file" id="cvFile_${boxId}" accept="image/*,.pdf,.doc,.docx" onchange="previewCVImg(this, ${boxId})">
+          </div>
+          <div class="preview-container" id="cvPreviewContainer_${boxId}">
+            <button type="button" class="btn-remove-img" onclick="clearCVImg(${boxId})">✕</button>
+            <img id="cvPreview_${boxId}" class="preview-img">
+            <p id="cvPdf_${boxId}" class="pdf-label"></p>
+          </div>
+        </div>
+      `;
+      document.getElementById('cvUploadZone').insertAdjacentHTML('beforeend', html);
+    }
+
+    function previewCVImg(input, id) {
+        const f = input.files[0];
+        const container = document.getElementById(`cvPreviewContainer_${id}`);
+        const imgEl = document.getElementById(`cvPreview_${id}`);
+        const pdfText = document.getElementById(`cvPdf_${id}`);
+        if(f) {
+            container.style.display = 'block';
+            if (f.type.startsWith('image/')) {
+                const r = new FileReader();
+                r.onload = e => { imgEl.src = e.target.result; imgEl.style.display = 'block'; pdfText.style.display = 'none'; };
+                r.readAsDataURL(f);
+            } else {
+                imgEl.style.display = 'none';
+                pdfText.innerText = "📄 " + f.name;
+                pdfText.style.display = 'block';
+            }
+        }
+    }
+
+    function clearCVImg(id) {
+      document.getElementById(`cvFile_${id}`).value = '';
+      document.getElementById(`cvPreviewContainer_${id}`).style.display = 'none';
+    }
+
+    async function submitCVDocuments() {
+        const boxes = document.querySelectorAll('.dynamic-cv-upload');
+        let hasError = false;
+        let filesPayload = [];
+        let fileIndex = 1; // Để đếm số _1, _2 lúc gửi lên Google
+
+        boxes.forEach(box => {
+            const idMatch = box.id.match(/\d+/);
+            if (!idMatch) return;
+            const id = idMatch[0];
+            const fileInput = document.getElementById(`cvFile_${id}`);
+            const fileError = document.getElementById(`cvFileError_${id}`);
+            
+            box.classList.remove('input-error'); fileError.style.display = 'none';
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                // Nếu là box đầu tiên mà không có file thì báo lỗi, box phụ thì bỏ qua
+                if (id === "1") {
+                    box.classList.add('input-error'); fileError.style.display = 'block'; hasError = true;
+                }
+                return; 
+            }
+            
+            // Ép tên thành f1, f2, f3... để Backend Google hiểu
+            filesPayload[`f${fileIndex}`] = {
+                file: fileInput.files[0],
+                label: `f${fileIndex}`
+            };
+            fileIndex++;
+        });
+
+        if (hasError) return;
+        
+        // Nếu không có file nào (Object rỗng)
+        if (Object.keys(filesPayload).length === 0) {
+            showCustomAlert("⚠️ 提出するファイルがありません。", true);
+            return;
+        }
+
+        setLoading(true, "アップロード中...", "画像を圧縮・送信しています");
+        const oldProgress = currentUser.progress || ""; 
+        
+        try {
+            // Nén ảnh / Đọc Base64 cho tất cả file
+            let finalFiles = {};
+            for (const key in filesPayload) {
+                const fInfo = filesPayload[key];
+                const isImage = fInfo.file.type.startsWith("image/");
+                let base64Data = "";
+                if (isImage) {
+                    base64Data = await processImg(fInfo.file, false); // Nén ảnh nhưng KHÔNG gắn Watermark (CV thì ko cần mộc chéo)
+                } else {
+                    base64Data = await new Promise(resolve => {
+                        const reader = new FileReader();
+                        reader.onload = e => resolve(e.target.result);
+                        reader.readAsDataURL(fInfo.file);
+                    });
+                }
+                finalFiles[key] = { data: base64Data, label: fInfo.label };
+            }
+
+            // Gọi Backend GAS (Tái sử dụng hàm uploadFiles gốc của hệ thống)
+            google.script.run.withSuccessHandler(res => {
+                setLoading(false);
+                if (res && res.success) {
+                    currentUser.statusResume = res.newVal;
+                    if (res.user) currentUser = res.user; 
+                    else if (res.progress) currentUser.progress = res.progress;
+                    
+                    const isNewlyCompleted = !oldProgress.includes("完了") && currentUser.progress.includes("完了");
+                    if (isNewlyCompleted) {
+                        document.getElementById('finalSuccessPopup').style.display = 'flex'; 
+                    } else {
+                        showCustomAlert("履歴書を提出しました。"); 
+                        routeUser(); 
+                    }
+                } else {
+                    showCustomAlert("⚠️ エラー: " + (res.message || res.error), true);
+                }
+            }).withFailureHandler(err => {
+                setLoading(false);
+                showCustomAlert("通信エラー: 接続を確認して再試行してください。", true);
+            }).uploadFiles(currentUser.id, finalFiles, 'resume', '履歴書');
+
+        } catch (e) {
+            setLoading(false);
+            showCustomAlert("ファイル処理エラー: " + e.message, true);
+        }
+    }
+    
     // ==========================================
     // AUTO-SAVE DRAFT LOGIC (KARI FORM)
     // ==========================================
