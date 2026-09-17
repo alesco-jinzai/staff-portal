@@ -1156,7 +1156,11 @@
       })
       .catch(err => {
         setLoading(false);
-        errorEl.innerText = "通信エラーが発生しました。ネットワークを確認してください。";
+        
+        // 👉 ÉP NÓ PHẢI HIỆN LỖI LÊN CONSOLE VÀ LÊN MÀN HÌNH LUÔN!
+        console.error("LỖI BẮT ĐƯỢC TẠI CATCH:", err);
+        errorEl.innerText = "通信エラー: " + err.message; 
+        
         errorEl.style.display = 'block';
       });
     }
