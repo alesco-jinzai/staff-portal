@@ -390,10 +390,12 @@
   <div id="finalSuccessPopup" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 999999; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
     <div style="background: var(--md-surface); padding: 30px 20px; border-radius: var(--shape-large); width: 85%; max-width: 400px; text-align: center; box-shadow: var(--elevation-2); transform: translateY(0); animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
       <div style="font-size: 60px; margin-bottom: 10px;">🎉</div>
-      <h2 style="color: var(--md-success); margin: 0 0 10px 0; font-size: 20px;">登録が完了しました！</h2>
-      <p style="font-size: 14px; color: var(--md-on-surface-variant); margin-bottom: 24px; line-height: 1.5;">すべての書類提出・入社手続きが完了しました。<br>これより「出退勤」機能が利用可能になります。</p>
-      <button class="btn btn-primary" style="height: 56px; font-size: 16px; margin: 0;" onclick="finalizeAndMoveToAttendance()">
-        出勤画面へ進む
+      <h2 style="color: var(--md-success); margin: 0 0 10px 0; font-size: 20px;">すべての提出が完了しました！</h2>
+      <p style="font-size: 14px; color: var(--md-on-surface-variant); margin-bottom: 24px; line-height: 1.5;">入社に必要な書類の提出がすべて完了しました。<br>ご協力ありがとうございました。</p>
+      
+      <!-- 👉 ĐÃ SỬA: Đổi nút thành "Đóng", tắt popup và ở lại trang MyPage -->
+      <button class="btn btn-primary" style="height: 56px; font-size: 16px; margin: 0;" onclick="closeFinalPopup()">
+        確認
       </button>
     </div>
   </div>
@@ -3562,7 +3564,7 @@
           currentUser = res.user;
           renderAttendanceView();
           showView('viewAttendance');
-          showCustomAlert("ログインしました。");
+          showCustomAlert("すべての書類提出が完了しました！");
         } else {
           showCustomAlert("データの取得に失敗しました。もう一度お試しください。", true);
           showView('viewAuth');
