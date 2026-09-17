@@ -2423,11 +2423,28 @@
     }
 
     function clearFirstBoxImg() {
-      const input = document.getElementById('kari_f1');
-      if(input) input.value = '';
-      document.getElementById('kari_p1-c').style.display = 'none';
-      document.getElementById('kari_p1').src = '';
-      document.getElementById('kari_pdf1').innerText = '';
+      // Dọn khung 1 (CV)
+      const inputRes = document.getElementById('kari_f1'); // Dùng class để tìm thay vì id cứng
+      if(inputRes) inputRes.value = '';
+      const cRes = document.getElementById('p_res_1-c');
+      if(cRes) cRes.style.display = 'none';
+      const imgRes = document.getElementById('p_res_1-img');
+      if(imgRes) imgRes.src = '';
+      const pdfRes = document.getElementById('p_res_1-pdf');
+      if(pdfRes) pdfRes.innerText = '';
+
+      // Dọn khung 2 (Bằng cấp)
+      const inputCert = document.getElementById('box_Cert_1'); // ô mặc định đầu tiên
+      if(inputCert) {
+        let fCert = inputCert.querySelector('input[type="file"]');
+        if(fCert) fCert.value = '';
+      }
+      const cCert = document.getElementById('p_cert_1-c');
+      if(cCert) cCert.style.display = 'none';
+      const imgCert = document.getElementById('p_cert_1-img');
+      if(imgCert) imgCert.src = '';
+      const pdfCert = document.getElementById('p_cert_1-pdf');
+      if(pdfCert) pdfCert.innerText = '';
     }
 
     let pendingKariData = null;
