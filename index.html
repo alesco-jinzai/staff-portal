@@ -1123,6 +1123,9 @@
             localStorage.removeItem('alescoUserObj');
         }
         if (res.route === "step1") {
+          // 👉 THÊM DÒNG NÀY ĐỂ XÓA TÀN DƯ CỦA NGƯỜI CŨ:
+          localStorage.removeItem('alescoKariDraft');
+          
           resetKariForm();
           let cleanPhoneForDetect = phoneInput.value.replace(/\D/g, "");
           if (cleanPhoneForDetect.startsWith("090") || cleanPhoneForDetect.startsWith("080") || cleanPhoneForDetect.startsWith("070")) {
@@ -1132,7 +1135,7 @@
             showLandlineField(); 
           }
           document.getElementById('kariDob').value = dobInput.value;
-          loadKariDraft(); 
+          // loadKariDraft(); // 👉 TẠM THỜI COMMENT HOẶC XÓA DÒNG NÀY ĐI
           showView('viewKari');
           showCustomAlert("初めての登録ですね。\nプロフィールを入力してください。", "info");
         } else if (res.route === "step2") {
