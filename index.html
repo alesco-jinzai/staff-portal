@@ -1201,9 +1201,13 @@
          `;
       }
 
+// (Tìm cái dòng isForeigner này làm mốc)
       const isForeigner = (currentUser.nationality !== '日本');
-      const idTitle = isForeigner ? '在留カード' : '本人確認書類';
+      const idTitle = isForeigner ? '在留カード' : '身分証 / 在留カード';
       
+      // 👉 THÊM BIẾN NÀY ĐỂ CHECK XEM CÓ NỢ RIREKISHO KHÔNG
+      const resumeStatus = currentUser.statusResume || ""; 
+
       const allTasksList = [
         // 1. マイナンバー提供
         { id: 'mynumber',  title: 'マイナンバー提供', status: currentUser.statusMyNumber, desc: "マイナンバーカード、通知カード等" },
@@ -1222,7 +1226,14 @@
         });
       }
 
-      // 5. 追加書類 (Đã đưa lên giữa theo đúng thứ tự ông yêu cầu)
+      // 👉 BỔ SUNG: 履歴書・職務経歴書 (NẾU CÒN NỢ THÌ HIỆN LÊN ĐẦU)
+      if (resumeStatus.indexOf("提出済") === -1 && resumeStatus.indexOf("不要") === -1) {
+        allTasksList.push({ 
+          id: 'resume', title: '履歴書・職務経歴書', status: resumeStatus, desc: "画像またはPDFファイル" 
+        });
+      }
+
+      // 5. 追加書類
       allTasksList.push({ 
         id: 'misc', title: 'その他の書類 (追加書類)', status: '', desc: "学生証・診断書・資格証・領収書など" 
       });
@@ -1289,11 +1300,16 @@
       const content = document.getElementById('taskDetailContent');
       const actions = document.getElementById('taskDetailActions');
       content.innerHTML = ''; actions.innerHTML = '';
+      
       let historyHtml = '';
       let currentStatus = '';
+      
+      // Lấy lịch sử nộp để hiện ra
       if(id === 'id') currentStatus = currentUser.statusID;
       if(id === 'bank') currentStatus = currentUser.statusBank;
       if(id === 'mynumber') currentStatus = currentUser.statusMyNumber;
+      if(id === 'resume') currentStatus = currentUser.statusResume; // 👉 THÊM CV VÀO ĐÂY
+      
       if (currentStatus && currentStatus.includes('提出済')) {
         const lines = currentStatus.split('\n');
         let logItems = '';
@@ -1314,6 +1330,8 @@
           </div>
         `;
       }
+
+      // NHÁNH 1: CÁC LOẠI HỢP ĐỒNG KÝ TÊN
       if (id === 'agreement' || id === 'nda' || id === 'consent') {
         let docTitle = '告知書兼同意書';
         if (id === 'agreement') docTitle = '承諾書';
@@ -1338,6 +1356,7 @@
         actions.innerHTML = `<button class="btn btn-primary" onclick="submitSignature('${id}')">送信する</button>`;
         setTimeout(() => checkInitialVisibility('docBox', 'taskCheck', 'hintText'), 300);
       } 
+      // NHÁNH 2: BÀI THI P-MARK
       else if (id === 'edu') {
         title.innerText = '個人情報保護教育';
         content.innerHTML = `
@@ -1346,13 +1365,11 @@
             <p class="scroll-hint" id="hintText">※一番下までスクロールしてください</p>
           </div>
           <div class="checkbox-item" id="checkGroup" onclick="toggleCheckboxFromBox('taskCheck')">
-            <!-- 👉 ĐỔI HÀM ONCHANGE THÀNH toggleTaskEduTest -->
             <input type="checkbox" id="taskCheck" disabled onchange="toggleTaskEduTest(this)"> 
             <label for="taskCheck">内容を確認しました</label>
           </div>
           <p class="error-message" id="eduCheckError">「内容を確認しました」にチェックを入れてください。</p>
           
-          <!-- 👉 ĐỔI ID THÀNH taskTestArea ĐỂ KHÔNG BỊ ĐÁ NHAU -->
           <div id="taskTestArea" style="display:none;">
             <h4 style="font-size:14px; color:var(--primary); margin: 20px 0 10px;">【理解度テスト】正しい方にチェック</h4>
             ${renderTestQuestions('task_q')}
@@ -1361,6 +1378,7 @@
         actions.innerHTML = `<button class="btn btn-primary" onclick="submitEdu()">完了する</button>`;
         setTimeout(() => checkInitialVisibility('docBox', 'taskCheck', 'hintText'), 300);
       }
+      // NHÁNH 3: MY NUMBER (NHIỀU LỰA CHỌN)
       else if (id === 'mynumber') {
         title.innerText = 'マイナンバー提供';
         const isForeigner = (currentUser.nationality !== '日本');
@@ -1397,19 +1415,31 @@
         `;
         actions.innerHTML = `<button class="btn btn-primary" onclick="submitMyNumber()">送信する</button>`;
       }
+      // NHÁNH 4: UPLOAD ẢNH CƠ BẢN (ID, Bank, Resume)
       else {
-        title.innerText = (id==='id' ? '本人確認書類' : '銀行口座情報');
+        // 👉 ĐÃ FIX CHUẨN XÁC: Phân định tiêu đề cho cả 3 loại
+        let docTitle = '銀行口座情報';
+        if (id === 'id') docTitle = '身分証 / 在留カード';
+        else if (id === 'resume') docTitle = '履歴書・職務経歴書';
+        
+        title.innerText = docTitle;
+        
         let html = historyHtml + `
           <div class="upload-box" id="box_f1">
-            <label>1枚目の画像 <span class="error-message" id="error_f1" style="display:none; color:var(--error);">(画像を選択してください)</span></label>
+            <label>1枚目のファイル <span class="error-message" id="error_f1" style="display:none; color:var(--error);">(選択してください)</span></label>
             <div class="file-input-wrapper"><input type="file" accept="image/jpeg, image/png, image/heic, application/pdf" onchange="previewImg(this, 'p1')"></div>
             <div class="preview-container" id="p1-c"><img id="p1" class="preview-img"></div>
           </div>
         `;
-        if(id==='id') {
+        
+        // Thẻ ID thì luôn bắt buộc có khung up mặt sau. CV (resume) cũng cho 2 khung lỡ họ có Rirekisho + Shokumukeirekisho
+        if(id === 'id' || id === 'resume') {
+          let label2 = (id === 'id') ? '2枚目の画像 (裏面等)' : '2枚目のファイル (職務経歴書等・任意)';
+          let reqSpan = (id === 'id') ? `<span class="error-message" id="error_f2" style="display:none; color:var(--error);">(裏面も必須です)</span>` : '';
+          
           html += `
             <div class="upload-box" id="box_f2">
-              <label>2枚目の画像 (裏面等) <span class="error-message" id="error_f2" style="display:none; color:var(--error);">(裏面も必須です)</span></label>
+              <label>${label2} ${reqSpan}</label>
               <div class="file-input-wrapper"><input type="file" accept="image/jpeg, image/png, image/heic, application/pdf" onchange="previewImg(this, 'p2')"></div>
               <div class="preview-container" id="p2-c"><img id="p2" class="preview-img"></div>
             </div>
@@ -1552,6 +1582,7 @@
       if (!docTypeLabel) {
         if (id === 'bank') docTypeLabel = "口座情報";
         if (id === 'id') docTypeLabel = (currentUser.nationality === "外国籍") ? "在留カード" : "身分証明書";
+        if (id === 'resume') docTypeLabel = "履歴書";
       }
       setLoading(true, "アップロード中...", "画像を圧縮・送信しています");
       const oldProgress = currentUser.progress || ""; 
