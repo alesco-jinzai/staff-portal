@@ -537,31 +537,54 @@
         <div id="kariStep4" style="display:none;">
           <h3>4. 履歴書・資格証明書のアップロード</h3>
           <p style="font-size:13px; color:#5f6368; margin-bottom:15px; line-height: 1.5;">
-            履歴書・職務経歴書、または<b>お仕事に関連する資格証明書（語学検定の認定書など）</b>の画像またはPDFファイルをご提出ください。
-            <br>
-            <span style="color:var(--md-error); font-weight:bold; font-size: 11px;">※ 履歴書・職務経歴書はアップロード必須です。</span>
+            書類がある場合は、画像またはPDFファイルを添付してください。<br>
+            <span style="color:var(--md-primary); font-weight:bold; font-size: 11px;">※ 書類の提出は任意です。お手元にない場合はそのまま次へお進みください。</span>
           </p>
-          <p style="font-size:11px; color:var(--md-error); margin-bottom:15px; line-height:1.4;">
-            ※ ファイルの容量が大きい場合（PDF等）、アップロードに時間がかかることがあります。画面を閉じずにお待ちください。
-          </p>
-          <div id="kariUploadZone">
-            <div class="upload-box dynamic-upload" id="kariBox_1">
-              <label>履歴書 <span class="error-message" id="kariError_1" style="display:none;">（ファイルを選択してください）</span></label>
-              <div class="file-input-wrapper">
-                <input type="file" id="kari_f1" accept="image/*,.pdf,.doc,.docx" onchange="previewDynamicImg(this, 'kari_p1', 1)">
-              </div>
-              <div class="preview-container" id="kari_p1-c">
-                <button type="button" class="btn-remove-img" onclick="clearFirstBoxImg()">✕</button>
-                <img id="kari_p1" class="preview-img">
-                <p id="kari_pdf1" class="pdf-label"></p>
+
+          <!-- 👉 KHUNG 1: 履歴書・職務経歴書 (TỰ NGUYỆN) -->
+          <div style="background:var(--md-surface-container); border:1px solid var(--md-outline-variant); border-radius:12px; padding:15px; margin-bottom:20px;">
+            <strong style="color:var(--md-primary); font-size:14px; display:block; margin-bottom:10px;">📄 履歴書・職務経歴書 (任意)</strong>
+            <div id="kariUploadZoneResume">
+              <div class="upload-box dynamic-upload" id="box_Resume_1">
+                <div class="file-input-wrapper">
+                  <input type="file" class="file-resume" accept="image/*,.pdf,.doc,.docx" onchange="previewKariFile(this, 'p_res_1')">
+                </div>
+                <div class="preview-container" id="p_res_1-c">
+                  <button type="button" class="btn-remove-img" onclick="clearKariBox('p_res_1', this)">✕</button>
+                  <img id="p_res_1-img" class="preview-img">
+                  <p id="p_res_1-pdf" class="pdf-label"></p>
+                </div>
               </div>
             </div>
+            <div style="text-align:center; margin-top:10px;">
+              <button type="button" class="btn btn-outline" style="width:auto; height:36px; padding:0 15px; font-size:12px; margin:0;" onclick="addKariUploadBox('Resume')">
+                ＋ 履歴書・職務経歴書を追加する
+              </button>
+            </div>
           </div>
-          <div style="text-align:center; margin-bottom: 25px;">
-            <button type="button" class="btn btn-outline" style="width:auto; display:inline-block; padding:10px 20px; font-size:14px; margin:0;" onclick="addUploadBox()">
-              ＋ 職務経歴書・資格証明書を追加する
-            </button>
+
+          <!-- 👉 KHUNG 2: 資格証明書 (TỰ NGUYỆN -> LƯU VÀO MISC_DOCS) -->
+          <div style="background:var(--md-surface-container); border:1px solid var(--md-outline-variant); border-radius:12px; padding:15px; margin-bottom:20px;">
+            <strong style="color:var(--md-primary); font-size:14px; display:block; margin-bottom:10px;">🎓 資格証明書（語学検定・免許等）(任意)</strong>
+            <div id="kariUploadZoneCert">
+              <div class="upload-box dynamic-upload" id="box_Cert_1">
+                <div class="file-input-wrapper">
+                  <input type="file" class="file-cert" accept="image/*,.pdf,.doc,.docx" onchange="previewKariFile(this, 'p_cert_1')">
+                </div>
+                <div class="preview-container" id="p_cert_1-c">
+                  <button type="button" class="btn-remove-img" onclick="clearKariBox('p_cert_1', this)">✕</button>
+                  <img id="p_cert_1-img" class="preview-img">
+                  <p id="p_cert_1-pdf" class="pdf-label"></p>
+                </div>
+              </div>
+            </div>
+            <div style="text-align:center; margin-top:10px;">
+              <button type="button" class="btn btn-outline" style="width:auto; height:36px; padding:0 15px; font-size:12px; margin:0;" onclick="addKariUploadBox('Cert')">
+                ＋ 資格証明書を追加する
+              </button>
+            </div>
           </div>
+
           <div class="btn-group">
               <button class="btn btn-primary" onclick="prepareKariConfirm()">入力内容を確認する</button>
               <button class="btn btn-gray" onclick="nextKariStep(3)">戻る</button>
@@ -2185,48 +2208,50 @@
 
     let uploadBoxCount = 1; 
 
-    function addUploadBox() {
-      uploadBoxCount++;
-      const boxId = uploadBoxCount;
+    let boxCounter = { Resume: 1, Cert: 1 };
+
+    function addKariUploadBox(type) {
+      boxCounter[type]++;
+      const id = boxCounter[type];
       const html = `
-        <div class="upload-box dynamic-upload" id="kariBox_${boxId}">
-          <button type="button" class="btn-remove-img" onclick="removeUploadBox(${boxId})">✕</button>
-          <label>追加ファイル ${boxId} <span style="font-size:12px; color:#5f6368; font-weight:normal;">(職務経歴書・資格証等)</span></label>
+        <div class="upload-box dynamic-upload" id="box_${type}_${id}">
+          <button type="button" class="btn-remove-img" onclick="document.getElementById('box_${type}_${id}').remove()">✕</button>
           <div class="file-input-wrapper">
-            <input type="file" id="kari_f${boxId}" accept="image/*,.pdf,.doc,.docx" onchange="previewDynamicImg(this, 'kari_p${boxId}', ${boxId})">
+            <input type="file" class="file-${type.toLowerCase()}" accept="image/*,.pdf,.doc,.docx" onchange="previewKariFile(this, 'p_${type.toLowerCase()}_${id}')">
           </div>
-          <div class="preview-container" id="kari_p${boxId}-c">
-            <img id="kari_p${boxId}" class="preview-img">
-            <p id="kari_pdf${boxId}" class="pdf-label"></p>
+          <div class="preview-container" id="p_${type.toLowerCase()}_${id}-c">
+            <img id="p_${type.toLowerCase()}_${id}-img" class="preview-img">
+            <p id="p_${type.toLowerCase()}_${id}-pdf" class="pdf-label"></p>
           </div>
         </div>
       `;
-      document.getElementById('kariUploadZone').insertAdjacentHTML('beforeend', html);
+      document.getElementById(`kariUploadZone${type}`).insertAdjacentHTML('beforeend', html);
     }
 
-    function removeUploadBox(boxId) {
-      const box = document.getElementById(`kariBox_${boxId}`);
-      if (box) box.remove();
-    }
-
-    function previewDynamicImg(input, imgId, boxId) {
+    function previewKariFile(input, prefix) {
       const f = input.files[0];
-      const container = document.getElementById(`${imgId}-c`);
-      const imgEl = document.getElementById(imgId);
-      const pdfText = document.getElementById(`kari_pdf${boxId}`);
-      if(f) {
-        container.style.display = 'block';
-        if (f.type.startsWith('image/')) {
-          const r = new FileReader();
-          r.onload = e => { imgEl.src = e.target.result; imgEl.style.display = 'block'; pdfText.style.display = 'none'; };
-          r.readAsDataURL(f);
-        } 
-        else {
-          imgEl.style.display = 'none';
-          pdfText.innerText = "📄 " + f.name;
-          pdfText.style.display = 'block';
-        }
+      if (!f) return;
+      const container = document.getElementById(`${prefix}-c`);
+      const imgEl = document.getElementById(`${prefix}-img`);
+      const pdfEl = document.getElementById(`${prefix}-pdf`);
+      
+      container.style.display = 'block';
+      if (f.type.startsWith('image/')) {
+        const r = new FileReader();
+        r.onload = e => { imgEl.src = e.target.result; imgEl.style.display = 'block'; pdfEl.style.display = 'none'; };
+        r.readAsDataURL(f);
+      } else {
+        imgEl.style.display = 'none';
+        pdfEl.innerText = "📄 " + f.name;
+        pdfEl.style.display = 'block';
       }
+    }
+
+    function clearKariBox(prefix, btnEl) {
+      const box = btnEl.closest('.upload-box');
+      const input = box.querySelector('input[type="file"]');
+      if (input) input.value = '';
+      document.getElementById(`${prefix}-c`).style.display = 'none';
     }
 
     function removeDynamicImg(boxId) {
@@ -2237,16 +2262,8 @@
 
     function prepareKariConfirm() {
       try {
-        const box1 = document.getElementById('kariBox_1');
-        const error1 = document.getElementById('kariError_1');
-        const firstInput = document.getElementById('kari_f1');
-        if (box1) box1.classList.remove('input-error');
-        if (error1) error1.style.display = 'none';
-        if (!firstInput || !firstInput.files || firstInput.files.length === 0) {
-          if (box1) box1.classList.add('input-error');
-          if (error1) error1.style.display = 'inline';
-          return;
-        }
+        // 👉 ĐÃ XÓA BỎ LỆNH BẮT LỖI THIẾU FILE Ở ĐÂY (CHO QUA TỰ DO)
+
         const nameKanji = document.getElementById('kariLastName').value + " " + document.getElementById('kariFirstName').value;
         const nameKana = document.getElementById('kariLastKana').value + " " + document.getElementById('kariFirstKana').value;
         const dob = document.getElementById('kariDob').value;
@@ -2260,9 +2277,15 @@
         const addr1 = document.getElementById('kariAddr1').value;
         const addr2 = document.getElementById('kariAddr2').value;
         const addr3 = document.getElementById('kariAddr3').value;
-        const allInputs = document.querySelectorAll('#kariUploadZone input[type="file"]');
-        let fileCount = 0;
-        for (let input of allInputs) { if (input.files && input.files.length > 0) fileCount++; }
+
+        // Đếm số lượng file của từng khung
+        let resumeCount = 0, certCount = 0;
+        document.querySelectorAll('#kariUploadZoneResume input[type="file"]').forEach(i => { if(i.files[0]) resumeCount++; });
+        document.querySelectorAll('#kariUploadZoneCert input[type="file"]').forEach(i => { if(i.files[0]) certCount++; });
+
+        let resumeText = resumeCount > 0 ? `${resumeCount} 件 添付済` : '<span style="color:#d32f2f;">未提出 (後から提出可能)</span>';
+        let certText = certCount > 0 ? `${certCount} 件 添付済` : 'なし';
+
         const confirmHtml = `
           <div class="confirm-box">
             <div class="confirm-row"><span class="confirm-label">氏名</span><span class="confirm-val">${nameKanji}（${nameKana}）</span></div>
@@ -2272,18 +2295,18 @@
             <div class="confirm-row"><span class="confirm-label">電話番号</span><span class="confirm-val">${phone}</span></div>
             <div class="confirm-row"><span class="confirm-label">メールアドレス</span><span class="confirm-val">${email}</span></div>
             <div class="confirm-row"><span class="confirm-label">現住所</span><span class="confirm-val">〒${zip}<br>${addr1}${addr2}<br>${addr3}</span></div>
-            <div class="confirm-row"><span class="confirm-label">添付ファイル</span><span class="confirm-val">履歴書等（計 ${fileCount} 件）</span></div>
+            <div class="confirm-row"><span class="confirm-label">履歴書・職務経歴書</span><span class="confirm-val">${resumeText}</span></div>
+            <div class="confirm-row"><span class="confirm-label">資格証明書</span><span class="confirm-val">${certText}</span></div>
           </div>
         `;
         document.getElementById('kariConfirmDataBox').innerHTML = confirmHtml;
+        
         for(let i=1; i<=5; i++) {
           const el = document.getElementById('kariStep' + i);
           if(el) el.style.display = (i === 5) ? 'block' : 'none';
         }
         window.scrollTo(0,0);
-      } catch(e) {
-        console.error("Lỗi tại prepareKariConfirm:", e);
-      }
+      } catch(e) { console.error("Lỗi tại prepareKariConfirm:", e); }
     }
 
     function goToStep2FromSuccess() {
@@ -2319,35 +2342,49 @@
           address2: document.getElementById('kariAddr2').value,
           address3: document.getElementById('kariAddr3').value
         };
+
         setLoading(true, "データを送信中...", "少々お待ちください");
+
         google.script.run.withSuccessHandler(async (res) => {
           if (res.success) {
-            const allInputs = document.querySelectorAll('#kariUploadZone input[type="file"]');
-            let filesToUpload = [];
-            allInputs.forEach(input => {
-              if (input.files && input.files[0]) filesToUpload.push(input.files[0]);
-            });
-            const totalFiles = filesToUpload.length;
-            for (let i = 0; i < totalFiles; i++) {
-              const file = filesToUpload[i];
-              const isImage = file.type.startsWith("image/");
-              setLoading(true, `ファイルを送信中... (${i + 1} / ${totalFiles})`, `「${file.name}」をアップロードしています`);
-              let base64Data = "";
-              if (isImage) {
-                base64Data = await processImg(file, false);
-              } else {
-                base64Data = await new Promise(resolve => {
-                  const reader = new FileReader();
-                  reader.onload = e => resolve(e.target.result);
-                  reader.readAsDataURL(file);
-                });
-              }
+            // 1. Thu thập file CV
+            let resumeFiles = [];
+            document.querySelectorAll('#kariUploadZoneResume input[type="file"]').forEach(i => { if (i.files[0]) resumeFiles.push(i.files[0]); });
+            
+            // 2. Thu thập file Bằng cấp
+            let certFiles = [];
+            document.querySelectorAll('#kariUploadZoneCert input[type="file"]').forEach(i => { if (i.files[0]) certFiles.push(i.files[0]); });
+
+            const totalFiles = resumeFiles.length + certFiles.length;
+            let fileCounter = 0;
+
+            // 👉 GỬI CÁC FILE CV (Đặt nhãn: 履歴書)
+            for (let i = 0; i < resumeFiles.length; i++) {
+              fileCounter++;
+              let file = resumeFiles[i];
+              setLoading(true, `ファイルを送信中... (${fileCounter} / ${totalFiles})`, `「${file.name}」を履歴書としてアップロード中`);
+              let b64 = await readFileAsBase64(file);
               await new Promise(resolve => {
                 google.script.run.withSuccessHandler(() => resolve())
-                  .saveSingleKariFile(res.folderName, {data: base64Data, isImage: isImage}, formData.nameKanji, (i + 1));
+                  .saveSingleKariFile(res.folderName, { data: b64, isImage: file.type.startsWith("image/") }, formData.nameKanji, (i + 1), "履歴書");
               });
             }
+
+            // 👉 GỬI CÁC FILE BẰNG CẤP (Đặt nhãn: 資格証明書)
+            for (let j = 0; j < certFiles.length; j++) {
+              fileCounter++;
+              let file = certFiles[j];
+              setLoading(true, `ファイルを送信中... (${fileCounter} / ${totalFiles})`, `「${file.name}」を資格証明書としてアップロード中`);
+              let b64 = await readFileAsBase64(file);
+              await new Promise(resolve => {
+                google.script.run.withSuccessHandler(() => resolve())
+                  .saveSingleKariFile(res.folderName, { data: b64, isImage: file.type.startsWith("image/") }, formData.nameKanji, (j + 1), "資格証明書");
+              });
+            }
+
             setLoading(true, "最終処理を行っています...", "まもなく完了します");
+            
+            // 👉 BÁO CÁO CHO BACKEND BIẾT CÓ NỘP CV HAY KHÔNG
             google.script.run.withSuccessHandler((result) => {
               setLoading(false);
               resetKariForm();
@@ -2357,13 +2394,28 @@
                 pendingKariRowIndex = result.kariRowIndex;
               }
               showView('viewKariSuccess');
-            }).finalCheckKari(res.rowIndex);
+            }).finalCheckKari(res.rowIndex, (resumeFiles.length > 0), certFiles.length);
+
+          } else {
+            setLoading(false);
+            showCustomAlert("エラー: " + res.message, true);
           }
         }).createKariRecord(formData);
+
       } catch (e) {
         setLoading(false);
-        showCustomAlert("予期しないエラーが発生しました: " + e.message, true);
+        showCustomAlert("予期しないエラー: " + e.message, true);
       }
+    }
+
+    // Hàm phụ đọc Base64
+    async function readFileAsBase64(file) {
+      if (file.type.startsWith("image/")) return await processImg(file, false);
+      return await new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.readAsDataURL(file);
+      });
     }
 
     function clearFirstBoxImg() {
