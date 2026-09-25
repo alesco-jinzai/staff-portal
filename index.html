@@ -1058,26 +1058,6 @@
       return String(nameStr).replace(/\//g, ' ');
     }
     
-    // 👉 FIX LỖI: An toàn 100% cho mọi trường hợp đăng ký
-    function closeFinalPopup() {
-      document.getElementById('finalSuccessPopup').style.display = 'none';
-      
-      // Nếu là nộp 1 mạch từ lúc mới đăng ký (Chưa có currentUser hoặc đang ở màn hình HonRegister)
-      const isFromWizard = document.getElementById('viewHonRegister').classList.contains('active');
-      
-      if (isFromWizard) {
-          // Đá ra màn hình "Đăng ký thành công" và Logout cho an toàn
-          localStorage.removeItem('alescoPhone'); 
-          localStorage.removeItem('alescoDob');
-          localStorage.removeItem('alescoUserObj');
-          currentUser = null;
-          showView('viewHonSuccess'); // Mở màn hình xanh báo hoàn tất!
-      } else {
-          // Nếu là nộp bù từ MyPage -> Load lại MyPage
-          renderMyPage(); 
-      }
-    }
-    
     function searchAddress() {
       const zip = document.getElementById('regZip').value.replace(/[^0-9]/g, "");
       if(zip.length !== 7) return alert("郵便番号は7桁で入力してください。"); 
@@ -1190,6 +1170,24 @@
       });
     }
 
+    // 👉 DÁN ĐOẠN NÀY LÊN TRÊN HÀM renderMyPage():
+    function closeFinalPopup() {
+      document.getElementById('finalSuccessPopup').style.display = 'none';
+      
+      const honReg = document.getElementById('viewHonRegister');
+      const isFromWizard = honReg && honReg.classList.contains('active');
+      
+      if (isFromWizard) {
+          localStorage.removeItem('alescoPhone'); 
+          localStorage.removeItem('alescoDob');
+          localStorage.removeItem('alescoUserObj');
+          currentUser = null;
+          showView('viewHonSuccess'); 
+      } else {
+          renderMyPage(); 
+      }
+    }
+    
     function renderMyPage() {
       showView('viewMyPage');
       document.getElementById('mpUserName').innerText = safeCleanName(currentUser.name) + " 様";
@@ -3573,23 +3571,6 @@
         setLoading(false);
         container.innerHTML = `<p style="text-align:center; color:red;">通信エラーが発生しました。</p>`;
       });
-    }
-
-    function finalizeAndMoveToAttendance() {
-      document.getElementById('finalSuccessPopup').style.display = 'none';
-      setLoading(true, "データを最終同期しています...");
-      google.script.run.withSuccessHandler(res => {
-        setLoading(false);
-        if (res.success && res.user) {
-          currentUser = res.user;
-          renderAttendanceView();
-          showView('viewAttendance');
-          showCustomAlert("すべての書類提出が完了しました！");
-        } else {
-          showCustomAlert("データの取得に失敗しました。もう一度お試しください。", true);
-          showView('viewAuth');
-        }
-      }).getUserStatusById(currentUser.id);
     }
 
     // =========================================================
