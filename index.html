@@ -2162,6 +2162,21 @@
           if (hasErr) return;
         }
         if (step === 4) {
+          // Lấy xem người dùng đang đứng ở bước nào
+          const currentStepElement = document.querySelector('#viewKari > div[style*="display: block"]') || document.querySelector('#viewKari > div:not([style*="display: none"])');
+          const currentStepId = currentStepElement ? currentStepElement.id : '';
+
+          // 👉 NẾU TỪ BƯỚC 5 LÙI VỀ BƯỚC 4 -> CHUYỂN MÀN HÌNH NGAY LẬP TỨC, KHÔNG GỌI GOOGLE!
+          if (currentStepId === 'kariStep5') {
+              for(let i=1; i<=5; i++) {
+                const el = document.getElementById('kariStep' + i);
+                if(el) el.style.display = (i === 4) ? 'block' : 'none';
+              }
+              window.scrollTo(0,0);
+              return;
+          }
+
+          // CÒN NẾU TỪ BƯỚC 3 TIẾN LÊN BƯỚC 4 -> KIỂM TRA LỖI NHẬP LIỆU VÀ GỌI GOOGLE CHECK TRÙNG SĐT
           const el = {
             zip: document.getElementById('kariZip'), phone: document.getElementById('kariPhone'),
             landline: document.getElementById('kariLandline'), email: document.getElementById('kariEmail'),
@@ -2218,11 +2233,13 @@
           if (!el.addr1.value.trim()) { el.addr1.classList.add('input-error'); err.addr1.style.display = 'inline'; hasErr = true; }
           if (!el.addr2.value.trim()) { el.addr2.classList.add('input-error'); err.addr2.style.display = 'inline'; hasErr = true; }
           if (hasErr) return;
+          
           const phoneToCheck = phoneVal ? phoneVal : landlineVal;
           const nextBtn = document.querySelector('#kariStep3 .btn-primary');
           const originalBtnText = nextBtn.innerText;
           nextBtn.disabled = true;
           nextBtn.innerText = "確認中..."; 
+          
           google.script.run.withSuccessHandler(function(isExist) {
             nextBtn.disabled = false;
             nextBtn.innerText = originalBtnText;
@@ -2244,6 +2261,7 @@
               nextBtn.innerText = originalBtnText;
               showCustomAlert("通信エラーが発生しました。", true);
           }).checkPhoneExists(phoneToCheck);
+          
           return; 
         }
         if (step === 5) {
