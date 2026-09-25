@@ -1057,7 +1057,27 @@
       if (!nameStr) return "---";
       return String(nameStr).replace(/\//g, ' ');
     }
-
+    
+    // 👉 FIX LỖI: An toàn 100% cho mọi trường hợp đăng ký
+    function closeFinalPopup() {
+      document.getElementById('finalSuccessPopup').style.display = 'none';
+      
+      // Nếu là nộp 1 mạch từ lúc mới đăng ký (Chưa có currentUser hoặc đang ở màn hình HonRegister)
+      const isFromWizard = document.getElementById('viewHonRegister').classList.contains('active');
+      
+      if (isFromWizard) {
+          // Đá ra màn hình "Đăng ký thành công" và Logout cho an toàn
+          localStorage.removeItem('alescoPhone'); 
+          localStorage.removeItem('alescoDob');
+          localStorage.removeItem('alescoUserObj');
+          currentUser = null;
+          showView('viewHonSuccess'); // Mở màn hình xanh báo hoàn tất!
+      } else {
+          // Nếu là nộp bù từ MyPage -> Load lại MyPage
+          renderMyPage(); 
+      }
+    }
+    
     function searchAddress() {
       const zip = document.getElementById('regZip').value.replace(/[^0-9]/g, "");
       if(zip.length !== 7) return alert("郵便番号は7桁で入力してください。"); 
