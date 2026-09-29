@@ -684,12 +684,20 @@
         });
     }
 
-    function openNasFolder() {
-      let pathsToTry = NAS_BASE_PATHS.map(basePath => basePath + "\\" + selectedFolderName);
-      let joinedPaths = pathsToTry.join("||");
-      let encodedPaths = encodeURIComponent(joinedPaths);
-      let uri = "alesco://" + encodedPaths;
-      window.location.href = uri;
+    function openNasFolder(folderName) {
+        // Đường dẫn gốc đến kho NAS của ông
+        const fullPath = `\\\\landisk-9905cb\\disk1\\共有フォルダ（最新）\\★★CastingNavスタッフ個人情報※ﾌﾎﾙﾀﾞ名変更禁止※\\★社員番号有り　※フォルダ名は絶対に変更しない！！※\\${folderName}`;
+    
+        // 👉 KIỂM TRA: Nếu đang chạy trong App (.exe)
+        if (typeof process !== 'undefined' && process.versions && process.versions.electron) {
+            const { ipcRenderer } = require('electron');
+            ipcRenderer.send('open-folder', fullPath); // Gọi App mở folder trực tiếp
+        } 
+        // Nếu đang xem trên Web thường
+        else {
+            // Vẫn dùng cách cũ alesco:// cho những người không cài App
+            window.location.href = `alesco://${encodeURIComponent(fullPath)}`;
+        }
     }
 
     function closeModal() {
