@@ -685,18 +685,31 @@
     }
 
     function openNasFolder(folderName) {
-        // Đường dẫn gốc đến kho NAS của ông
-        const fullPath = `\\\\landisk-9905cb\\disk1\\共有フォルダ（最新）\\★★CastingNavスタッフ個人情報※ﾌﾎﾙﾀﾞ名変更禁止※\\★社員番号有り　※フォルダ名は絶対に変更しない！！※\\${folderName}`;
+        if (!folderName) return alert("フォルダ名が登録されていません。");
     
-        // 👉 KIỂM TRA: Nếu đang chạy trong App (.exe)
-        if (typeof process !== 'undefined' && process.versions && process.versions.electron) {
+        // 1. Khai báo 2 đường dẫn (Kho chính và Kho tạm Aoto)
+        const pathArchive = `\\\\landisk-9905cb\\disk1\\共有フォルダ（最新）\\★★CastingNavスタッフ個人情報※ﾌｫﾙﾀﾞ名変更禁止※\\★社員番号有り　※フォルダ名は絶対に変更しない！！※\\${folderName}`;
+        const pathAoto = `\\\\landisk-9905cb\\disk1\\共有フォルダ（最新）\\青戸\\★新規登録者個人情報（仮登録スタッフ）※ファイル名変更しない！！\\${folderName}`;
+    
+        // 2. Kiểm tra môi trường: Đang chạy trong Desktop App hay Trình duyệt?
+        const isElectron = (typeof process !== 'undefined' && process.versions && !!process.versions.electron);
+    
+        if (isElectron) {
+            // --- KỊCH BẢN A: ĐANG CHẠY TRONG APP (.EXE) ---
             const { ipcRenderer } = require('electron');
-            ipcRenderer.send('open-folder', fullPath); // Gọi App mở folder trực tiếp
+            
+            // Gửi lệnh cho App mở cả 2 folder (nếu tồn tại)
+            // Lưu ý: AlescoOpener.ps1 của chúng ta đã có logic check Test-Path rồi nên rất an toàn
+            ipcRenderer.send('open-folder', pathArchive);
+            ipcRenderer.send('open-folder', pathAoto);
         } 
-        // Nếu đang xem trên Web thường
         else {
-            // Vẫn dùng cách cũ alesco:// cho những người không cài App
-            window.location.href = `alesco://${encodeURIComponent(fullPath)}`;
+            // --- KỊCH BẢN B: ĐANG XEM TRÊN WEB (CHROME/EDGE) ---
+            // Gộp 2 đường dẫn lại bằng dấu || giống hệt quy ước cũ của alesco_opener.js
+            const combinedPath = pathArchive + "||" + pathAoto;
+            
+            // Gọi giao thức alesco:// (Yêu cầu máy phải cài Registry)
+            window.location.href = `alesco://${encodeURIComponent(combinedPath)}`;
         }
     }
 
