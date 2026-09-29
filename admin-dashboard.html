@@ -684,12 +684,25 @@
         });
     }
 
-    function openNasFolder() {
-      let pathsToTry = NAS_BASE_PATHS.map(basePath => basePath + "\\" + selectedFolderName);
-      let joinedPaths = pathsToTry.join("||");
-      let encodedPaths = encodeURIComponent(joinedPaths);
-      let uri = "alesco://" + encodedPaths;
-      window.location.href = uri;
+    function openNasFolder(folderName) {
+        if (!folderName) return alert("フォルダ名が登録されていません。");
+    
+        // Dùng String.raw để viết đường dẫn Windows dễ dàng, chính xác 100%
+        const baseArchive = String.raw`\\landisk-9905cb\disk1\共有フォルダ（最新）\★★CastingNavスタッフ個人情報※ﾌｫﾙﾀﾞ名変更禁止※\★社員番号有り　※フォルダ名は絶対に変更しない！！※`;
+        const baseAoto = String.raw`\\landisk-9905cb\disk1\共有フォルダ（最新）\青戸\★新規登録者個人情報（仮登録スタッフ）※ファイル名変更しない！！`;
+    
+        const pathArchive = `${baseArchive}\\${folderName}`;
+        const pathAoto = `${baseAoto}\\${folderName}`;
+    
+        if (window.electronAPI) {
+            // Gửi lệnh mở cho App (App sẽ tự check tồn tại rồi mở)
+            window.electronAPI.openNasFolder(pathArchive);
+            window.electronAPI.openNasFolder(pathAoto);
+        } else {
+            // Dành cho người dùng Web bình thường (cần Registry)
+            const combinedPath = pathArchive + "||" + pathAoto;
+            window.location.href = `alesco://${encodeURIComponent(combinedPath)}`;
+        }
     }
 
     function closeModal() {
