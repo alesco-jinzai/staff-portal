@@ -111,16 +111,47 @@
 </head>
 <body>
 
-  <div id="adminAuthOverlay" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:var(--bg, #f4f7fc); z-index:999999; display:none; justify-content:center; align-items:center;">
-    <div style="background:#fff; padding:40px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.1); width:90%; max-width:350px; text-align:center;">
-      <h2 style="color:var(--primary); margin-top:0;">管理者ログイン</h2>
-      <p style="font-size: 12px; color: #666; margin-bottom: 20px;">進捗管理システム</p>
-      <input type="text" id="adminUser" placeholder="ID" style="width:100%; height:45px; margin-bottom:15px; padding:0 15px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;">
-      <input type="password" id="adminPass" placeholder="パスワード" style="width:100%; height:45px; margin-bottom:20px; padding:0 15px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;">
-      <button onclick="handleAdminLogin()" id="btnAdminLogin" style="width:100%; height:45px; background:var(--primary); color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size: 15px;">ログイン</button>
-      <p id="adminLoginError" style="color:#d32f2f; font-size:13px; font-weight:bold; margin-top:15px; display:none;"></p>
+  <!-- 👉 GIAO DIỆN ĐĂNG NHẬP ADMIN CHUẨN DOANH NGHIỆP CAO CẤP -->
+  <div id="adminAuthOverlay" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background: linear-gradient(135deg, #f4f7fc 0%, #e2e8f0 100%); z-index:999999; display:none; justify-content:center; align-items:center;">
+    
+    <div style="background:var(--surface); padding:40px; border-radius:16px; box-shadow: 0 15px 35px rgba(0,97,164,0.1), 0 5px 15px rgba(0,0,0,0.05); width:90%; max-width:400px; text-align:center; animation: fadeInPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+      
+      <!-- Logo Công ty -->
+      <img src="logo.png" alt="ALESCO" style="width: 150px; margin-bottom: 20px;" onerror="this.src='https://alesco-v.co.jp/wp/wp-content/uploads/ALESCO-LOGO.png'">
+      
+      <h2 style="color:var(--primary); margin:0 0 5px 0; font-size:22px; font-weight:700; letter-spacing:1px;">データ統合システム</h2>
+
+      <!-- Form nhập liệu -->
+      <div style="text-align: left; margin-bottom: 15px;">
+        <label style="display:block; font-size:12px; font-weight:bold; color:#4A5568; margin-bottom:5px;">ログインID</label>
+        <!-- 👉 ĐÃ THÊM: font-weight: normal; -->
+        <input type="text" id="adminUser" placeholder="IDを入力してください" style="width:100%; height:48px; padding:0 15px; border:2px solid #E2E8F0; border-radius:8px; box-sizing:border-box; font-size:15px; font-weight: normal; outline:none; transition:0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#E2E8F0'">
+      </div>
+
+      <div style="text-align: left; margin-bottom: 25px;">
+        <label style="display:block; font-size:12px; font-weight:bold; color:#4A5568; margin-bottom:5px;">パスワード</label>
+        <!-- 👉 ĐÃ THÊM: font-weight: normal; -->
+        <input type="password" id="adminPass" placeholder="パスワードを入力してください" style="width:100%; height:48px; padding:0 15px; border:2px solid #E2E8F0; border-radius:8px; box-sizing:border-box; font-size:15px; font-weight: normal; outline:none; transition:0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#E2E8F0'">
+      </div>
+
+      <!-- Ô Báo Lỗi -->
+      <div id="adminLoginError" style="background:#FFF5F5; color:#C53030; font-size:13px; font-weight:bold; padding:10px; border-radius:6px; margin-bottom:15px; display:none; border:1px solid #FEB2B2;"></div>
+
+      <!-- Nút Đăng nhập -->
+      <button onclick="handleAdminLogin()" id="btnAdminLogin" style="width:100%; height:50px; background:var(--primary); color:#fff; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size: 16px; transition:0.2s; box-shadow:0 4px 6px rgba(0,97,164,0.2);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0,97,164,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(0,97,164,0.2)';">
+        システムにログイン
+      </button>
+
+      <div style="margin-top: 20px; font-size: 12px; color: #A0AEC0;">© Alesco Co., Ltd.</div>
     </div>
   </div>
+
+  <style>
+    @keyframes fadeInPop {
+      0% { opacity: 0; transform: scale(0.9) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+  </style>
 
   <!-- THÊM 1 MÀN HÌNH LOADING CHE TOÀN TRANG (Mặc định bật) -->
   <div id="fullPageLoading" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:var(--bg, #f4f7fc); z-index:999998; display:flex; flex-direction:column; justify-content:center; align-items:center;">
@@ -708,7 +739,28 @@
       .catch(e => { err.innerText = "通信エラー"; err.style.display="block"; })
       .finally(() => { btn.disabled = false; btn.innerText = "ログイン"; });
     }
-
+    // 👉 TỰ ĐỘNG NHẢY Ô VÀ ĐĂNG NHẬP KHI BẤM ENTER
+    document.addEventListener('DOMContentLoaded', () => {
+      const uInput = document.getElementById('adminUser');
+      const pInput = document.getElementById('adminPass');
+      
+      if (uInput) {
+        uInput.addEventListener("keyup", function(e) { 
+          if (e.key === "Enter") {
+             e.preventDefault();
+             if (pInput) pInput.focus(); 
+          }
+        });
+      }
+      if (pInput) {
+        pInput.addEventListener("keyup", function(e) { 
+          if (e.key === "Enter") {
+             e.preventDefault();
+             handleAdminLogin(); 
+          }
+        });
+      }
+    });
   </script>
 </body>
 </html>
