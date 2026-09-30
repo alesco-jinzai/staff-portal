@@ -208,7 +208,7 @@
         <tbody id="tableBody"></tbody>
         <tfoot id="tableFoot" style="background:#f4f7fc; font-weight:bold;">
             <tr>
-                <td colspan=8" style="text-align:right;">合計:</td>
+                <td colspan="8" style="text-align:right;">合計:</td>
                 <td id="totalHours" style="color:var(--primary); font-size:16px;">00:00</td>
                 <td></td>
                 <td id="totalFee" style="color:var(--primary); font-size:16px;">¥0</td>
@@ -902,7 +902,19 @@
           .then(r => r.json())
           .then(res => {
               if (res.result && res.result.success) {
-                  window.open(res.result.url, '_blank');
+                  
+                  // 👉 FIX CHUẨN: ÉP TẢI FILE XUỐNG MÁY, TRÁNH BỊ CHROME CHẶN!
+                  const pdfUrl = res.result.url;
+                  const a = document.createElement('a');
+                  a.style.display = 'none';
+                  // Gắn thêm đuôi export=download để ép tải thẳng về
+                  a.href = pdfUrl + (pdfUrl.includes('?') ? '&' : '?') + 'export=download';
+                  a.target = '_blank';
+                  a.download = `シフト表_${client}.pdf`; 
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+
                   showToast('PDFの生成が完了しました。', 'success');
               } else {
                   showToast("エラー: " + (res.error || res.result.message), "error");
