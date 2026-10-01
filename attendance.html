@@ -603,11 +603,23 @@
     // 👇 BÁC THÊM ĐOẠN ĐỔ DỮ LIỆU LOG VÀO ĐÂY 👇
     const logBox = document.getElementById('editAuditLog');
     if (rowObj.auditLog && rowObj.auditLog.trim() !== "") {
-        logBox.innerText = rowObj.auditLog;
-        logBox.style.color = "#333";
+        // Chẻ string thành mảng theo dấu xuống dòng
+        let lines = rowObj.auditLog.split('\n');
+        let htmlLog = '';
+        
+        lines.forEach(line => {
+            if(line.trim()) {
+                // Bôi màu cam cho cái chữ trong ngoặc vuông [2026/10/01... 修正]
+                let formattedLine = line.replace(/\[(.*?)\]/, '<span style="color:#e65100; font-weight:bold;">[$1]</span>');
+                
+                // Bọc mỗi dòng vào 1 thẻ div để không bao giờ bị đè lên nhau
+                htmlLog += `<div style="border-bottom: 1px dashed #e2e8f0; padding-bottom: 4px; margin-bottom: 4px;">${formattedLine}</div>`;
+            }
+        });
+        
+        logBox.innerHTML = htmlLog;
     } else {
-        logBox.innerText = "変更履歴はありません。"; // Không có lịch sử
-        logBox.style.color = "#999";
+        logBox.innerHTML = '<div style="color:#94a3b8; font-style:italic;">変更履歴はありません。</div>';
     }
     // 👆 KẾT THÚC ĐOẠN ĐỔ LOG 👆
 
