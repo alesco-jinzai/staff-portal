@@ -562,6 +562,10 @@
     document.getElementById('editCheckOut').value = "";
     document.getElementById('editFee').value = "";
     document.getElementById('editBreakMins').value = "";
+    const logBox = document.getElementById('editAuditLog');
+    if (logBox) {
+        logBox.innerHTML = '<div style="color:#94a3b8; font-style:italic;">新規作成のため、変更履歴はありません。</div>';
+    }    
     document.getElementById('btnSaveRecord').disabled = false;
     document.getElementById('btnDeleteRecord').style.display = "none";
     document.getElementById('locSmartList').innerHTML = "";
