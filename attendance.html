@@ -263,6 +263,13 @@
           <label style="font-size:12px; color:#5f6368; font-weight:700;">交通費 (半角数字)</label>
           <input type="number" id="editFee" placeholder="例: 500" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
         </div>
+        <!-- 👇 BÁC CHÈN THÊM KHỐI "AUDIT LOG" NÀY VÀO ĐÂY 👇 -->
+        <div style="display:flex; flex-direction:column; gap:6px; margin-top: 5px;">
+          <label style="font-size:12px; color:var(--primary); font-weight:700;">変更履歴 (システムログ)</label>
+          <div id="editAuditLog" style="height:80px; overflow-y:auto; padding:10px; border:1px dashed #bbb; border-radius:6px; background:#f4f7fc; font-size:11px; font-family:monospace; color:#333; white-space:pre-wrap; line-height:1.5;">
+            <!-- Log sẽ được JS đẩy vào đây -->
+          </div>
+        </div>
       </div>
       <div style="padding:15px 25px; border-top:1px solid var(--border); background:#f8f9fa; display:flex; justify-content:space-between; align-items:center;">
         <button id="btnDeleteRecord" style="background:#dc3545; color:white; border:none; height:36px; padding:0 20px; border-radius:6px; font-weight:bold; cursor:pointer; display:none;" onclick="deleteRecord()">削除</button>
@@ -591,9 +598,18 @@
     document.getElementById('editCheckIn').value = rowObj.checkInActual || "";
     document.getElementById('editCheckOut').value = rowObj.checkOutActual || "";
     document.getElementById('editFee').value = rowObj.fee || "";
-
-    // 👉 THÊM DÒNG NÀY VÀO: Đổ số phút nghỉ vào ô input
     document.getElementById('editBreakMins').value = rowObj.breakMins || "";
+
+    // 👇 BÁC THÊM ĐOẠN ĐỔ DỮ LIỆU LOG VÀO ĐÂY 👇
+    const logBox = document.getElementById('editAuditLog');
+    if (rowObj.auditLog && rowObj.auditLog.trim() !== "") {
+        logBox.innerText = rowObj.auditLog;
+        logBox.style.color = "#333";
+    } else {
+        logBox.innerText = "変更履歴はありません。"; // Không có lịch sử
+        logBox.style.color = "#999";
+    }
+    // 👆 KẾT THÚC ĐOẠN ĐỔ LOG 👆
 
     document.getElementById('btnSaveRecord').disabled = false;
     document.getElementById('btnDeleteRecord').style.display = "block";
