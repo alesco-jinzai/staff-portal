@@ -1084,19 +1084,37 @@
       const phoneInput = document.getElementById('authPhone');
       const dobInput = document.getElementById('authDob');
       const errorEl = document.getElementById('authError');
+      
       phoneInput.classList.remove('input-error');
       dobInput.classList.remove('input-error');
       errorEl.style.display = 'none';
+      
       const phoneVal = phoneInput.value.replace(/\D/g, ""); 
+      
+      // 👇 BỘ LỌC CHỐNG AUTOFILL IPHONE 👇
+      let rawDob = dobInput.value;
+      let safeDob = "";
+      if (rawDob) {
+          let tempDob = rawDob.replace(/\//g, '-'); // Đổi / thành -
+          let parts = tempDob.split('-');
+          if (parts.length === 3) {
+              // Ép thêm số 0 vào tháng/ngày nếu Autofill điền thiếu (VD: 1986-5-9 -> 1986-05-09)
+              safeDob = parts[0] + '-' + parts[1].padStart(2, '0') + '-' + parts[2].padStart(2, '0');
+          } else {
+              safeDob = tempDob;
+          }
+      }
+      // 👆 KẾT THÚC BỘ LỌC 👆
+
       const isValidPhone = (val) => val.length >= 10 && val.length <= 11 && val.startsWith("0");
-      if (!phoneVal || !dobInput.value || !isValidPhone(phoneVal)) {
+      if (!phoneVal || !safeDob || !isValidPhone(phoneVal)) {
         if (!phoneVal) {
           phoneInput.classList.add('input-error');
           errorEl.innerText = "電話番号を入力してください。";
         } else if (!isValidPhone(phoneVal)) {
           phoneInput.classList.add('input-error');
           errorEl.innerText = "電話番号は0から始まる10〜11桁の数字で入力してください。"; 
-        } else if (!dobInput.value) {
+        } else if (!safeDob) {
           dobInput.classList.add('input-error');
           errorEl.innerText = "生年月日を入力してください。";
         }
@@ -1104,10 +1122,11 @@
         return; 
       }
       setLoading(true);
+      
       fetch(GAS_WEB_APP_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: "smartLogin", params: [phoneVal, dobInput.value] }),
+        body: JSON.stringify({ action: "smartLogin", params: [phoneVal, safeDob] }), // Gửi safeDob
         redirect: 'follow'
       })
       .then(r => r.json())
@@ -1122,18 +1141,16 @@
           return;
         }
         localStorage.setItem('alescoPhone', phoneVal);
-        localStorage.setItem('alescoDob', dobInput.value);
+        localStorage.setItem('alescoDob', safeDob);
         
         if (res.user) {
             localStorage.setItem('alescoUserObj', JSON.stringify(res.user));
         } else {
-            // 👇 THÊM ĐOẠN NÀY ĐỂ GIẾT CHẾT ACCOUNT CŨ NẾU LÀ NGƯỜI MỚI 👇
             localStorage.removeItem('alescoUserObj');
         }
+        
         if (res.route === "step1") {
-          // 👉 THÊM DÒNG NÀY ĐỂ XÓA TÀN DƯ CỦA NGƯỜI CŨ:
           localStorage.removeItem('alescoKariDraft');
-          
           resetKariForm();
           let cleanPhoneForDetect = phoneInput.value.replace(/\D/g, "");
           if (cleanPhoneForDetect.startsWith("090") || cleanPhoneForDetect.startsWith("080") || cleanPhoneForDetect.startsWith("070")) {
@@ -1142,8 +1159,10 @@
             document.getElementById('kariLandline').value = phoneInput.value;
             showLandlineField(); 
           }
-          document.getElementById('kariDob').value = dobInput.value;
-          // loadKariDraft(); // 👉 TẠM THỜI COMMENT HOẶC XÓA DÒNG NÀY ĐI
+          
+          // Dùng safeDob ném vào ô nhập để tránh lỗi Safari
+          document.getElementById('kariDob').value = safeDob; 
+          
           showView('viewKari');
           showCustomAlert("初めての登録ですね。\nプロフィールを入力してください。", "info");
         } else if (res.route === "step2") {
@@ -1167,11 +1186,8 @@
       })
       .catch(err => {
         setLoading(false);
-        
-        // 👉 ÉP NÓ PHẢI HIỆN LỖI LÊN CONSOLE VÀ LÊN MÀN HÌNH LUÔN!
         console.error("LỖI BẮT ĐƯỢC TẠI CATCH:", err);
         errorEl.innerText = "通信エラー: " + err.message; 
-        
         errorEl.style.display = 'block';
       });
     }
