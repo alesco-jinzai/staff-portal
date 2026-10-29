@@ -124,8 +124,10 @@
       <!-- Form nhập liệu -->
       <div style="text-align: left; margin-bottom: 15px;">
         <label style="display:block; font-size:12px; font-weight:bold; color:#4A5568; margin-bottom:5px;">ログインID</label>
-        <!-- 👉 ĐÃ THÊM: font-weight: normal; -->
-        <input type="text" id="adminUser" placeholder="IDを入力してください" style="width:100%; height:48px; padding:0 15px; border:2px solid #E2E8F0; border-radius:8px; box-sizing:border-box; font-size:15px; font-weight: normal; outline:none; transition:0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#E2E8F0'">
+        <!-- 👉 ĐÃ ĐỔI THÀNH DROP-DOWN SELECT -->
+        <select id="adminUser" style="width:100%; height:48px; padding:0 15px; border:2px solid #E2E8F0; border-radius:8px; box-sizing:border-box; font-size:15px; font-weight: normal; outline:none; transition:0.2s; background: #fff; cursor: pointer; color: #333;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#E2E8F0'">
+          <option value="" disabled selected>読み込み中...</option>
+        </select>
       </div>
 
       <div style="text-align: left; margin-bottom: 25px;">
@@ -739,19 +741,35 @@
       .catch(e => { err.innerText = "通信エラー"; err.style.display="block"; })
       .finally(() => { btn.disabled = false; btn.innerText = "ログイン"; });
     }
-    // 👉 TỰ ĐỘNG NHẢY Ô VÀ ĐĂNG NHẬP KHI BẤM ENTER
+    // 👉 TỰ ĐỘNG LẤY DANH SÁCH ADMIN KHI BẬT WEB
     document.addEventListener('DOMContentLoaded', () => {
-      const uInput = document.getElementById('adminUser');
-      const pInput = document.getElementById('adminPass');
       
-      if (uInput) {
-        uInput.addEventListener("keyup", function(e) { 
-          if (e.key === "Enter") {
-             e.preventDefault();
-             if (pInput) pInput.focus(); 
-          }
-        });
-      }
+      // Gọi API lấy danh sách Admin
+      fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: "getAdminList", params: [] }), // Hàm mới
+        redirect: 'follow'
+      })
+      .then(r => r.json())
+      .then(res => {
+        const selectEl = document.getElementById('adminUser');
+        if (res.result && res.result.success) {
+          // Có data thì vẽ ra option
+          let html = '<option value="" disabled selected>名前を選択してください</option>';
+          res.result.list.forEach(name => {
+            html += `<option value="${name}">${name}</option>`;
+          });
+          selectEl.innerHTML = html;
+        } else {
+          selectEl.innerHTML = '<option value="">読み込み失敗</option>';
+        }
+      }).catch(e => {
+          document.getElementById('adminUser').innerHTML = '<option value="">通信エラー</option>';
+      });
+  
+      // Code bắt sự kiện Enter cũ của bác
+      const pInput = document.getElementById('adminPass');
       if (pInput) {
         pInput.addEventListener("keyup", function(e) { 
           if (e.key === "Enter") {
