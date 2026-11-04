@@ -746,6 +746,16 @@
             申告書を入力する
           </button>
         </div>
+
+        <!-- 👇 BÁC CHÈN THÊM CẢNH BÁO SHITEISHO VÀO ĐÂY 👇 -->
+        <div id="shiteishoAlert" style="display:none; background:#e3f2fd; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #90caf9;">
+          <p style="margin:0 0 12px 0; font-size:13px; color:#1565c0; font-weight:700;">
+            <span style="font-size:16px; margin-right:8px;">🛂</span> パスポートの「指定書」の提出が必要です。
+          </p>
+          <button class="btn btn-primary" style="background:#1565c0; height:48px; font-size:14px; margin:0;" onclick="openTask('misc', '指定書')">追加書類から提出する</button>
+        </div>
+        <!-- 👆 KẾT THÚC CẢNH BÁO SHITEISHO 👆 -->
+        
         <div id="taskList"></div>
         <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
           <button id="mpBtnBack" class="btn btn-gray" onclick="renderAttendanceView()">戻る</button>
@@ -1230,7 +1240,13 @@
       // Nếu là "メイン" mà chưa nộp Fuyo thì mới hiện cảnh báo đỏ
       let needsFuyo = (isMainEmployee && fuyoStatus.indexOf('提出済') === -1);
       document.getElementById('shinkokushoAlert').style.display = needsFuyo ? 'block' : 'none';
-      
+      // 👇 BÁC THÊM LOGIC CHECK SHITEISHO VÀO ĐÂY 👇
+      let isWorkingHoliday = (currentUser.employmentType === 'ワーキングホリデー');
+      let miscDocsLogs = currentUser.miscDocs || "";
+      // Nếu là Working Holiday VÀ trong cột AF chưa có chữ "指定書" -> Hiện Banner
+      let needsShiteisho = (isWorkingHoliday && miscDocsLogs.indexOf('指定書') === -1);
+      document.getElementById('shiteishoAlert').style.display = needsShiteisho ? 'block' : 'none';
+      // 👆 --------------------------------------- 👆      
       let extraNoticeHtml = '';
       if (isFullyOnboarded) {
          extraNoticeHtml = `
@@ -3617,12 +3633,24 @@
     // LOGIC DÀNH RIÊNG CHO MỤC "CÁC LOẠI GIẤY TỜ KHÁC" (MISC_DOCS)
     // =========================================================
     
-    // Gắn luồng mở View
+    // 👇 THAY THẾ BẰNG ĐOẠN NÀY 👇
     const originalOpenTask = window.openTask;
-    window.openTask = function(id) {
+    window.openTask = function(id, autoFillName = null) {
         if (id === 'misc') {
             resetMiscUploadForm();
             showView('viewMiscUpload');
+            
+            // Nếu có truyền tên (từ Banner), tự động điền vào ô Input số 1
+            if (autoFillName) {
+                setTimeout(() => {
+                    const firstInput = document.getElementById('miscName_1');
+                    if (firstInput) {
+                        firstInput.value = autoFillName;
+                        firstInput.readOnly = true; // Khóa luôn không cho nó gõ bậy bạ
+                        firstInput.style.backgroundColor = "#e8f0fe"; // Tô màu nền nhấn mạnh
+                    }
+                }, 100);
+            }
             return;
         }
         originalOpenTask(id);
