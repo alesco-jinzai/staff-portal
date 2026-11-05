@@ -224,70 +224,82 @@
     </div>
   </div>
   <div id="toast-container"></div>
+  <!-- MODAL SỬA GIỜ (ĐÃ FIX CẤU TRÚC VÀ MỞ RỘNG 650PX) -->
   <div id="editModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(2px);" onclick="if(event.target.id==='editModal') document.getElementById('editModal').style.display='none'">
-    <!-- 👉 ĐÃ SỬA: max-width: 650px để bung rộng Popup ra -->
     <div style="background:var(--surface); width:95%; max-width:650px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2); overflow:hidden; display:flex; flex-direction:column; animation: slideDown 0.3s ease;">
+      
+      <!-- PHẦN 1: HEADER -->
       <div style="background:var(--primary); color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center;">
         <h2 id="modalTitle" style="margin:0; font-size:18px; font-weight:700;">勤務記録の修正</h2>
         <button style="background:transparent; border:none; color:white; font-size:26px; cursor:pointer; line-height:1; padding:0; transition:0.2s;" onclick="document.getElementById('editModal').style.display='none'">×</button>
       </div>
+      
+      <!-- PHẦN 2: BODY (Chứa các ô nhập liệu) -->
       <div style="padding:25px; display:flex; flex-direction:column; gap:15px;">
         <input type="hidden" id="editRowIndex">
+        
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">社員 (ID - 名前)</label>
           <div class="dropdown-container">
-            <input type="text" id="editEmpInput" style="width:100%; height:40px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none; box-sizing:border-box;" placeholder="名前またはIDで検索..." autocomplete="nope" role="presentation">
+            <input type="text" id="editEmpInput" style="width:100%; height:40px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; outline:none; box-sizing:border-box;" placeholder="名前またはIDで検索..." autocomplete="nope" role="presentation">
             <div id="empSmartList" class="dropdown-list"></div>
           </div>
         </div>
+        
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">勤務地</label>
           <div class="dropdown-container">
-            <input type="text" id="editLocInput" style="width:100%; height:40px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none; box-sizing:border-box;" placeholder="勤務地を検索..." autocomplete="nope" role="presentation">
+            <input type="text" id="editLocInput" style="width:100%; height:40px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; outline:none; box-sizing:border-box;" placeholder="勤務地を検索..." autocomplete="nope" role="presentation">
             <div id="locSmartList" class="dropdown-list"></div>
           </div>
         </div>
+        
+        <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">日付</label>
-          <input type="date" id="editDate" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
+          <input type="date" id="editDate" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; outline:none;">
         </div>
-
-        <!-- 👇 BÁC THAY THẾ KHỐI NHẬP GIỜ BẰNG ĐOẠN NÀY 👇 -->
+        
+        <!-- Khối Giờ và GPS -->
         <div style="display:flex; flex-direction:column; gap:10px; background:#f4f7fc; padding:15px; border-radius:8px; border:1px solid var(--border);">
           <div style="display:flex; justify-content:space-between; align-items:center;">
              <label style="font-size:13px; color:var(--primary); font-weight:700;">打刻時間 (修正する時間)</label>
              <span id="actualTimeDisplay" style="font-size:12px; font-weight:bold; color:#666; background:#fff; padding:4px 10px; border-radius:20px; border:1px solid #ccc;">
-               <!-- Giờ thực tế sẽ hiện ở đây -->
+               ✨ 新規作成
              </span>
           </div>
           <div style="display:flex; gap:15px;">
             <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
               <label style="font-size:11px; color:#5f6368; font-weight:700;">出勤時刻</label>
-              <input type="time" id="editCheckIn" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
+              <input type="time" id="editCheckIn" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; outline:none;">
             </div>
             <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
               <label style="font-size:11px; color:#5f6368; font-weight:700;">退勤時刻</label>
-              <input type="time" id="editCheckOut" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
+              <input type="time" id="editCheckOut" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; outline:none;">
             </div>
           </div>
         </div>
-        <!-- 👆 KẾT THÚC KHỐI NHẬP GIỜ 👆 -->
+        
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">休憩 (分)</label>
-          <input type="number" id="editBreakMins" placeholder="例: 60" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
+          <input type="number" id="editBreakMins" placeholder="例: 60" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; outline:none;">
         </div>
+        
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">交通費 (半角数字)</label>
-          <input type="number" id="editFee" placeholder="例: 500" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
+          <input type="number" id="editFee" placeholder="例: 500" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; outline:none;">
         </div>
+
+        <!-- Khối Audit Log -->
         <div style="display:flex; flex-direction:column; gap:6px; margin-top: 5px;">
           <label style="font-size:12px; color:var(--primary); font-weight:700;">変更履歴 (システムログ)</label>
-          
-          <!-- 👉 ĐÃ SỬA: Xóa font-family cũ, để nó tự đồng bộ font web -->
           <div id="editAuditLog" style="height:120px; overflow-y:auto; padding:10px; border:1px solid #d1d5db; border-radius:6px; background:#f8fafc; font-size:12px; color:#334155; white-space:nowrap; line-height:1.6; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
             <!-- Log sẽ được JS đẩy vào đây -->
           </div>
         </div>
-      </div>
+
+      </div> <!-- KẾT THÚC PHẦN BODY -->
+
+      <!-- PHẦN 3: FOOTER (Chứa các nút bấm) -->
       <div style="padding:15px 25px; border-top:1px solid var(--border); background:#f8f9fa; display:flex; justify-content:space-between; align-items:center;">
         <button id="btnDeleteRecord" style="background:#dc3545; color:white; border:none; height:36px; padding:0 20px; border-radius:6px; font-weight:bold; cursor:pointer; display:none;" onclick="deleteRecord()">削除</button>
         <div style="flex:1"></div>
@@ -296,6 +308,7 @@
           <button id="btnSaveRecord" class="btn btn-primary" onclick="saveRecord()">保存する</button>
         </div>
       </div>
+      
     </div>
   </div>
   <div id="smartExportModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(2px);">
