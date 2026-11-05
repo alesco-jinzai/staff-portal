@@ -247,20 +247,30 @@
             <div id="locSmartList" class="dropdown-list"></div>
           </div>
         </div>
-        <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">日付</label>
           <input type="date" id="editDate" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
         </div>
-        <div style="display:flex; gap:15px;">
-          <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
-            <label style="font-size:12px; color:#5f6368; font-weight:700;">出勤時刻 (実際)</label>
-            <input type="time" id="editCheckIn" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
+
+        <!-- 👇 BÁC THAY THẾ KHỐI NHẬP GIỜ BẰNG ĐOẠN NÀY 👇 -->
+        <div style="display:flex; flex-direction:column; gap:10px; background:#f4f7fc; padding:15px; border-radius:8px; border:1px solid var(--border);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+             <label style="font-size:13px; color:var(--primary); font-weight:700;">打刻時間 (修正する時間)</label>
+             <span id="actualTimeDisplay" style="font-size:12px; font-weight:bold; color:#666; background:#fff; padding:4px 10px; border-radius:20px; border:1px solid #ccc;">
+               <!-- Giờ thực tế sẽ hiện ở đây -->
+             </span>
           </div>
-          <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
-            <label style="font-size:12px; color:#5f6368; font-weight:700;">退勤時刻 (実際)</label>
-            <input type="time" id="editCheckOut" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
+          <div style="display:flex; gap:15px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+              <label style="font-size:11px; color:#5f6368; font-weight:700;">出勤時刻</label>
+              <input type="time" id="editCheckIn" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
+            </div>
+            <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+              <label style="font-size:11px; color:#5f6368; font-weight:700;">退勤時刻</label>
+              <input type="time" id="editCheckOut" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
+            </div>
           </div>
         </div>
+        <!-- 👆 KẾT THÚC KHỐI NHẬP GIỜ 👆 -->
         <div style="display:flex; flex-direction:column; gap:6px;">
           <label style="font-size:12px; color:#5f6368; font-weight:700;">休憩 (分)</label>
           <input type="number" id="editBreakMins" placeholder="例: 60" style="height:36px; padding:0 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-weight:600; outline:none;">
@@ -558,22 +568,37 @@
   function openAddModal() {
     document.getElementById('modalTitle').innerText = "勤務記録の新規登録";
     document.getElementById('editRowIndex').value = "";
+    
     const empInput = document.getElementById('editEmpInput');
     const locInput = document.getElementById('editLocInput');
     empInput.value = ""; empInput.readOnly = false; empInput.style.backgroundColor = "#fff";
     locInput.value = ""; locInput.readOnly = false; locInput.style.backgroundColor = "#fff";
+    
     document.getElementById('editDate').value = "";
     document.getElementById('editCheckIn').value = "";
     document.getElementById('editCheckOut').value = "";
     document.getElementById('editFee').value = "";
     document.getElementById('editBreakMins').value = "";
+    
+    // Dọn dẹp Audit Log
     const logBox = document.getElementById('editAuditLog');
     if (logBox) {
         logBox.innerHTML = '<div style="color:#94a3b8; font-style:italic;">新規作成のため、変更履歴はありません。</div>';
     }    
+
+    // 👇 ĐOẠN MỚI THÊM: Dọn dẹp cái chữ GPS 📍 trả về mặc định 👇
+    const actualDisplay = document.getElementById('actualTimeDisplay');
+    if (actualDisplay) {
+        actualDisplay.innerHTML = `新規作成`;
+        actualDisplay.style.backgroundColor = "#fff";
+        actualDisplay.style.borderColor = "#ccc";
+    }
+    // 👆 --------------------------------------------------- 👆
+
     document.getElementById('btnSaveRecord').disabled = false;
     document.getElementById('btnDeleteRecord').style.display = "none";
     document.getElementById('locSmartList').innerHTML = "";
+    
     if (masterEmployees.length === 0) {
       document.getElementById('btnSaveRecord').innerText = "読み込み中...";
       document.getElementById('btnSaveRecord').disabled = true;
@@ -596,43 +621,49 @@
     const locInput = document.getElementById('editLocInput');
     
     empInput.value = `${rowObj.empId} | ${rowObj.empName.replace(/\//g, ' ')}`;
-    empInput.readOnly = true; 
-    empInput.style.backgroundColor = "#f1f3f4";
+    empInput.readOnly = true; empInput.style.backgroundColor = "#f1f3f4";
     empInput.onfocus = null; empInput.onkeyup = null; 
     
     locInput.value = rowObj.location || "";
-    locInput.readOnly = true;
-    locInput.style.backgroundColor = "#f1f3f4";
+    locInput.readOnly = true; locInput.style.backgroundColor = "#f1f3f4";
     locInput.onfocus = null; locInput.onkeyup = null;
     
     document.getElementById('editDate').value = rowObj.date.replace(/\//g, '-');
-    document.getElementById('editCheckIn').value = rowObj.checkInActual || "";
-    document.getElementById('editCheckOut').value = rowObj.checkOutActual || "";
     document.getElementById('editFee').value = rowObj.fee || "";
     document.getElementById('editBreakMins').value = rowObj.breakMins || "";
 
-    // 👇 BÁC THÊM ĐOẠN ĐỔ DỮ LIỆU LOG VÀO ĐÂY 👇
+    // 👉 ĐỔI LẠI: Lấy GIỜ LÀM TRÒN đổ vào 2 ô Input cho Admin sửa
+    document.getElementById('editCheckIn').value = rowObj.checkIn || "";
+    document.getElementById('editCheckOut').value = rowObj.checkOut || "";
+
+    // 👉 HIỂN THỊ GIỜ THỰC TẾ LÊN DÒNG BÊN TRÊN (KÈM ICON GPS)
+    const actualDisplay = document.getElementById('actualTimeDisplay');
+    let actIn = rowObj.checkInActual || "--:--";
+    let actOut = rowObj.checkOutActual || "--:--";
+    if (rowObj.hasGPS) {
+        actualDisplay.innerHTML = `<span style="color:#2e7d32;">📍 GPS記録</span> (実: ${actIn} ~ ${actOut})`;
+        actualDisplay.style.borderColor = "#a5d6a7";
+        actualDisplay.style.backgroundColor = "#e8f5e9";
+    } else {
+        actualDisplay.innerHTML = `✍️ 手動入力 (実: ${actIn} ~ ${actOut})`;
+        actualDisplay.style.borderColor = "#ccc";
+        actualDisplay.style.backgroundColor = "#fff";
+    }
+
     const logBox = document.getElementById('editAuditLog');
     if (rowObj.auditLog && rowObj.auditLog.trim() !== "") {
-        // Chẻ string thành mảng theo dấu xuống dòng
         let lines = rowObj.auditLog.split('\n');
         let htmlLog = '';
-        
         lines.forEach(line => {
             if(line.trim()) {
-                // Bôi màu cam cho cái chữ trong ngoặc vuông [2026/10/01... 修正]
                 let formattedLine = line.replace(/\[(.*?)\]/, '<span style="color:#e65100; font-weight:bold;">[$1]</span>');
-                
-                // Bọc mỗi dòng vào 1 thẻ div để không bao giờ bị đè lên nhau
                 htmlLog += `<div style="border-bottom: 1px dashed #e2e8f0; padding-bottom: 4px; margin-bottom: 4px;">${formattedLine}</div>`;
             }
         });
-        
         logBox.innerHTML = htmlLog;
     } else {
         logBox.innerHTML = '<div style="color:#94a3b8; font-style:italic;">変更履歴はありません。</div>';
     }
-    // 👆 KẾT THÚC ĐOẠN ĐỔ LOG 👆
 
     document.getElementById('btnSaveRecord').disabled = false;
     document.getElementById('btnDeleteRecord').style.display = "block";
