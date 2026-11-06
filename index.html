@@ -562,19 +562,23 @@
             書類がある場合は、画像またはPDFファイルを添付してください。<br>
             <span style="color:var(--md-primary); font-weight:bold; font-size: 11px;">※ 書類の提出は任意です。お手元にない場合はそのまま次へお進みください。</span>
           </p>
-          <!-- 👇 KHỐI CHỌN NGÔN NGỮ (TỰ NGUYỆN) 👇 -->
-          <div style="background:var(--md-surface-container); border:1px solid var(--md-outline-variant); border-radius:12px; padding:15px; margin-bottom:20px; position:relative;">
+          <!-- 👇 KHỐI CHỌN NGÔN NGỮ ĐÃ ĐƯỢC FIX TỌA ĐỘ 👇 -->
+          <div style="background:var(--md-surface-container); border:1px solid var(--md-outline-variant); border-radius:12px; padding:15px; margin-bottom:20px;">
             <strong style="color:var(--md-primary); font-size:14px; display:block; margin-bottom:10px;">🌐 対応可能言語 (任意)</strong>
             <p style="font-size: 12px; color: var(--md-on-surface-variant); margin-bottom: 12px;">通訳・翻訳などの語学スキルを活かせる業務をご希望の方は入力してください。</p>
             
-            <div class="tag-input-box" id="tagInputBox" onclick="document.getElementById('langSearch').focus()">
-              <input type="text" id="langSearch" class="tag-input-field" placeholder="言語を入力・選択" autocomplete="off">
+            <!-- ĐÃ THÊM THẺ DIV NÀY ĐỂ GIỮ CHÂN DROPDOWN -->
+            <div style="position: relative;">
+              <div class="tag-input-box" id="tagInputBox" onclick="document.getElementById('langSearch').focus()">
+                <input type="text" id="langSearch" class="tag-input-field" placeholder="言語を入力・選択" autocomplete="off">
+              </div>
+              <div id="langDropdown" class="dropdown-list"></div>
             </div>
-            <div id="langDropdown" class="dropdown-list"></div>
+            
             <!-- Ô ẩn để chứa dữ liệu nối bằng dấu phẩy Zenkaku -->
             <input type="hidden" id="kariLanguages">
           </div>
-          <!-- 👆 KẾT THÚC KHỐI NGÔN NGỮ 👆 -->    
+          <!-- 👆 KẾT THÚC KHỐI NGÔN NGỮ 👆 -->   
           <!-- 👉 KHUNG 1: 履歴書・職務経歴書 (TỰ NGUYỆN) -->
           <div style="background:var(--md-surface-container); border:1px solid var(--md-outline-variant); border-radius:12px; padding:15px; margin-bottom:20px;">
             <strong style="color:var(--md-primary); font-size:14px; display:block; margin-bottom:10px;">📄 履歴書・職務経歴書 (任意)</strong>       
@@ -4109,7 +4113,13 @@
           const div = document.createElement('div');
           div.className = 'dropdown-item';
           div.innerText = lang;
-          div.onclick = () => addTag(lang);
+          
+          // 👉 ĐÃ ĐỔI THÀNH ONMOUSEDOWN ĐỂ CHỐNG LỖI TẮT BẢNG
+          div.onmousedown = (e) => { 
+            e.preventDefault(); // Giữ con trỏ chuột ở lại ô nhập
+            addTag(lang); 
+          };
+          
           dropdown.appendChild(div);
         });
       }
