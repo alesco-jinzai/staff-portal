@@ -4036,7 +4036,8 @@
             email: document.getElementById('kariEmail').value,
             zip: document.getElementById('kariZip').value,
             addr1: document.getElementById('kariAddr1').value,
-            addr2: document.getElementById('kariAddr2').value
+            addr2: document.getElementById('kariAddr2').value,
+            languages: document.getElementById('kariLanguages') ? document.getElementById('kariLanguages').value : ""
         };
         localStorage.setItem('alescoKariDraft', JSON.stringify(draftData));
     }
@@ -4054,6 +4055,12 @@
                 if(draftData.zip) document.getElementById('kariZip').value = draftData.zip;
                 if(draftData.addr1) document.getElementById('kariAddr1').value = draftData.addr1;
                 if(draftData.addr2) document.getElementById('kariAddr2').value = draftData.addr2;
+                // 👇 Phục hồi Ngôn ngữ
+                if(draftData.languages && document.getElementById('kariLanguages')) {
+                    // Cắt chuỗi thành mảng và ném vào selectedLangs
+                    selectedLangs = draftData.languages.split('、').filter(l => l.trim() !== "");
+                    updateTagsUI(); // Vẽ lại các cục Tag màu xanh
+                }
             } catch(e){}
         }
     }
@@ -4089,23 +4096,43 @@
     // 2. Logic xử lý Tag Input
     let selectedLangs = [];
     
+    // ==========================================
+    // LOGIC XỬ LÝ DROPDOWN NGÔN NGỮ (BỌC THÉP)
+    // ==========================================
+    // Khởi tạo mảng trống nếu chưa có
+    if (typeof selectedLangs === 'undefined') {
+        var selectedLangs = [];
+    }
+
     function initTagInput() {
       const searchInput = document.getElementById('langSearch');
       const dropdown = document.getElementById('langDropdown');
       const box = document.getElementById('tagInputBox');
 
-      if(!searchInput) return;
+      if(!searchInput || !dropdown || !box) return; // Nếu k thấy HTML thì bỏ qua
 
-      searchInput.addEventListener('focus', () => { box.classList.add('focused'); renderTagDropdown(''); });
-      searchInput.addEventListener('blur', () => { box.classList.remove('focused'); setTimeout(() => dropdown.classList.remove('show'), 200); });
-      searchInput.addEventListener('input', (e) => { renderTagDropdown(e.target.value); });
+      searchInput.addEventListener('focus', () => { 
+          box.classList.add('focused'); 
+          renderTagDropdown(''); 
+      });
+      
+      searchInput.addEventListener('blur', () => { 
+          box.classList.remove('focused'); 
+          setTimeout(() => dropdown.classList.remove('show'), 200); 
+      });
+      
+      searchInput.addEventListener('input', (e) => { 
+          renderTagDropdown(e.target.value); 
+      });
     }
 
     function renderTagDropdown(query) {
       const dropdown = document.getElementById('langDropdown');
-      dropdown.innerHTML = '';
+      if (!dropdown) return;
       
+      dropdown.innerHTML = '';
       const filtered = languageList.filter(lang => !selectedLangs.includes(lang) && lang.toLowerCase().includes(query.toLowerCase()));
+      
       if (filtered.length === 0) {
         dropdown.innerHTML = '<div class="dropdown-item" style="color:#999; pointer-events:none;">見つかりません</div>';
       } else {
@@ -4113,13 +4140,10 @@
           const div = document.createElement('div');
           div.className = 'dropdown-item';
           div.innerText = lang;
-          
-          // 👉 ĐÃ ĐỔI THÀNH ONMOUSEDOWN ĐỂ CHỐNG LỖI TẮT BẢNG
           div.onmousedown = (e) => { 
-            e.preventDefault(); // Giữ con trỏ chuột ở lại ô nhập
-            addTag(lang); 
+              e.preventDefault(); // Chống mất focus
+              addTag(lang); 
           };
-          
           dropdown.appendChild(div);
         });
       }
@@ -4127,40 +4151,48 @@
     }
 
     function addTag(lang) {
-      selectedLangs.push(lang);
+      if (!selectedLangs.includes(lang)) {
+          selectedLangs.push(lang);
+      }
       document.getElementById('langSearch').value = '';
       updateTagsUI();
+      saveKariDraft(); // Gọi lưu nháp ngay lập tức
     }
 
     function removeTag(lang) {
       selectedLangs = selectedLangs.filter(l => l !== lang);
       updateTagsUI();
+      saveKariDraft(); // Gọi lưu nháp ngay lập tức
     }
 
     function updateTagsUI() {
       const box = document.getElementById('tagInputBox');
       const searchInput = document.getElementById('langSearch');
       const hiddenInput = document.getElementById('kariLanguages');
+      if (!box || !searchInput || !hiddenInput) return;
       
+      // Xóa hết tag cũ trên màn hình
       document.querySelectorAll('#tagInputBox .tag').forEach(t => t.remove());
 
+      // Vẽ lại tag mới
       selectedLangs.forEach(lang => {
         const tag = document.createElement('div');
         tag.className = 'tag';
-        tag.innerHTML = `${lang} <span class="tag-close" onclick="removeTag('${lang}')">×</span>`;
+        tag.innerHTML = `${lang} <span class="tag-close" onmousedown="event.preventDefault(); removeTag('${lang}')">×</span>`;
         box.insertBefore(tag, searchInput);
       });
 
-      // 👉 ĐIỂM ĂN TIỀN: Nối mảng bằng dấu phẩy Zenkaku 
       hiddenInput.value = selectedLangs.join('、');
       
-      renderTagDropdown('');
+      renderTagDropdown(''); // Cập nhật lại list sau khi thêm
       searchInput.focus();
     }
 
-    // Kích hoạt khi trang load xong
+    // 👉 ÉP KÍCH HOẠT HÀM KHI LOAD XONG TRANG
     document.addEventListener("DOMContentLoaded", () => {
-      initTagInput();
+        setTimeout(() => {
+            initTagInput();
+        }, 500); // Đợi 0.5s cho chắc cốp HTML đã render xong
     });
               
   </script>
