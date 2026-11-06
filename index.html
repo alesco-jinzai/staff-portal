@@ -387,6 +387,20 @@
       line-height: 1.2;
       text-align: center;
     }
+
+    /* --- SMART TAG INPUT (CHỌN NGÔN NGỮ) --- */
+    .tag-input-box { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; width: 100%; min-height: 54px; padding: 8px 16px; background-color: var(--md-surface-container); border: 1px solid var(--md-outline); border-radius: 12px; transition: 0.2s; cursor: text; }
+    .tag-input-box.focused { border-color: var(--md-primary); background-color: var(--md-surface); box-shadow: 0 0 0 2px rgba(0, 97, 164, 0.1); }
+    .tag { background-color: var(--md-primary-container); color: var(--md-on-primary-container); font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 8px; display: flex; align-items: center; gap: 6px; }
+    .tag-close { cursor: pointer; color: var(--md-primary); font-weight: bold; font-size: 16px; line-height: 1; }
+    .tag-close:hover { color: var(--md-error); }
+    .tag-input-field { border: none !important; outline: none !important; box-shadow: none !important; padding: 0 !important; height: 30px !important; flex: 1; min-width: 120px; font-size: 15px; background: transparent !important; }
+    .dropdown-list { position: absolute; top: 100%; left: 0; width: 100%; max-height: 200px; overflow-y: auto; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; display: none; margin-top: 4px; }
+    .dropdown-list.show { display: block; }
+    .dropdown-item { padding: 12px 16px; font-size: 14px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid #F3F4F6; }
+    .dropdown-item:last-child { border-bottom: none; }
+    .dropdown-item:hover { background-color: var(--md-surface-variant); color: var(--md-primary); font-weight: 700; }
+    
   </style>
 </head>
 <body>
@@ -552,6 +566,21 @@
           <!-- 👉 KHUNG 1: 履歴書・職務経歴書 (TỰ NGUYỆN) -->
           <div style="background:var(--md-surface-container); border:1px solid var(--md-outline-variant); border-radius:12px; padding:15px; margin-bottom:20px;">
             <strong style="color:var(--md-primary); font-size:14px; display:block; margin-bottom:10px;">📄 履歴書・職務経歴書 (任意)</strong>
+            
+            <!-- 👇 KHỐI CHỌN NGÔN NGỮ (TỰ NGUYỆN) 👇 -->
+            <div style="background:var(--md-surface-container); border:1px solid var(--md-outline-variant); border-radius:12px; padding:15px; margin-bottom:20px; position:relative;">
+              <strong style="color:var(--md-primary); font-size:14px; display:block; margin-bottom:10px;">🌐 対応可能言語 (任意)</strong>
+              <p style="font-size: 12px; color: var(--md-on-surface-variant); margin-bottom: 12px;">通訳・翻訳などの語学スキルを活かせる業務をご希望の方は入力してください。</p>
+              
+              <div class="tag-input-box" id="tagInputBox" onclick="document.getElementById('langSearch').focus()">
+                <input type="text" id="langSearch" class="tag-input-field" placeholder="言語を入力・選択" autocomplete="off">
+              </div>
+              <div id="langDropdown" class="dropdown-list"></div>
+              <!-- Ô ẩn để chứa dữ liệu nối bằng dấu phẩy Zenkaku -->
+              <input type="hidden" id="kariLanguages">
+            </div>
+            <!-- 👆 KẾT THÚC KHỐI NGÔN NGỮ 👆 -->            
+            
             <div id="kariUploadZoneResume">
               <div class="upload-box dynamic-upload" id="box_Resume_1">
                 <div class="file-input-wrapper">
@@ -2479,7 +2508,8 @@
           zipcode: document.getElementById('kariZip').value,
           address1: document.getElementById('kariAddr1').value,
           address2: document.getElementById('kariAddr2').value,
-          address3: document.getElementById('kariAddr3').value
+          address3: document.getElementById('kariAddr3').value,
+          languages: document.getElementById('kariLanguages').value 
         };
 
         setLoading(true, "データを送信中...", "少々お待ちください");
@@ -4025,6 +4055,105 @@
         });
     });
 
+    // 1. Danh sách ngôn ngữ (Copy từ Partner App)
+    const languageList = [
+      "アイスランド語", "アイマラ語", "アイルランド語", "アヴァル語", "アゼルバイジャン語", "アチェ語", "アチョリ語", "アッサム語", "アファール語", "アブハズ語", 
+      "アフリカーンス語", "アムハラ語", "アラビア語", "アルール語", "アルバニア語", "アルメニア語", "アワディー語", "イタリア語", "イディッシュ語", "イヌクトゥット語（ラテン文字）", 
+      "イヌクトゥット語（音節文字）", "イバン語", "イボ語", "イロカノ語", "インドネシア語", "ウイグル語", "ウェールズ語", "ヴェネト語", "ヴェンダ語", "ウォロフ語", 
+      "ウクライナ語", "ウズベク語", "ウドムルト語", "ウルドゥ語", "エウェ語", "エストニア語", "エスペラント語", "オセット語", "オック語", "オディア語（オリヤ語）", 
+      "オランダ語", "オロモ語", "カーシ語", "ガー語", "カザフ語", "カタルーニャ語", "カヌリ語", "カラーリット語", "ガリシア語", "カンナダ語", "キガ語", "キコンゴ語", 
+      "キトゥバ語", "キニヤルワンダ語", "ギリシャ語", "キルギス語", "グアラニ語", "グジャラート語", "クメール語", "クリオ語", "クリミア タタール語（キリル文字）", 
+      "クリミア タタール語（ラテン文字）", "クルド語（クルマンジー）", "クルド語（ソラニー）", "クレオール語（セーシェル）", "クレオール語（モーリシャス）", "クロアチア語", 
+      "ケクチ語", "ケチュア語", "コーサ語", "コクバラ語", "コミ語", "コルシカ語", "コンカニ語", "サーミ語（北部）", "サポテク語", "サモア語", "サンゴ語", "サンスクリット語", 
+      "サンタル語（オルチキ文字）", "サンタル語（ラテン文字）", "シチリア語", "ジャマイカ クレオール語", "ジャワ語", "シャン語", "ジュラ語", "ジョージア語（グルジア語）", 
+      "ショナ語", "シロンスク語", "シンド語", "シンハラ語", "ジンポー語", "スウェーデン語", "ズールー語", "スコットランド ゲール語", "スス語", "スペイン語", "スロバキア語", 
+      "スロベニア語", "スワート語", "スワヒリ語", "スンダ語", "セブアノ語", "セペディ語", "セルビア語", "ソト語", "ソマリ語", "ゾンカ語", "タイ語", "タガログ語", "タジク語", 
+      "タタール語", "タヒチ語", "タマージク語", "タマージク語（ティフィナグ）", "タミル語", "ダリー語", "チェコ語", "チェチェン語", "チェワ語", "チベット語", "チャモロ語", 
+      "チュヴァシ語", "チューク語", "ツォンガ語", "ツワナ語", "ティグリニャ語", "ティブ語", "ディベヒ語", "ディンカ語", "テトゥン語", "テルグ語", "デンマーク語", "ドイツ語", 
+      "トゥイ語", "トゥバ語", "トゥル語", "トゥンブカ語", "トクピシン語", "ドグリ語", "トルクメン語", "トルコ語", "トンガ語", "ドンベ語", "ナワトル語（東部ウアステカ）", 
+      "ヌエル語", "ネパールバサ語（ネワール語）", "ネパール語", "ノルウェー語", "ハイチ語", "ハウサ語", "バウレ語", "ハカ チン語", "バシキール語", "パシュト語", "バスク語", 
+      "バタク カロ語", "バタク シマルングン語", "バタクトバ語", "パピアメント語", "バリ語", "バルーチー語", "ハワイ語", "パンガシナン語", "ハンガリー語", "パンジャブ語（グルムキー）", 
+      "パンジャブ語（シャームキー）", "バンバラ語", "パンパンガ語", "ビコール語", "ヒリガイノン語", "ヒンディー語", "フィジー語", "フィンランド語", "フェロー語", "フォン語", 
+      "フラニ語", "フランス語", "フランス語（カナダ）", "フリウリ語", "フリジア語", "ブリヤート語", "ブルガリア語", "ブルトン語", "フンスリュック語", "ベタウィ語", "ベトナム語", 
+      "ヘブライ語", "ベラルーシ語", "ペルシャ語", "ベンガル語", "ベンバ語", "ボージュプリー語", "ポーランド語", "ボスニア語", "ポルトガル語（ブラジル）", "ポルトガル語（ポルトガル）", 
+      "マーシャル語", "マイティリー語", "マオリ語", "マカッサル語", "マケドニア語", "マドゥラ語", "マム語", "マラーティー語", "マラガシ語", "マラヤーラム語", "マルタ語", 
+      "マルワディー語", "マレー語", "マレー語（ジャウィ）", "マン島語", "ミゾ語", "ミナン語", "ミャンマー語（ビルマ語）", "メイテイ語（マニプリ語）", "モンゴル語", "モン語", 
+      "ヤクート語", "ユカテコマヤ語", "ヨルバ語", "ラオ語", "ラテン語", "ラトガリア語", "ラトビア語", "リグリア語", "リトアニア語", "リンガラ語", "リンブルフ語", "ルーマニア語", 
+      "ルオ語", "ルガンダ語", "ルクセンブルク語", "ルバ語", "ルンディ語", "ロシア語", "ロマーニー語", "ロンバルド語", "ワライ語", "ンコ語", "ンダウ語", "ンデベレ語（南部）", 
+      "英語", "韓国語", "広東語", "中国語（簡体）", "中国語（繁体）", "牧地マリ語"
+    ];
+
+    // 2. Logic xử lý Tag Input
+    let selectedLangs = [];
+    
+    function initTagInput() {
+      const searchInput = document.getElementById('langSearch');
+      const dropdown = document.getElementById('langDropdown');
+      const box = document.getElementById('tagInputBox');
+
+      if(!searchInput) return;
+
+      searchInput.addEventListener('focus', () => { box.classList.add('focused'); renderTagDropdown(''); });
+      searchInput.addEventListener('blur', () => { box.classList.remove('focused'); setTimeout(() => dropdown.classList.remove('show'), 200); });
+      searchInput.addEventListener('input', (e) => { renderTagDropdown(e.target.value); });
+    }
+
+    function renderTagDropdown(query) {
+      const dropdown = document.getElementById('langDropdown');
+      dropdown.innerHTML = '';
+      
+      const filtered = languageList.filter(lang => !selectedLangs.includes(lang) && lang.toLowerCase().includes(query.toLowerCase()));
+      if (filtered.length === 0) {
+        dropdown.innerHTML = '<div class="dropdown-item" style="color:#999; pointer-events:none;">見つかりません</div>';
+      } else {
+        filtered.forEach(lang => {
+          const div = document.createElement('div');
+          div.className = 'dropdown-item';
+          div.innerText = lang;
+          div.onclick = () => addTag(lang);
+          dropdown.appendChild(div);
+        });
+      }
+      dropdown.classList.add('show');
+    }
+
+    function addTag(lang) {
+      selectedLangs.push(lang);
+      document.getElementById('langSearch').value = '';
+      updateTagsUI();
+    }
+
+    function removeTag(lang) {
+      selectedLangs = selectedLangs.filter(l => l !== lang);
+      updateTagsUI();
+    }
+
+    function updateTagsUI() {
+      const box = document.getElementById('tagInputBox');
+      const searchInput = document.getElementById('langSearch');
+      const hiddenInput = document.getElementById('kariLanguages');
+      
+      document.querySelectorAll('#tagInputBox .tag').forEach(t => t.remove());
+
+      selectedLangs.forEach(lang => {
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+        tag.innerHTML = `${lang} <span class="tag-close" onclick="removeTag('${lang}')">×</span>`;
+        box.insertBefore(tag, searchInput);
+      });
+
+      // 👉 ĐIỂM ĂN TIỀN: Nối mảng bằng dấu phẩy Zenkaku 
+      hiddenInput.value = selectedLangs.join('、');
+      
+      renderTagDropdown('');
+      searchInput.focus();
+    }
+
+    // Kích hoạt khi trang load xong
+    document.addEventListener("DOMContentLoaded", () => {
+      initTagInput();
+    });
+              
   </script>
 </body>
 </html>
