@@ -2066,6 +2066,8 @@
       return "";
     }
     document.addEventListener('DOMContentLoaded', () => {
+      
+      // 1. FORMAT Ô SỐ ĐIỆN THOẠI (Chỉ nhập số, tối đa 11 ký tự)
       const phoneInputs = ['authPhone', 'kariPhone', 'kariLandline'];
       phoneInputs.forEach(id => {
         const input = document.getElementById(id);
@@ -2076,6 +2078,8 @@
           });
         }
       });
+    
+      // 2. FORMAT Ô MÃ BƯU ĐIỆN (Zipcode) (Tự chèn dấu gạch ngang)
       const zipInputs = ['kariZip'];
       zipInputs.forEach(id => {
         const input = document.getElementById(id);
@@ -2090,6 +2094,8 @@
           });
         }
       });
+    
+      // 3. TỰ ĐỘNG ĐĂNG NHẬP BẰNG DATA LƯU SẴN (Smart Login)
       const savedPhone = localStorage.getItem('alescoPhone');
       const savedDob = localStorage.getItem('alescoDob');
       const savedUserObj = localStorage.getItem('alescoUserObj');
@@ -2129,11 +2135,16 @@
               localStorage.clear();
           }
       }
-
-      // 1. Phục hồi dữ liệu nếu có nháp
+    
+      // 4. KÍCH HOẠT DROPDOWN CHỌN NGÔN NGỮ (Tự nguyện)
+      if (typeof initTagInput === 'function') {
+          initTagInput();
+      }
+    
+      // 5. PHỤC HỒI DỮ LIỆU ĐANG GÕ DỞ (Draft)
       loadKariDraft();
-
-      // 2. Cứ mỗi lần gõ phím vào form Kari là tự động lưu nháp
+    
+      // 6. GẮN MÁY NGHE LÉN (Tự lưu nháp khi gõ)
       const kariInputs = ['kariLastName', 'kariFirstName', 'kariLastKana', 'kariFirstKana', 'kariDob', 'kariPhone', 'kariEmail', 'kariZip', 'kariAddr1', 'kariAddr2'];
       kariInputs.forEach(id => {
           const el = document.getElementById(id);
@@ -2141,7 +2152,7 @@
               el.addEventListener('input', saveKariDraft);
           }
       });
-
+    
     });
 
     window.nextKariStep = function(step) {
@@ -4042,15 +4053,6 @@
             } catch(e){}
         }
     }
-
-    // Gắn "máy nghe lén" vào các ô nhập. Cứ gõ phím là tự lưu.
-    document.addEventListener('DOMContentLoaded', () => {
-        const kariInputs = ['kariLastName', 'kariFirstName', 'kariLastKana', 'kariFirstKana', 'kariEmail', 'kariZip', 'kariAddr1', 'kariAddr2'];
-        kariInputs.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.addEventListener('input', saveKariDraft);
-        });
-    });
 
     // 1. Danh sách ngôn ngữ (Copy từ Partner App)
     const languageList = [
