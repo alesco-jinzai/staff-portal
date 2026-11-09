@@ -387,20 +387,6 @@
       line-height: 1.2;
       text-align: center;
     }
-
-    /* --- SMART TAG INPUT (CHỌN NGÔN NGỮ) --- */
-    .tag-input-box { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; width: 100%; min-height: 54px; padding: 8px 16px; background-color: var(--md-surface-container); border: 1px solid var(--md-outline); border-radius: 12px; transition: 0.2s; cursor: text; }
-    .tag-input-box.focused { border-color: var(--md-primary); background-color: var(--md-surface); box-shadow: 0 0 0 2px rgba(0, 97, 164, 0.1); }
-    .tag { background-color: var(--md-primary-container); color: var(--md-on-primary-container); font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 8px; display: flex; align-items: center; gap: 6px; }
-    .tag-close { cursor: pointer; color: var(--md-primary); font-weight: bold; font-size: 16px; line-height: 1; }
-    .tag-close:hover { color: var(--md-error); }
-    .tag-input-field { border: none !important; outline: none !important; box-shadow: none !important; padding: 0 !important; height: 30px !important; flex: 1; min-width: 120px; font-size: 15px; background: transparent !important; }
-    .dropdown-list { position: absolute; top: 100%; left: 0; width: 100%; max-height: 200px; overflow-y: auto; background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; display: none; margin-top: 4px; }
-    .dropdown-list.show { display: block; }
-    .dropdown-item { padding: 12px 16px; font-size: 14px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid #F3F4F6; }
-    .dropdown-item:last-child { border-bottom: none; }
-    .dropdown-item:hover { background-color: var(--md-surface-variant); color: var(--md-primary); font-weight: 700; }
-    
   </style>
 </head>
 <body>
@@ -412,7 +398,7 @@
       <div style="font-size: 60px; margin-bottom: 10px;">🎉</div>
       <h2 style="color: var(--md-success); margin: 0 0 10px 0; font-size: 20px;">すべての提出が完了しました！</h2>
       <p style="font-size: 14px; color: var(--md-on-surface-variant); margin-bottom: 24px; line-height: 1.5;">入社に必要な書類の提出がすべて完了しました。<br>ご協力ありがとうございました。</p>
-      
+
       <!-- 👉 ĐÃ SỬA: Đổi nút thành "Đóng", tắt popup và ở lại trang MyPage -->
       <button class="btn btn-primary" style="height: 56px; font-size: 16px; margin: 0;" onclick="closeFinalPopup()">
         確認
@@ -563,11 +549,9 @@
             <span style="color:var(--md-primary); font-weight:bold; font-size: 11px;">※ 書類の提出は任意です。お手元にない場合はそのまま次へお進みください。</span>
           </p>
 
-          <!-- 👆 KHỐI NGÔN NGỮ 👆 -->   
-          
           <!-- 👉 KHUNG 1: 履歴書・職務経歴書 (TỰ NGUYỆN) -->
           <div style="background:var(--md-surface-container); border:1px solid var(--md-outline-variant); border-radius:12px; padding:15px; margin-bottom:20px;">
-            <strong style="color:var(--md-primary); font-size:14px; display:block; margin-bottom:10px;">📄 履歴書・職務経歴書 (任意)</strong>       
+            <strong style="color:var(--md-primary); font-size:14px; display:block; margin-bottom:10px;">📄 履歴書・職務経歴書 (任意)</strong>
             <div id="kariUploadZoneResume">
               <div class="upload-box dynamic-upload" id="box_Resume_1">
                 <div class="file-input-wrapper">
@@ -771,7 +755,7 @@
           <button class="btn btn-primary" style="background:#1565c0; height:48px; font-size:14px; margin:0;" onclick="openTask('misc', '指定書')">追加書類から提出する</button>
         </div>
         <!-- 👆 KẾT THÚC CẢNH BÁO SHITEISHO 👆 -->
-        
+
         <div id="taskList"></div>
         <div style="margin-top: 40px; border-top: 1px solid var(--md-outline-variant); padding-top: 24px;">
           <button id="mpBtnBack" class="btn btn-gray" onclick="renderAttendanceView()">戻る</button>
@@ -812,13 +796,13 @@
       <div id="manualModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(3px);">
         <div style="background: var(--md-surface-container); padding: 24px 20px; border-radius: var(--shape-large); width: 90%; max-width: 400px; max-height: 90vh; overflow-y: auto; box-shadow: var(--elevation-2);">
           <h3 id="manualModalTitle" style="text-align:center; margin: 0 0 16px 0; color: var(--md-primary); font-size: 18px;">勤務記録の修正</h3>
-          
+
           <label style="margin-bottom: 4px; display:block; font-size: 13px; font-weight: 500; color: var(--md-on-surface-variant);">日付</label>
           <input type="date" id="manualDate" style="width: 100%; margin-bottom: 12px; height: 48px; border: 1px solid var(--md-outline); border-radius: var(--shape-medium); padding: 0 16px; box-sizing: border-box; font-size: 16px;">
-          
+
           <label style="margin-bottom: 4px; display:block; font-size: 13px; font-weight: 500; color: var(--md-on-surface-variant);">勤務地</label>
           <select id="manualLocation" style="width: 100%; margin-bottom: 12px; height: 48px; border: 1px solid var(--md-outline); border-radius: var(--shape-medium); padding: 0 16px; box-sizing: border-box; font-size: 16px;"></select>
-          
+
           <div style="display:flex; gap:10px; margin-bottom: 12px;">
             <div style="flex:1;">
               <label style="margin-bottom: 4px; display:block; font-size: 13px; font-weight: 500; color: var(--md-on-surface-variant);">出勤時間</label>
@@ -829,7 +813,7 @@
               <input type="time" id="manualOut" style="width: 100%; height: 48px; border: 1px solid var(--md-outline); border-radius: var(--shape-medium); padding: 0 16px; box-sizing: border-box; font-size: 16px;">
             </div>
           </div>
-          
+
           <div style="display:flex; gap:10px; margin-bottom: 20px;">
             <div style="flex:1;">
               <label style="margin-bottom: 4px; display:block; font-size: 13px; font-weight: 500; color: var(--md-on-surface-variant);">休憩時間 (分)</label>
@@ -840,9 +824,9 @@
               <input type="tel" id="manualFee" inputmode="numeric" placeholder="例: 500" style="width: 100%; height: 48px; border: 1px solid var(--md-outline); border-radius: var(--shape-medium); padding: 0 16px; box-sizing: border-box; font-size: 16px;">
             </div>
           </div>
-          
+
           <input type="hidden" id="manualRowIndex">
-          
+
           <div style="display:flex; gap:10px;">
             <button class="btn btn-gray" style="flex:1; margin:0; height: 48px;" onclick="document.getElementById('manualModal').style.display='none'">キャンセル</button>
             <button class="btn btn-primary" style="flex:1; margin:0; height: 48px;" onclick="saveManualData()">保存</button>
@@ -963,7 +947,7 @@
         <p style="font-size:13px; color:#5f6368; margin-bottom:15px; line-height: 1.5;">
           学生証、診断書、資格証など、追加で提出が必要な書類はこちらからアップロードしてください。
         </p>
-        
+
         <div id="miscUploadZone">
           <!-- Box Upload 1 (Mặc định) -->
           <div class="upload-box dynamic-misc-upload" id="miscBox_1">
@@ -975,7 +959,7 @@
                 <!-- Droplist sinh bằng JS -->
               </div>
             </div>
-            
+
             <label>ファイル <span class="error-message" id="miscFileError_1" style="display:none;">（ファイルを選択してください）</span></label>
             <div class="file-input-wrapper">
               <input type="file" id="miscFile_1" accept="image/*,.pdf,.doc,.docx" onchange="previewMiscImg(this, 1)">
@@ -1089,7 +1073,7 @@
       if (!nameStr) return "---";
       return String(nameStr).replace(/\//g, ' ');
     }
-    
+
     function searchAddress() {
       const zip = document.getElementById('regZip').value.replace(/[^0-9]/g, "");
       if(zip.length !== 7) return alert("郵便番号は7桁で入力してください。"); 
@@ -1110,13 +1094,13 @@
       const phoneInput = document.getElementById('authPhone');
       const dobInput = document.getElementById('authDob');
       const errorEl = document.getElementById('authError');
-      
+
       phoneInput.classList.remove('input-error');
       dobInput.classList.remove('input-error');
       errorEl.style.display = 'none';
-      
+
       const phoneVal = phoneInput.value.replace(/\D/g, ""); 
-      
+
       // 👇 BỘ LỌC CHỐNG AUTOFILL IPHONE 👇
       let rawDob = dobInput.value;
       let safeDob = "";
@@ -1148,7 +1132,7 @@
         return; 
       }
       setLoading(true);
-      
+
       fetch(GAS_WEB_APP_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -1168,13 +1152,13 @@
         }
         localStorage.setItem('alescoPhone', phoneVal);
         localStorage.setItem('alescoDob', safeDob);
-        
+
         if (res.user) {
             localStorage.setItem('alescoUserObj', JSON.stringify(res.user));
         } else {
             localStorage.removeItem('alescoUserObj');
         }
-        
+
         if (res.route === "step1") {
           localStorage.removeItem('alescoKariDraft');
           resetKariForm();
@@ -1185,10 +1169,10 @@
             document.getElementById('kariLandline').value = phoneInput.value;
             showLandlineField(); 
           }
-          
+
           // Dùng safeDob ném vào ô nhập để tránh lỗi Safari
           document.getElementById('kariDob').value = safeDob; 
-          
+
           showView('viewKari');
           showCustomAlert("初めての登録ですね。\nプロフィールを入力してください。", "info");
         } else if (res.route === "step2") {
@@ -1221,10 +1205,10 @@
     // 👉 DÁN ĐOẠN NÀY LÊN TRÊN HÀM renderMyPage():
     function closeFinalPopup() {
       document.getElementById('finalSuccessPopup').style.display = 'none';
-      
+
       const honReg = document.getElementById('viewHonRegister');
       const isFromWizard = honReg && honReg.classList.contains('active');
-      
+
       if (isFromWizard) {
           localStorage.removeItem('alescoPhone'); 
           localStorage.removeItem('alescoDob');
@@ -1235,14 +1219,14 @@
           renderMyPage(); 
       }
     }
-    
+
     function renderMyPage() {
       showView('viewMyPage');
       document.getElementById('mpUserName').innerText = safeCleanName(currentUser.name) + " 様";
-      
+
       // Hiển thị loại hình, nếu trống thì báo "Chưa cài đặt" để nó biết đường liên hệ HR
       document.getElementById('mpUserType').innerText = currentUser.employmentType || "未設定 (会社にご連絡ください)"; 
-      
+
       const isFullyOnboarded = currentUser.progress && currentUser.progress.indexOf("完了") > -1;
       const btnBack = document.getElementById('mpBtnBack');
       if (btnBack) {
@@ -1252,7 +1236,7 @@
 
       let fuyoStatus = currentUser.statusFuyo || "";
       let isMainEmployee = (currentUser.employmentType === 'メイン');
-      
+
       // Nếu là "メイン" mà chưa nộp Fuyo thì mới hiện cảnh báo đỏ
       let needsFuyo = (isMainEmployee && fuyoStatus.indexOf('提出済') === -1);
       document.getElementById('shinkokushoAlert').style.display = needsFuyo ? 'block' : 'none';
@@ -1278,17 +1262,17 @@
 // (Tìm cái dòng isForeigner này làm mốc)
       const isForeigner = (currentUser.nationality !== '日本');
       const idTitle = isForeigner ? '在留カード' : '身分証 / 在留カード';
-      
+
       // 👉 THÊM BIẾN NÀY ĐỂ CHECK XEM CÓ NỢ RIREKISHO KHÔNG
       const resumeStatus = currentUser.statusResume || ""; 
 
       const allTasksList = [
         // 1. マイナンバー提供
         { id: 'mynumber',  title: 'マイナンバー提供', status: currentUser.statusMyNumber, desc: "マイナンバーカード、通知カード等" },
-        
+
         // 2. 身分証/在留カード
         { id: 'id',        title: idTitle, status: currentUser.statusID, desc: "身分証明書・在留カード等" },
-        
+
         // 3. 口座情報
         { id: 'bank',      title: '口座情報', status: currentUser.statusBank, desc: "給与振込先となる通帳の口座情報ページ等" }
       ];
@@ -1314,13 +1298,13 @@
 
       // 6. 告知書兼同意書
       allTasksList.push({ id: 'consent',   title: '告知書兼同意書', status: currentUser.statusConsent, desc: "個人情報の取扱いに関する同意" });
-      
+
       // 7. 承諾書
       allTasksList.push({ id: 'agreement', title: '承諾書', status: currentUser.statusAgreement, desc: "労働条件の電子明示に関する承諾" });
-      
+
       // 8. 秘密保持契約書
       allTasksList.push({ id: 'nda',       title: '秘密保持契約書', status: currentUser.statusNDA, desc: "機密情報の取扱いに関する契約" });
-      
+
       // 9. 個人情報保護教育
       allTasksList.push({ id: 'edu',       title: '個人情報保護教育', status: currentUser.statusEdu, desc: "Pマーク教育資料の確認とテスト" });
 
@@ -1331,7 +1315,7 @@
         let statusText = t.status || "";
         let isSkipped = statusText.includes('提出不要') || statusText.includes('提供拒否');
         let isDone = statusText.includes('同意済') || statusText.includes('完了') || statusText.includes('提出済');
-        
+
         let badgeClass = 'status-wait';
         let badgeText = '未対応';
 
@@ -1352,9 +1336,9 @@
           if (t.id === 'fuyo') clickAction = `onclick="openFuyoForm()"`;
           else clickAction = `onclick="openTask('${t.id}')"`;
         }
-        
+
         let cardClass = !canClick ? "task-card is-done" : "task-card";
-        
+
         html += `
           <div class="${cardClass}" ${clickAction}>
             <div style="flex:1; padding-right:15px;">
@@ -1374,16 +1358,16 @@
       const content = document.getElementById('taskDetailContent');
       const actions = document.getElementById('taskDetailActions');
       content.innerHTML = ''; actions.innerHTML = '';
-      
+
       let historyHtml = '';
       let currentStatus = '';
-      
+
       // Lấy lịch sử nộp để hiện ra
       if(id === 'id') currentStatus = currentUser.statusID;
       if(id === 'bank') currentStatus = currentUser.statusBank;
       if(id === 'mynumber') currentStatus = currentUser.statusMyNumber;
       if(id === 'resume') currentStatus = currentUser.statusResume; // 👉 THÊM CV VÀO ĐÂY
-      
+
       if (currentStatus && currentStatus.includes('提出済')) {
         const lines = currentStatus.split('\n');
         let logItems = '';
@@ -1411,7 +1395,7 @@
         if (id === 'agreement') docTitle = '承諾書';
         if (id === 'nda') docTitle = '秘密保持契約書';
         title.innerText = docTitle;
-        
+
         content.innerHTML = `
           <div class="scroll-container">
             <div class="scroll-box" id="docBox" onscroll="handleScrollStrict(this, 'taskCheck', 'hintText')">${getDocContent(id)}</div>
@@ -1492,7 +1476,7 @@
       // NHÁNH 4: NỘP HỒ SƠ KHÔNG GIỚI HẠN FILE (DÀNH CHO CV)
       else if (id === 'resume') {
         title.innerText = '履歴書・職務経歴書';
-        
+
         let html = historyHtml + `
           <p style="font-size:13px; color:#5f6368; margin-bottom:15px; line-height: 1.5;">
             お手持ちの履歴書・職務経歴書の画像またはPDFファイルをアップロードしてください。（複数枚ある場合は「＋ファイルを追加」を押してください）
@@ -1526,7 +1510,7 @@
       else {
         let docTitle = (id === 'id') ? '身分証 / 在留カード' : '銀行口座情報';
         title.innerText = docTitle;
-        
+
         let html = historyHtml + `
           <div class="upload-box" id="box_f1">
             <label>1枚目の画像 <span class="error-message" id="error_f1" style="display:none; color:var(--error);">(画像を選択してください)</span></label>
@@ -1534,7 +1518,7 @@
             <div class="preview-container" id="p1-c"><img id="p1" class="preview-img"></div>
           </div>
         `;
-        
+
         if(id === 'id') {
           html += `
             <div class="upload-box" id="box_f2">
@@ -1573,7 +1557,7 @@
       const area = document.getElementById('taskTestArea');
       if (area) area.style.display = cb.checked ? 'block' : 'none'; 
     }
-    
+
     function toggleCheckboxFromBox(checkId) {
       const cb = document.getElementById(checkId);
       if(cb && !cb.disabled) {
@@ -1723,7 +1707,7 @@
 
     let fuyoPollingTimer = null;
     let fuyoPollCount = 0;
-    
+
     function openFuyoForm() {
       const baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdbGr6tn2GQ6a7Fyg8v6IxN1Uies_Q35EWoehULIgrXGifkXA/viewform";
       const cleanName = currentUser.name ? currentUser.name.replace(/\//g, ' ') : '';
@@ -1762,12 +1746,12 @@
         }).getUserStatusById(currentUser.id);
       }, 5000); 
     }
-    
+
     function cancelFuyoPolling() {
       if (fuyoPollingTimer) clearInterval(fuyoPollingTimer);
       document.getElementById('fuyoWaitModal').style.display = 'none';
     }
-    
+
     function submitSignature(type) {
       const signInput = document.getElementById('taskSign');
       const checkInput = document.getElementById('taskCheck');
@@ -1822,27 +1806,27 @@
       const checkInput = document.getElementById('taskCheck');
       const errorMsg = document.getElementById('eduCheckError');
       if (errorMsg) errorMsg.style.display = 'none';
-      
+
       if(!checkInput || !checkInput.checked) {
         if (errorMsg) errorMsg.style.display = 'block';
         const grp = document.getElementById('checkGroup');
         if (grp) grp.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
-      
+
       let results = [];
       let firstMissingQ = null;
-      
+
       // Tìm đúng cái bảng thi của MyPage
       const testContainer = document.getElementById('taskTestArea') || document.getElementById('testArea');
       const qBoxes = testContainer.querySelectorAll('.test-q-box');
-      
+
       for (let i = 0; i < 10; i++) {
         const qBox = qBoxes[i];
         // Quét đáp án
         const selectedOption = testContainer.querySelector(`input[name="task_q${i}"]:checked`) || testContainer.querySelector(`input[name="q${i}"]:checked`);
         if (qBox) qBox.classList.remove('error');
-        
+
         if (!selectedOption) {
           if (qBox) { 
             qBox.classList.add('error'); 
@@ -1852,22 +1836,22 @@
           results.push(`Q${i+1}:${selectedOption.value}`);
         }
       }
-      
+
       if (firstMissingQ) {
         firstMissingQ.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
-      
+
       const resultString = results.join(', ');
       setLoading(true, "送信中...", "テスト結果を判定しています");
-      
+
       google.script.run.withSuccessHandler(res => {
         setLoading(false);
         if (res.success) {
             currentUser.statusEdu = res.newVal;
             if (res.user) currentUser = res.user;
             else if (res.progress) currentUser.progress = res.progress;
-            
+
             // 👉 THÊM ĐÚNG ĐOẠN NÀY VÀO ĐÂY:
             // Nhận tín hiệu từ Backend -> Bắn lệnh đẻ PDF chạy ngầm trên mây!
             if (res.shouldTriggerPdf) {
@@ -2056,8 +2040,6 @@
       return "";
     }
     document.addEventListener('DOMContentLoaded', () => {
-      
-      // 1. FORMAT Ô SỐ ĐIỆN THOẠI (Chỉ nhập số, tối đa 11 ký tự)
       const phoneInputs = ['authPhone', 'kariPhone', 'kariLandline'];
       phoneInputs.forEach(id => {
         const input = document.getElementById(id);
@@ -2068,8 +2050,6 @@
           });
         }
       });
-    
-      // 2. FORMAT Ô MÃ BƯU ĐIỆN (Zipcode) (Tự chèn dấu gạch ngang)
       const zipInputs = ['kariZip'];
       zipInputs.forEach(id => {
         const input = document.getElementById(id);
@@ -2084,8 +2064,6 @@
           });
         }
       });
-    
-      // 3. TỰ ĐỘNG ĐĂNG NHẬP BẰNG DATA LƯU SẴN (Smart Login)
       const savedPhone = localStorage.getItem('alescoPhone');
       const savedDob = localStorage.getItem('alescoDob');
       const savedUserObj = localStorage.getItem('alescoUserObj');
@@ -2125,16 +2103,11 @@
               localStorage.clear();
           }
       }
-    
-      // 4. KÍCH HOẠT DROPDOWN CHỌN NGÔN NGỮ (Tự nguyện)
-      if (typeof initTagInput === 'function') {
-          initTagInput();
-      }
-    
-      // 5. PHỤC HỒI DỮ LIỆU ĐANG GÕ DỞ (Draft)
+
+      // 1. Phục hồi dữ liệu nếu có nháp
       loadKariDraft();
-    
-      // 6. GẮN MÁY NGHE LÉN (Tự lưu nháp khi gõ)
+
+      // 2. Cứ mỗi lần gõ phím vào form Kari là tự động lưu nháp
       const kariInputs = ['kariLastName', 'kariFirstName', 'kariLastKana', 'kariFirstKana', 'kariDob', 'kariPhone', 'kariEmail', 'kariZip', 'kariAddr1', 'kariAddr2'];
       kariInputs.forEach(id => {
           const el = document.getElementById(id);
@@ -2142,7 +2115,7 @@
               el.addEventListener('input', saveKariDraft);
           }
       });
-    
+
     });
 
     window.nextKariStep = function(step) {
@@ -2298,13 +2271,13 @@
           if (!el.addr1.value.trim()) { el.addr1.classList.add('input-error'); err.addr1.style.display = 'inline'; hasErr = true; }
           if (!el.addr2.value.trim()) { el.addr2.classList.add('input-error'); err.addr2.style.display = 'inline'; hasErr = true; }
           if (hasErr) return;
-          
+
           const phoneToCheck = phoneVal ? phoneVal : landlineVal;
           const nextBtn = document.querySelector('#kariStep3 .btn-primary');
           const originalBtnText = nextBtn.innerText;
           nextBtn.disabled = true;
           nextBtn.innerText = "確認中..."; 
-          
+
           google.script.run.withSuccessHandler(function(isExist) {
             nextBtn.disabled = false;
             nextBtn.innerText = originalBtnText;
@@ -2326,7 +2299,7 @@
               nextBtn.innerText = originalBtnText;
               showCustomAlert("通信エラーが発生しました。", true);
           }).checkPhoneExists(phoneToCheck);
-          
+
           return; 
         }
         if (step === 5) {
@@ -2400,7 +2373,7 @@
       const container = document.getElementById(`${prefix}-c`);
       const imgEl = document.getElementById(`${prefix}-img`);
       const pdfEl = document.getElementById(`${prefix}-pdf`);
-      
+
       container.style.display = 'block';
       if (f.type.startsWith('image/')) {
         const r = new FileReader();
@@ -2466,7 +2439,7 @@
           </div>
         `;
         document.getElementById('kariConfirmDataBox').innerHTML = confirmHtml;
-        
+
         for(let i=1; i<=5; i++) {
           const el = document.getElementById('kariStep' + i);
           if(el) el.style.display = (i === 5) ? 'block' : 'none';
@@ -2506,8 +2479,7 @@
           zipcode: document.getElementById('kariZip').value,
           address1: document.getElementById('kariAddr1').value,
           address2: document.getElementById('kariAddr2').value,
-          address3: document.getElementById('kariAddr3').value,
-          languages: document.getElementById('kariLanguages').value 
+          address3: document.getElementById('kariAddr3').value
         };
 
         setLoading(true, "データを送信中...", "少々お待ちください");
@@ -2517,7 +2489,7 @@
             // 1. Thu thập file CV
             let resumeFiles = [];
             document.querySelectorAll('#kariUploadZoneResume input[type="file"]').forEach(i => { if (i.files[0]) resumeFiles.push(i.files[0]); });
-            
+
             // 2. Thu thập file Bằng cấp
             let certFiles = [];
             document.querySelectorAll('#kariUploadZoneCert input[type="file"]').forEach(i => { if (i.files[0]) certFiles.push(i.files[0]); });
@@ -2550,7 +2522,7 @@
             }
 
             setLoading(true, "最終処理を行っています...", "まもなく完了します");
-            
+
             // 👉 BÁO CÁO CHO BACKEND BIẾT CÓ NỘP CV HAY KHÔNG
             google.script.run.withSuccessHandler((result) => {
               setLoading(false);
@@ -3100,7 +3072,7 @@
         let html = '';
         let totalMinutes = 0;
         let totalFee = 0;
-        
+
         // 1. BIẾN THEO DÕI SỐ LƯỢNG CA CHƯA DUYỆT (Theo từng cửa hàng)
         let unapprovedCounts = {};
 
@@ -3112,28 +3084,28 @@
             const statusBadge = item.isApproved 
               ? `<span style="background:var(--md-surface-variant); color:var(--md-on-surface-variant); padding:4px 10px; border-radius:6px; font-size:13px; font-weight:bold;">承認済</span>`
               : `<span style="background:var(--md-error-container); color:var(--md-error); padding:4px 10px; border-radius:6px; font-size:13px; font-weight:bold;">未承認</span>`;
-            
+
             // 👉 ĐỔI FORMAT TỔNG GIỜ LÀM (Từ số thập phân sang Giờ:Phút)
             let hoursStr = "00:00";
             if (item.totalDuration && Number(item.totalDuration) > 0) {
                 let h = Math.floor(Number(item.totalDuration));
                 let m = Math.round((Number(item.totalDuration) - h) * 60);
                 hoursStr = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
-                
+
                 // Cộng dồn vào Total chung của cả tháng
                 totalMinutes += (h * 60) + m;
             }
 
             totalFee += Number(item.fee) || 0;
-            
+
             // Giao diện hiển thị Giờ Nghỉ (Text thường, mượt mà)
             let breakHtml = item.breakMins > 0 
                 ? `<span style="margin-left:8px;"> (休: ${item.breakMins}分)</span>` 
                 : '';
-            
+
             const editBtn = item.isApproved ? '' : `<button style="background:none; border:2px solid var(--md-primary); color:var(--md-primary); border-radius:8px; padding:8px 24px; font-size:14px; font-weight:bold; cursor:pointer;" onclick="openManualModal('${item.dateFull}', '${item.location}', '${item.checkIn}', '${item.checkOut}', '${item.breakMins}', '${item.fee}', '${item.rowIndex}')">修正</button>`;
             const shoninBtn = item.isApproved ? '' : `<button style="background:var(--md-secondary); border:none; color:#fff; border-radius:8px; padding:8px 24px; font-size:14px; font-weight:bold; cursor:pointer;" onclick="openShoninModal('single', '${item.dateFull}', '${item.location}')">承認する</button>`;
-            
+
             html += `
               <div class="task-card" style="flex-direction:column; align-items:stretch; gap:12px; padding:20px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--md-outline-variant); padding-bottom:12px;">
@@ -3158,7 +3130,7 @@
                 </div>
               </div>
             `;
-            
+
             // 2. GOM ĐẾM NHỮNG CA CHƯA DUYỆT CÓ ĐỦ GIỜ IN/OUT
             if (!item.isApproved && item.checkIn !== "---" && item.checkOut !== "---" && item.location) {
               if (!unapprovedCounts[item.location]) unapprovedCounts[item.location] = 0;
@@ -3169,7 +3141,7 @@
           document.getElementById('summaryTotalTime').innerText = Math.floor(totalMinutes/60) + ":" + String(totalMinutes%60).padStart(2, '0');
           document.getElementById('summaryTotalFee').innerText = totalFee.toLocaleString() + '円';
           document.getElementById('historySummary').style.display = 'flex';
-          
+
         } else {
           html = '<p style="text-align:center;">データがありません。</p>';
           document.getElementById('historySummary').style.display = 'none';
@@ -3189,10 +3161,10 @@
 
         // Ghép nút Duyệt hàng loạt lên đầu danh sách, sau đó mới đến các ca làm việc
         container.innerHTML = bulkHtml + html;
-        
+
       }).getEmployeeAttendanceHistory(currentUser.id, parseInt(year, 10), parseInt(month, 10));
     }
-    
+
     function openManualModal(date='', loc='', inTime='', outTime='', breakMins='', fee='', rowIndex='') {
       document.getElementById('manualModalTitle').innerText = date ? "勤務記録の修正" : "勤務記録の追加";
       document.getElementById('manualDate').value = date;
@@ -3206,7 +3178,7 @@
       document.getElementById('manualModal').style.display = 'flex';
       google.script.run.withSuccessHandler(locations => {
         let options = '<option value="" disabled selected>選択してください</option>';
-        
+
         // --- THÊM ĐOẠN NÀY VÀO ---
         let isLocInList = false;
         if (locations && locations.length > 0) {
@@ -3263,11 +3235,11 @@
       document.getElementById('shoninTargetLoc').value = locName; // Lấy Tên cửa hàng
       document.getElementById('shoninApproverName').value = '';
       document.getElementById('shoninPassword').value = '';
-      
+
       const desc = (mode === 'bulk') 
             ? `【一括承認】<br>拠点: <b>${locName}</b><br>対象月: ${document.getElementById('historyMonthFilter').value}` 
             : `【個別承認】<br>日付: ${dateStr}<br>拠点: <b>${locName}</b>`;
-            
+
       document.getElementById('shoninModalDesc').innerHTML = desc;
       document.getElementById('shoninModal').style.display = 'flex';
     }
@@ -3435,10 +3407,10 @@
             else if (stagedAdditions.has(key)) cls = 'staging';
             else if (stagedDeletions.has(key)) cls = 'available';
             else if (isKibo) cls = 'requested';
-            
+
             // 👉 THÊM DÒNG NÀY ĐỂ TẠO CHỮ GIỜ NGHỈ NẾU CÓ
             let breakText = t.breakMins > 0 ? `<br><span style="font-size:10px; font-weight:normal; opacity:0.9;">(休: ${t.breakMins}分)</span>` : '';
-            
+
             // Ép chữ vào trong nút
             return `<div class="shift-slot ${cls}" onclick="handleShiftClick(this, '${key}', '${isKibo}', '${isKakutei}')">
                 ${t.name} ${breakText}
@@ -3496,30 +3468,30 @@
       const finalKeys = new Set(shiftData.kibo);
       stagedDeletions.forEach(k => finalKeys.delete(k));
       stagedAdditions.forEach(k => finalKeys.add(k));
-      
+
       const tMap = shiftData.templates.reduce((m, t) => { m[`${t.locationId}|${t.id}`] = t; return m; }, {});
       const shiftsToDisplay = Array.from(finalKeys).map(k => {
         const [lId, d, tId] = k.split('|');
         const t = tMap[`${lId}|${tId}`];
         return t ? { ...t, date: d, status: 'staging' } : null;
       }).filter(Boolean);
-      
+
       const byDate = shiftsToDisplay.reduce((acc, s) => { (acc[s.date] = acc[s.date] || []).push(s); return acc; }, {});
       const fDay = new Date(shiftYear, shiftMonth - 1, 1).getDay();
       const mDays = new Date(shiftYear, shiftMonth, 0).getDate();
-      
+
       let html = `<div class="calendar-header">${['日','月','火','水','木','金','土'].map(d=>`<div>${d}</div>`).join('')}</div><div class="calendar-grid">`;
       html += '<div class="calendar-day"></div>'.repeat(fDay);
-      
+
       for (let i = 1; i <= mDays; i++) {
         const dStr = `${shiftYear}-${String(shiftMonth).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-        
+
         // 👉 ĐÃ SỬA: Thêm Giờ nghỉ vào Calendar Review
         const sHtml = (byDate[dStr] || []).map(s => {
           let bText = (s.breakMins && s.breakMins > 0) ? ` (休: ${s.breakMins}分)` : '';
           return `<div class="shift-entry">${s.startTime}<br>${s.locationName}${bText}</div>`;
         }).join('');
-        
+
         html += `<div class="calendar-day"><div class="day-number">${i}</div>${sHtml}</div>`;
       }
       html += '</div>';
@@ -3598,7 +3570,7 @@
       const container = document.getElementById('kakuteiListContainer');
       container.innerHTML = '<p style="text-align:center;">読み込み中...</p>';
       setLoading(true, "取得中...");
-      
+
       fetch(GAS_WEB_APP_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -3609,10 +3581,10 @@
       .then(res => {
         setLoading(false);
         if (!res.result || !res.result.success) return container.innerHTML = `<p style="text-align:center; color:red;">${res.result?.message || 'エラー'}</p>`;
-        
+
         const tMap = res.result.templates.reduce((m, t) => { m[`${t.locationId}|${t.id}`] = t; return m; }, {});
         const byDate = {};
-        
+
         res.result.kakutei.forEach(k => {
           const p = k.split('|'); 
           const lId = p[0]; 
@@ -3625,15 +3597,15 @@
              byDate[dDate].push({ ...t, remarks: rm });
           }
         });
-        
+
         const sortedDays = Object.keys(byDate).sort();
         if (sortedDays.length === 0) return container.innerHTML = '<p style="text-align:center;">確定シフトはありません。</p>';
         const days = ['日', '月', '火', '水', '木', '金', '土'];
-        
+
         let html = sortedDays.map(dStr => {
           const dObj = new Date(dStr);
           const byLoc = byDate[dStr].reduce((acc, s) => { (acc[s.locationName] = acc[s.locationName] || []).push(s); return acc; }, {});
-          
+
           // 👉 ĐÃ SỬA: Thêm Giờ nghỉ vào Danh sách Ca Đã Chốt
           const locHtml = Object.entries(byLoc).map(([lName, shifts]) => {
             const sHtml = shifts.map(s => {
@@ -3646,7 +3618,7 @@
             }).join('');
             return `<div style="margin-bottom:8px;"><div class="location-header">${lName}</div>${sHtml}</div>`;
           }).join('');
-          
+
           return `<div class="shift-list-day"><div class="day-header">${shiftMonth}/${dObj.getDate()} (${days[dObj.getDay()]})</div>${locHtml}</div>`;
         }).join('');
         container.innerHTML = html;
@@ -3660,14 +3632,14 @@
     // =========================================================
     // LOGIC DÀNH RIÊNG CHO MỤC "CÁC LOẠI GIẤY TỜ KHÁC" (MISC_DOCS)
     // =========================================================
-    
+
     // 👇 THAY THẾ BẰNG ĐOẠN NÀY 👇
     const originalOpenTask = window.openTask;
     window.openTask = function(id, autoFillName = null) {
         if (id === 'misc') {
             resetMiscUploadForm();
             showView('viewMiscUpload');
-            
+
             // Nếu có truyền tên (từ Banner), tự động điền vào ô Input số 1
             if (autoFillName) {
                 setTimeout(() => {
@@ -3742,7 +3714,7 @@
     }
 
     function removeMiscBox(id) { document.getElementById(`miscBox_${id}`).remove(); }
-    
+
     function clearMiscImg(id) {
       document.getElementById(`miscFile_${id}`).value = '';
       document.getElementById(`miscPreviewContainer_${id}`).style.display = 'none';
@@ -3791,12 +3763,12 @@
             const idMatch = box.id.match(/\d+/);
             if (!idMatch) return;
             const id = idMatch[0];
-            
+
             const nameInput = document.getElementById(`miscName_${id}`);
             const nameError = document.getElementById(`miscNameError_${id}`);
             const fileInput = document.getElementById(`miscFile_${id}`);
             const fileError = document.getElementById(`miscFileError_${id}`);
-            
+
             nameInput.classList.remove('input-error'); nameError.style.display = 'none';
             box.classList.remove('input-error'); fileError.style.display = 'none';
 
@@ -3827,7 +3799,7 @@
         }
 
         setLoading(true, "送信中...", "ファイルを処理しています");
-        
+
         try {
             // Nén ảnh / Đọc Base64 cho tất cả file
             let finalDataArray = [];
@@ -3932,7 +3904,7 @@
             const id = idMatch[0];
             const fileInput = document.getElementById(`cvFile_${id}`);
             const fileError = document.getElementById(`cvFileError_${id}`);
-            
+
             box.classList.remove('input-error'); fileError.style.display = 'none';
 
             if (!fileInput.files || fileInput.files.length === 0) {
@@ -3942,7 +3914,7 @@
                 }
                 return; 
             }
-            
+
             // Ép tên thành f1, f2, f3... để Backend Google hiểu
             filesPayload[`f${fileIndex}`] = {
                 file: fileInput.files[0],
@@ -3952,7 +3924,7 @@
         });
 
         if (hasError) return;
-        
+
         // Nếu không có file nào (Object rỗng)
         if (Object.keys(filesPayload).length === 0) {
             showCustomAlert("⚠️ 提出するファイルがありません。", true);
@@ -3961,7 +3933,7 @@
 
         setLoading(true, "アップロード中...", "画像を圧縮・送信しています");
         const oldProgress = currentUser.progress || ""; 
-        
+
         try {
             // Nén ảnh / Đọc Base64 cho tất cả file
             let finalFiles = {};
@@ -3988,7 +3960,7 @@
                     currentUser.statusResume = res.newVal;
                     if (res.user) currentUser = res.user; 
                     else if (res.progress) currentUser.progress = res.progress;
-                    
+
                     const isNewlyCompleted = !oldProgress.includes("完了") && currentUser.progress.includes("完了");
                     if (isNewlyCompleted) {
                         document.getElementById('finalSuccessPopup').style.display = 'flex'; 
@@ -4009,7 +3981,7 @@
             showCustomAlert("ファイル処理エラー: " + e.message, true);
         }
     }
-    
+
     // ==========================================
     // AUTO-SAVE DRAFT LOGIC (KARI FORM)
     // ==========================================
@@ -4022,8 +3994,7 @@
             email: document.getElementById('kariEmail').value,
             zip: document.getElementById('kariZip').value,
             addr1: document.getElementById('kariAddr1').value,
-            addr2: document.getElementById('kariAddr2').value,
-            languages: document.getElementById('kariLanguages') ? document.getElementById('kariLanguages').value : ""
+            addr2: document.getElementById('kariAddr2').value
         };
         localStorage.setItem('alescoKariDraft', JSON.stringify(draftData));
     }
@@ -4041,146 +4012,19 @@
                 if(draftData.zip) document.getElementById('kariZip').value = draftData.zip;
                 if(draftData.addr1) document.getElementById('kariAddr1').value = draftData.addr1;
                 if(draftData.addr2) document.getElementById('kariAddr2').value = draftData.addr2;
-                // 👇 Phục hồi Ngôn ngữ
-                if(draftData.languages && document.getElementById('kariLanguages')) {
-                    // Cắt chuỗi thành mảng và ném vào selectedLangs
-                    selectedLangs = draftData.languages.split('、').filter(l => l.trim() !== "");
-                    updateTagsUI(); // Vẽ lại các cục Tag màu xanh
-                }
             } catch(e){}
         }
     }
 
-    // 1. Danh sách ngôn ngữ (Copy từ Partner App)
-    const languageList = [
-      "アイスランド語", "アイマラ語", "アイルランド語", "アヴァル語", "アゼルバイジャン語", "アチェ語", "アチョリ語", "アッサム語", "アファール語", "アブハズ語", 
-      "アフリカーンス語", "アムハラ語", "アラビア語", "アルール語", "アルバニア語", "アルメニア語", "アワディー語", "イタリア語", "イディッシュ語", "イヌクトゥット語（ラテン文字）", 
-      "イヌクトゥット語（音節文字）", "イバン語", "イボ語", "イロカノ語", "インドネシア語", "ウイグル語", "ウェールズ語", "ヴェネト語", "ヴェンダ語", "ウォロフ語", 
-      "ウクライナ語", "ウズベク語", "ウドムルト語", "ウルドゥ語", "エウェ語", "エストニア語", "エスペラント語", "オセット語", "オック語", "オディア語（オリヤ語）", 
-      "オランダ語", "オロモ語", "カーシ語", "ガー語", "カザフ語", "カタルーニャ語", "カヌリ語", "カラーリット語", "ガリシア語", "カンナダ語", "キガ語", "キコンゴ語", 
-      "キトゥバ語", "キニヤルワンダ語", "ギリシャ語", "キルギス語", "グアラニ語", "グジャラート語", "クメール語", "クリオ語", "クリミア タタール語（キリル文字）", 
-      "クリミア タタール語（ラテン文字）", "クルド語（クルマンジー）", "クルド語（ソラニー）", "クレオール語（セーシェル）", "クレオール語（モーリシャス）", "クロアチア語", 
-      "ケクチ語", "ケチュア語", "コーサ語", "コクバラ語", "コミ語", "コルシカ語", "コンカニ語", "サーミ語（北部）", "サポテク語", "サモア語", "サンゴ語", "サンスクリット語", 
-      "サンタル語（オルチキ文字）", "サンタル語（ラテン文字）", "シチリア語", "ジャマイカ クレオール語", "ジャワ語", "シャン語", "ジュラ語", "ジョージア語（グルジア語）", 
-      "ショナ語", "シロンスク語", "シンド語", "シンハラ語", "ジンポー語", "スウェーデン語", "ズールー語", "スコットランド ゲール語", "スス語", "スペイン語", "スロバキア語", 
-      "スロベニア語", "スワート語", "スワヒリ語", "スンダ語", "セブアノ語", "セペディ語", "セルビア語", "ソト語", "ソマリ語", "ゾンカ語", "タイ語", "タガログ語", "タジク語", 
-      "タタール語", "タヒチ語", "タマージク語", "タマージク語（ティフィナグ）", "タミル語", "ダリー語", "チェコ語", "チェチェン語", "チェワ語", "チベット語", "チャモロ語", 
-      "チュヴァシ語", "チューク語", "ツォンガ語", "ツワナ語", "ティグリニャ語", "ティブ語", "ディベヒ語", "ディンカ語", "テトゥン語", "テルグ語", "デンマーク語", "ドイツ語", 
-      "トゥイ語", "トゥバ語", "トゥル語", "トゥンブカ語", "トクピシン語", "ドグリ語", "トルクメン語", "トルコ語", "トンガ語", "ドンベ語", "ナワトル語（東部ウアステカ）", 
-      "ヌエル語", "ネパールバサ語（ネワール語）", "ネパール語", "ノルウェー語", "ハイチ語", "ハウサ語", "バウレ語", "ハカ チン語", "バシキール語", "パシュト語", "バスク語", 
-      "バタク カロ語", "バタク シマルングン語", "バタクトバ語", "パピアメント語", "バリ語", "バルーチー語", "ハワイ語", "パンガシナン語", "ハンガリー語", "パンジャブ語（グルムキー）", 
-      "パンジャブ語（シャームキー）", "バンバラ語", "パンパンガ語", "ビコール語", "ヒリガイノン語", "ヒンディー語", "フィジー語", "フィンランド語", "フェロー語", "フォン語", 
-      "フラニ語", "フランス語", "フランス語（カナダ）", "フリウリ語", "フリジア語", "ブリヤート語", "ブルガリア語", "ブルトン語", "フンスリュック語", "ベタウィ語", "ベトナム語", 
-      "ヘブライ語", "ベラルーシ語", "ペルシャ語", "ベンガル語", "ベンバ語", "ボージュプリー語", "ポーランド語", "ボスニア語", "ポルトガル語（ブラジル）", "ポルトガル語（ポルトガル）", 
-      "マーシャル語", "マイティリー語", "マオリ語", "マカッサル語", "マケドニア語", "マドゥラ語", "マム語", "マラーティー語", "マラガシ語", "マラヤーラム語", "マルタ語", 
-      "マルワディー語", "マレー語", "マレー語（ジャウィ）", "マン島語", "ミゾ語", "ミナン語", "ミャンマー語（ビルマ語）", "メイテイ語（マニプリ語）", "モンゴル語", "モン語", 
-      "ヤクート語", "ユカテコマヤ語", "ヨルバ語", "ラオ語", "ラテン語", "ラトガリア語", "ラトビア語", "リグリア語", "リトアニア語", "リンガラ語", "リンブルフ語", "ルーマニア語", 
-      "ルオ語", "ルガンダ語", "ルクセンブルク語", "ルバ語", "ルンディ語", "ロシア語", "ロマーニー語", "ロンバルド語", "ワライ語", "ンコ語", "ンダウ語", "ンデベレ語（南部）", 
-      "英語", "韓国語", "広東語", "中国語（簡体）", "中国語（繁体）", "牧地マリ語"
-    ];
-
-    // 2. Logic xử lý Tag Input
-    let selectedLangs = [];
-    
-    // ==========================================
-    // LOGIC XỬ LÝ DROPDOWN NGÔN NGỮ (BỌC THÉP)
-    // ==========================================
-    // Khởi tạo mảng trống nếu chưa có
-    if (typeof selectedLangs === 'undefined') {
-        var selectedLangs = [];
-    }
-
-    function initTagInput() {
-      const searchInput = document.getElementById('langSearch');
-      const dropdown = document.getElementById('langDropdown');
-      const box = document.getElementById('tagInputBox');
-
-      if(!searchInput || !dropdown || !box) return; // Nếu k thấy HTML thì bỏ qua
-
-      searchInput.addEventListener('focus', () => { 
-          box.classList.add('focused'); 
-          renderTagDropdown(''); 
-      });
-      
-      searchInput.addEventListener('blur', () => { 
-          box.classList.remove('focused'); 
-          setTimeout(() => dropdown.classList.remove('show'), 200); 
-      });
-      
-      searchInput.addEventListener('input', (e) => { 
-          renderTagDropdown(e.target.value); 
-      });
-    }
-
-    function renderTagDropdown(query) {
-      const dropdown = document.getElementById('langDropdown');
-      if (!dropdown) return;
-      
-      dropdown.innerHTML = '';
-      const filtered = languageList.filter(lang => !selectedLangs.includes(lang) && lang.toLowerCase().includes(query.toLowerCase()));
-      
-      if (filtered.length === 0) {
-        dropdown.innerHTML = '<div class="dropdown-item" style="color:#999; pointer-events:none;">見つかりません</div>';
-      } else {
-        filtered.forEach(lang => {
-          const div = document.createElement('div');
-          div.className = 'dropdown-item';
-          div.innerText = lang;
-          div.onmousedown = (e) => { 
-              e.preventDefault(); // Chống mất focus
-              addTag(lang); 
-          };
-          dropdown.appendChild(div);
+    // Gắn "máy nghe lén" vào các ô nhập. Cứ gõ phím là tự lưu.
+    document.addEventListener('DOMContentLoaded', () => {
+        const kariInputs = ['kariLastName', 'kariFirstName', 'kariLastKana', 'kariFirstKana', 'kariEmail', 'kariZip', 'kariAddr1', 'kariAddr2'];
+        kariInputs.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', saveKariDraft);
         });
-      }
-      dropdown.classList.add('show');
-    }
-
-    function addTag(lang) {
-      if (!selectedLangs.includes(lang)) {
-          selectedLangs.push(lang);
-      }
-      document.getElementById('langSearch').value = '';
-      updateTagsUI();
-      saveKariDraft(); // Gọi lưu nháp ngay lập tức
-    }
-
-    function removeTag(lang) {
-      selectedLangs = selectedLangs.filter(l => l !== lang);
-      updateTagsUI();
-      saveKariDraft(); // Gọi lưu nháp ngay lập tức
-    }
-
-    function updateTagsUI() {
-      const box = document.getElementById('tagInputBox');
-      const searchInput = document.getElementById('langSearch');
-      const hiddenInput = document.getElementById('kariLanguages');
-      if (!box || !searchInput || !hiddenInput) return;
-      
-      // Xóa hết tag cũ trên màn hình
-      document.querySelectorAll('#tagInputBox .tag').forEach(t => t.remove());
-
-      // Vẽ lại tag mới
-      selectedLangs.forEach(lang => {
-        const tag = document.createElement('div');
-        tag.className = 'tag';
-        tag.innerHTML = `${lang} <span class="tag-close" onmousedown="event.preventDefault(); removeTag('${lang}')">×</span>`;
-        box.insertBefore(tag, searchInput);
-      });
-
-      hiddenInput.value = selectedLangs.join('、');
-      
-      renderTagDropdown(''); // Cập nhật lại list sau khi thêm
-      searchInput.focus();
-    }
-
-    // 👉 ÉP KÍCH HOẠT HÀM KHI LOAD XONG TRANG
-    document.addEventListener("DOMContentLoaded", () => {
-        setTimeout(() => {
-            initTagInput();
-        }, 500); // Đợi 0.5s cho chắc cốp HTML đã render xong
     });
-              
+
   </script>
 </body>
 </html>
