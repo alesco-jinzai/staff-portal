@@ -387,6 +387,27 @@
       line-height: 1.2;
       text-align: center;
     }
+    /* CSS CHO TAG NGÔN NGỮ */
+    .lang-tag {
+      display: inline-flex; align-items: center; background: #e8f0fe; color: var(--md-primary);
+      padding: 6px 12px; border-radius: 16px; font-size: 13px; font-weight: bold; border: 1px solid #d2e3fc; margin-bottom: 5px;
+    }
+    .lang-tag span { cursor: pointer; margin-left: 8px; font-size: 16px; line-height: 1; transition: 0.2s;}
+    .lang-tag span:hover { color: var(--md-error); transform: scale(1.2);}
+    .dropdown-container { position: relative; width: 100%; }
+    .dropdown-list {
+      display: none; position: absolute; top: 100%; left: 0; width: 100%;
+      max-height: 250px; overflow-y: auto; background: #fff;
+      border: 1px solid var(--md-outline); border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1001; margin-top: 4px;
+    }
+    .dropdown-list.show { display: block; }
+    .dropdown-item {
+      padding: 12px 15px; font-size: 14px; color: var(--md-on-surface);
+      cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background 0.2s;
+    }
+    .dropdown-item:last-child { border-bottom: none; }
+    .dropdown-item:hover { background: #e8f0fe; color: var(--md-primary); font-weight: bold; }
   </style>
 </head>
 <body>
@@ -548,7 +569,22 @@
             書類がある場合は、画像またはPDFファイルを添付してください。<br>
             <span style="color:var(--md-primary); font-weight:bold; font-size: 11px;">※ 書類の提出は任意です。お手元にない場合はそのまま次へお進みください。</span>
           </p>
-
+          <!-- 👇 KHỐI KHAI BÁO NGÔN NGỮ 👇 -->
+          <div style="background:var(--md-surface-container); border:1px solid var(--md-outline-variant); border-radius:12px; padding:15px; margin-bottom:20px;">
+            <strong style="color:var(--md-primary); font-size:14px; display:block; margin-bottom:5px;">🌐 対応言語 (任意)</strong>
+            <p style="font-size:12px; color:#5f6368; margin-top:0; margin-bottom: 12px;">話せる言語を入力または選択してください（複数可）</p>
+            
+            <!-- Vùng chứa các Tag đã chọn -->
+            <div id="langTagsContainer" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;"></div>
+            
+            <!-- Ô gõ chữ và Dropdown -->
+            <div class="dropdown-container" style="width:100%; position: relative;">
+              <input type="text" id="kariLangInput" placeholder="例: 英語、ベトナム語..." autocomplete="off">
+              
+              <div id="kariLangList" class="dropdown-list" style="position: absolute; top: 100%; left: 0; width: 100%; max-height: 250px; overflow-y: auto; background: #fff; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; z-index: 1000;"></div>
+            </div>
+          </div>
+          <!-- 👆 KẾT THÚC KHỐI NGÔN NGỮ 👆 -->
           <!-- 👉 KHUNG 1: 履歴書・職務経歴書 (TỰ NGUYỆN) -->
           <div style="background:var(--md-surface-container); border:1px solid var(--md-outline-variant); border-radius:12px; padding:15px; margin-bottom:20px;">
             <strong style="color:var(--md-primary); font-size:14px; display:block; margin-bottom:10px;">📄 履歴書・職務経歴書 (任意)</strong>
@@ -1068,6 +1104,133 @@
         header.style.display = (id === 'viewAuth') ? 'none' : 'block';
       }
     };
+
+    // =====================================
+    // LOGIC AUTO-COMPLETE NGÔN NGỮ (BẢN FIX TRIỆT ĐỂ CHO MOBILE)
+    // =====================================
+    const languageList = [
+      "アイスランド語", "アイマラ語", "アイルランド語", "アヴァル語", "アゼルバイジャン語", "アチェ語", "アチョリ語", "アッサム語", "アファール語", "アブハズ語", 
+      "アフリカーンス語", "アムハラ語", "アラビア語", "アルール語", "アルバニア語", "アルメニア語", "アワディー語", "イタリア語", "イディッシュ語", "イヌクトゥット語（ラテン文字）", 
+      "イヌクトゥット語（音節文字）", "イバン語", "イボ語", "イロカノ語", "インドネシア語", "ウイグル語", "ウェールズ語", "ヴェネト語", "ヴェンダ語", "ウォロフ語", 
+      "ウクライナ語", "ウズベク語", "ウドムルト語", "ウルドゥ語", "エウェ語", "エストニア語", "エスペラント語", "オセット語", "オック語", "オディア語（オリヤ語）", 
+      "オランダ語", "オロモ語", "カーシ語", "ガー語", "カザフ語", "カタルーニャ語", "カヌリ語", "カラーリット語", "ガリシア語", "カンナダ語", "キガ語", "キコンゴ語", 
+      "キトゥバ語", "キニヤルワンダ語", "ギリシャ語", "キルギス語", "グアラニ語", "グジャラート語", "クメール語", "クリオ語", "クリミア タタール語（キリル文字）", 
+      "クリミア タタール語（ラテン文字）", "クルド語（クルマンジー）", "クルド語（ソラニー）", "クレオール語（セーシェル）", "クレオール語（モーリシャス）", "クロアチア語", 
+      "ケクチ語", "ケチュア語", "コーサ語", "コクバラ語", "コミ語", "コルシカ語", "コンカニ語", "サーミ語（北部）", "サポテク語", "サモア語", "サンゴ語", "サンスクリット語", 
+      "サンタル語（オルチキ文字）", "サンタル語（ラテン文字）", "シチリア語", "ジャマイカ クレオール語", "ジャワ語", "シャン語", "ジュラ語", "ジョージア語（グルジア語）", 
+      "ショナ語", "シロンスク語", "シンド語", "シンハラ語", "ジンポー語", "スウェーデン語", "ズールー語", "スコットランド ゲール語", "スス語", "スペイン語", "スロバキア語", 
+      "スロベニア語", "スワート語", "スワヒリ語", "スンダ語", "セブアノ語", "セペディ語", "セルビア語", "ソト語", "ソマリ語", "ゾンカ語", "タイ語", "タガログ語", "タジク語", 
+      "タタール語", "タヒチ語", "タマージク語", "タマージク語（ティフィナグ）", "タミル語", "ダリー語", "チェコ語", "チェチェン語", "チェワ語", "チベット語", "チャモロ語", 
+      "チュヴァシ語", "チューク語", "ツォンガ語", "ツワナ語", "ティグリニャ語", "ティブ語", "ディベヒ語", "ディンカ語", "テトゥン語", "テルグ語", "デンマーク語", "ドイツ語", 
+      "トゥイ語", "トゥバ語", "トゥル語", "トゥンブカ語", "トクピシン語", "ドグリ語", "トルクメン語", "トルコ語", "トンガ語", "ドンベ語", "ナワトル語（東部ウアステカ）", 
+      "ヌエル語", "ネパールバサ語（ネワール語）", "ネパール語", "ノルウェー語", "ハイチ語", "ハウサ語", "バウレ語", "ハカ チン語", "バシキール語", "パシュト語", "バスク語", 
+      "バタク カロ語", "バタク シマルングン語", "バタクトバ語", "パピアメント語", "バリ語", "バルーチー語", "ハワイ語", "パンガシナン語", "ハンガリー語", "パンジャブ語（グルムキー）", 
+      "パンジャブ語（シャームキー）", "バンバラ語", "パンパンガ語", "ビコール語", "ヒリガイノン語", "ヒンディー語", "フィジー語", "フィンランド語", "フェロー語", "フォン語", 
+      "フラニ語", "フランス語", "フランス語（カナダ）", "フリウリ語", "フリジア語", "ブリヤート語", "ブルガリア語", "ブルトン語", "フンスリュック語", "ベタウィ語", "ベトナム語", 
+      "ヘブライ語", "ベラルーシ語", "ペルシャ語", "ベンガル語", "ベンバ語", "ボージュプリー語", "ポーランド語", "ボスニア語", "ポルトガル語（ブラジル）", "ポルトガル語（ポルトガル）", 
+      "マーシャル語", "マイティリー語", "マオリ語", "マカッサル語", "マケドニア語", "マドゥラ語", "マム語", "マラーティー語", "マラガシ語", "マラヤーラム語", "マルタ語", 
+      "マルワディー語", "マレー語", "マレー語（ジャウィ）", "マン島語", "ミゾ語", "ミナン語", "ミャンマー語（ビルマ語）", "メイテイ語（マニプリ語）", "モンゴル語", "モン語", 
+      "ヤクート語", "ユカテコマヤ語", "ヨルバ語", "ラオ語", "ラテン語", "ラトガリア語", "ラトビア語", "リグリア語", "リトアニア語", "リンガラ語", "リンブルフ語", "ルーマニア語", 
+      "ルオ語", "ルガンダ語", "ルクセンブルク語", "ルバ語", "ルンディ語", "ロシア語", "ロマーニー語", "ロンバルド語", "ワライ語", "ンコ語", "ンダウ語", "ンデベレ語（南部）", 
+      "英語", "韓国語", "広東語", "中国語", "牧地マリ語"
+    ];
+
+    let selectedLanguages = [];
+    let isLangListHovered = false; // Biến cờ (Flag) cứu tinh
+
+    // Vẽ Tag
+    function renderLangTags() {
+      const container = document.getElementById('langTagsContainer');
+      if(!container) return;
+      container.innerHTML = '';
+      selectedLanguages.forEach(lang => {
+        container.innerHTML += `<div class="lang-tag">${lang} <span onclick="removeLang('${lang}')">×</span></div>`;
+      });
+    }
+
+    // Xóa Tag
+    function removeLang(lang) {
+      selectedLanguages = selectedLanguages.filter(l => l !== lang);
+      renderLangTags();
+    }
+
+    // 👉 ĐÃ ĐƯỢC ĐƯA RA NGOÀI ĐỂ HTML NHÌN THẤY
+    window.addLang = function(lang) {
+      const cleanLang = lang.trim();
+      if (cleanLang && !selectedLanguages.includes(cleanLang)) {
+        selectedLanguages.push(cleanLang);
+        renderLangTags();
+      }
+      
+      const input = document.getElementById('kariLangInput');
+      if (input) {
+          input.value = '';
+          input.focus(); // Ép con trỏ quay lại ô nhập liệu
+      }
+      // Sau khi thêm, vẽ lại list full
+      window.renderDropdown();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const langInput = document.getElementById('kariLangInput');
+      const langList = document.getElementById('kariLangList');
+      
+      if (!langInput || !langList) return;
+
+      // Đưa hàm vẽ list ra window để xài chung
+      window.renderDropdown = () => {
+        const val = langInput.value.trim().toLowerCase();
+        let html = '';
+        
+        let listToShow = val ? languageList.filter(l => l.toLowerCase().includes(val)) : languageList;
+        
+        if (listToShow.length === 0 && val) {
+          // 👉 DÙNG ONCLICK CHUẨN ĐỂ NHẬN SỰ KIỆN TRÊN MOBILE
+          html = `<div class="dropdown-item" onclick="addLang('${val}')" style="color:var(--md-primary);">＋「${val}」を追加する</div>`;
+        } else {
+          listToShow.forEach(l => {
+            html += `<div class="dropdown-item" onclick="addLang('${l}')">${l}</div>`;
+          });
+        }
+        
+        langList.innerHTML = html;
+        langList.style.display = 'block';
+      };
+
+      langInput.addEventListener('input', window.renderDropdown);
+      langInput.addEventListener('focus', window.renderDropdown);
+      langInput.addEventListener('click', window.renderDropdown);
+
+      langInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (this.value.trim()) window.addLang(this.value);
+        }
+      });
+
+      // 👉 CÚ LỪA HỆ THỐNG: Quản lý con trỏ chuột
+      // Khi ngón tay/chuột chạm vào khu vực List, giương cờ lên
+      langList.addEventListener('mouseenter', () => isLangListHovered = true);
+      langList.addEventListener('mouseleave', () => isLangListHovered = false);
+      langList.addEventListener('touchstart', () => isLangListHovered = true, {passive: true});
+
+      // Khi ô Input bị mất focus (do bấm đi chỗ khác), CHỈ ĐÓNG LIST KHI cờ đang hạ
+      langInput.addEventListener('blur', () => {
+          setTimeout(() => {
+              if (!isLangListHovered) {
+                  langList.style.display = 'none';
+              }
+          }, 150); // Cho nó nghỉ 150ms để sự kiện Click chạy xong đã
+      });
+
+      // Rút cờ khi chạm ngón tay ra chỗ khác (ngoài cái List)
+      document.addEventListener('touchend', (e) => {
+          if (!langList.contains(e.target) && e.target !== langInput) {
+              isLangListHovered = false;
+              langList.style.display = 'none';
+          }
+      });
+    });
 
     function safeCleanName(nameStr) {
       if (!nameStr) return "---";
@@ -2424,6 +2587,7 @@
 
         let resumeText = resumeCount > 0 ? `${resumeCount} 件 添付済` : '<span style="color:#d32f2f;">未提出 (後から提出可能)</span>';
         let certText = certCount > 0 ? `${certCount} 件 添付済` : 'なし';
+        let langText = selectedLanguages.length > 0 ? selectedLanguages.join('、') : 'なし';
 
         const confirmHtml = `
           <div class="confirm-box">
@@ -2479,7 +2643,8 @@
           zipcode: document.getElementById('kariZip').value,
           address1: document.getElementById('kariAddr1').value,
           address2: document.getElementById('kariAddr2').value,
-          address3: document.getElementById('kariAddr3').value
+          address3: document.getElementById('kariAddr3').value,
+          languages: selectedLanguages.join('、')
         };
 
         setLoading(true, "データを送信中...", "少々お待ちください");
@@ -2717,6 +2882,10 @@
       if(toggleBtn) toggleBtn.style.display = 'block';
       const dynamicBoxes = document.querySelectorAll('.dynamic-upload');
       dynamicBoxes.forEach(box => { if (box.id !== 'kariBox_1') box.remove(); });
+      // 👉 THÊM VÀO ĐÂY: Xóa mảng ngôn ngữ
+      selectedLanguages = [];
+      if(document.getElementById('langTagsContainer')) document.getElementById('langTagsContainer').innerHTML = '';
+      if(document.getElementById('kariLangInput')) document.getElementById('kariLangInput').value = '';
       uploadBoxCount = 1; 
       clearFirstBoxImg();
       const box = document.getElementById('kariBox');
@@ -3746,13 +3915,6 @@
         document.getElementById(`miscList_${id}`).style.display = 'none';
     }
 
-    // Ẩn dropdown khi bấm ra ngoài
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.dynamic-misc-upload')) {
-            document.querySelectorAll('.dropdown-list').forEach(el => el.style.display = 'none');
-        }
-    });
-
     // --- Submit Logic ---
     async function submitMiscDocuments() {
         const boxes = document.querySelectorAll('.dynamic-misc-upload');
@@ -4023,6 +4185,25 @@
             const el = document.getElementById(id);
             if (el) el.addEventListener('input', saveKariDraft);
         });
+    });
+
+    // =====================================
+    // CẢNH SÁT TRƯỞNG: QUẢN LÝ ĐÓNG DROP-DOWN TOÀN TRANG
+    // =====================================
+    document.addEventListener('click', function(e) {
+        // 1. Quản lý List của phần Nộp giấy tờ thêm (Misc Upload)
+        if (!e.target.closest('.dynamic-misc-upload')) {
+            document.querySelectorAll('.dynamic-misc-upload .dropdown-list').forEach(el => {
+                el.style.display = 'none';
+            });
+        }
+        
+        // 2. Quản lý List của phần Khai báo Ngôn ngữ (Kari Step 4)
+        const langContainer = document.getElementById('kariLangInput') ? document.getElementById('kariLangInput').closest('.dropdown-container') : null;
+        if (langContainer && !langContainer.contains(e.target)) {
+            const langList = document.getElementById('kariLangList');
+            if(langList) langList.style.display = 'none';
+        }
     });
 
   </script>
